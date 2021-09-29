@@ -1,0 +1,22 @@
+.sidebar{
+    float: left;
+    width: 25%;
+    background-color: bisque;
+    align-items: center;
+    display: flex;
+    justify-content: center;
+    height: 100%;
+    box-shadow: 5px 0 5px -2px #888;
+}
+
+.list{
+    width: 100%;
+}
+
+li{
+    border-bottom: 1px solid black;
+}
+
+Button{
+    width: 100%;
+}

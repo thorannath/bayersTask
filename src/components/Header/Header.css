@@ -1,0 +1,23 @@
+.navbar{
+    background-color:#D4E6B5;
+    padding: 20px;
+    display: flex;
+    height: 70px;
+    width: 100%;
+    align-items: center;
+}
+
+h1{
+    font-family:'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif
+}
+
+.menu-icons{
+    display: flex;
+    margin-left: auto;
+}
+
+.menu-icons Button{
+    margin-left: 20px;
+}
+
+

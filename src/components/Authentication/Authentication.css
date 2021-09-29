@@ -1,0 +1,33 @@
+.container-fluid{
+    height: 100vh;
+    display: flex;
+}
+
+.column{
+    width: 65%;
+    background-image: url('../Authentication/login.png');
+    background-size: cover;
+}
+
+.card{
+    width: 35%;
+    float: right;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    text-align: center;
+    padding: 20px;
+    box-shadow: 10px 0 5px -2px #888;
+}
+
+.form-group{
+    margin: 20px;
+}
+
+.form-input{
+    width: 100%;
+}
+
+.card Button{
+    width: 50%;
+}
