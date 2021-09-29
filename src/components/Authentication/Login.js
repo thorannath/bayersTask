@@ -1,66 +1,94 @@
 import { Button, TextField } from '@mui/material';
 import './Authentication.css';
 import Form from 'react-bootstrap/Form';
-import { Component } from 'react';
+import { useState, forwardRef } from 'react';
 import axios from 'axios';
-import { Redirect } from "react-router-dom";
+import { useHistory } from "react-router-dom";
+import Snackbar from '@mui/material/Snackbar';
 
-export default class Login extends Component {
+import MuiAlert from '@mui/material/Alert';
 
-    constructor(){
-        super();
-        this.state = {
-            username: '',
-            password:'',
-            redirect:null
+const Alert = forwardRef(function Alert(props, ref) {
+  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+});
+
+
+const Login = () => {
+    const history = useHistory();
+
+    const [username, setUsername] = useState('');
+    const [password, setPassword] = useState('');
+    const [open, setOpen] = useState(false);
+    const [message, setMessage] = useState('');
+    const [severity, setSeverity] = useState('error');
+
+    const handleFormSubmit = () => {
+        if (username && password) {
+            axios.post('http://localhost:3000/login', { username, password })
+                .then((res) => {
+                    if(res){
+                        if (res.data.success) {
+                            setMessage(res.data.message);
+                            setSeverity('success');
+                            history.push("/dashboard");
+                        }
+                        else {
+                            setSeverity('error');
+                            setMessage(res.data.message);
+                        }
+                    }
+                    else{
+                        setMessage("Invalid username or password");
+                    }
+                })
+                .catch(e=>{
+                    setMessage("Invalid username or password");
+                })
+
+                setOpen(true);
         }
     }
 
-    componentDidMount(){
-        this.setState({redirect:null});
-    }
-
-    handleFormSubmit() {
-        if(this.state.username && this.state.password){
-            axios.post('http://localhost:3000/login', this.state)
-            .then((res)=> {
-                console.log(res);
-                if(res.success){
-                    this.setState({redirect:"/dashboard"});
-                }
-                else{
-                    console.log(res.message);
-                }
-            })
+    const handleClose = (event, reason) => {
+        if (reason === 'clickaway') {
+          return;
         }
-    }
+    
+        setOpen(false);
+      };
 
-    render(){
-        // if(this.state.redirect){
-        //     return <Redirect to={this.state.redirect} />
-        // }
 
-        return (
-            <div>
-                <h1> Login </h1>
-                <Form onSubmit={this.handleFormSubmit}>
-                    <Form.Group className="form-group" controlId="username">
-                        <TextField id="outlined-basic" className="form-input" label="Username" variant="outlined" onChange= {(e)=> this.setState({username: e.target.value})} required />
-                    </Form.Group>
-                    <Form.Group className="form-group" controlId="password">
-                        <TextField
-                            id="outlined-password-input"
-                            label="Password"
-                            className="form-input"
-                            type="password"
-                            autoComplete="current-password"
-                            onChange= {(e)=> this.setState({password: e.target.value})}
-                            required
-                        />
-                    </Form.Group>
-                    <Button type="submit" variant="contained">Login</Button>
-                </Form>
-            </div>
-        )
-    }
+    return (
+        <div>
+            <h1> Login </h1>
+            <Form.Group className="form-group" controlId="username">
+                <TextField id="outlined-basic" className="form-input" label="Username" variant="outlined" onChange={(e) => setUsername(e.target.value)} required />
+            </Form.Group>
+            <Form.Group className="form-group" controlId="password">
+                <TextField
+                    id="outlined-password-input"
+                    label="Password"
+                    className="form-input"
+                    type="password"
+                    autoComplete="current-password"
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                />
+            </Form.Group>
+            <Button type="submit" variant="contained" onClick={handleFormSubmit}>Login</Button>
+
+            <Snackbar
+                open={open}
+                autoHideDuration={6000}
+                onClose={handleClose}
+                anchorOrigin={{ vertical:'top', horizontal:'right' }}
+            > 
+                <Alert severity={severity}>{message}</Alert>
+
+            </Snackbar>
+
+        </div>
+    )
 }
+
+export default Login

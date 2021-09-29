@@ -1,6 +1,6 @@
 import './App.css';
 import Authentication from './components/Authentication/Authentication';
-import { BrowserRouter, Route, Switch } from 'react-router-dom';
+import { BrowserRouter, Route, Switch, Redirect } from 'react-router-dom';
 import Dashboard from './components/Dashboard/Dashboard';
 
 function App() {
@@ -16,6 +16,7 @@ function App() {
           <Route path="/dashboard">
             <Dashboard />
           </Route>
+          <Redirect to="/login"/>
 
         </Switch>
 
