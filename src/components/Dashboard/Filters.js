@@ -17,6 +17,49 @@ export const Filters = (props) => {
   const cohort = props.cohort;
   const error = Object.keys(cohort).filter((v) => v).length !== 2;
 
+  const GroupData = ()=> {
+      if(props.groupBy == 'cohort'){
+        return (
+          <div className="patient-cohort">
+          <h3>Patient Cohort</h3>
+          <FormGroup>
+            {
+              patientCohort.map((data) => {
+                return <FormControlLabel
+                  control={
+                    <Checkbox checked={cohort[data]} onChange={(e) => props.onChange(e, 'cohort')} name={data} />
+                  }
+                  label={data}
+                />
+              })
+            }
+          </FormGroup>
+        </div>
+        )
+      }
+      else{
+        return (
+          <div className="payer-type">
+          <h3>Payer Type</h3>
+          <FormGroup>
+            {
+              payerType.map((data) => {
+                return <FormControlLabel
+                  control={
+                    <Checkbox
+                      // checked={cohort[data]} 
+                      onChange={props.onChange} name={data} />
+                  }
+                  label={data}
+                />
+              })
+            }
+          </FormGroup>
+        </div>
+        )
+      }
+  }
+
   return (
     <div className="filters">
 
@@ -31,40 +74,7 @@ export const Filters = (props) => {
         </RadioGroup>
       </div>
 
-      <div className="patient-cohort">
-        <h3>Patient Cohort</h3>
-        <FormGroup>
-          {
-            patientCohort.map((data) => {
-              return <FormControlLabel
-                control={
-                  <Checkbox checked={cohort[data]} onChange={(e) => props.onChange(e, 'cohort')} name={data} />
-                }
-                label={data}
-              />
-            })
-          }
-        </FormGroup>
-      </div>
-{/* 
-      <div className="payer-type">
-        <h3>Payer Type</h3>
-        <FormGroup>
-          {
-            payerType.map((data) => {
-              return <FormControlLabel
-                control={
-                  <Checkbox
-                    // checked={cohort[data]} 
-                    onChange={props.onChange} name={data} />
-                }
-                label={data}
-              />
-            })
-          }
-        </FormGroup>
-      </div> */}
-
+      <GroupData/>
       <Button color="primary" variant="contained" type="submit" onClick={props.onClick}> Update chart </Button>
     </div>
   )

@@ -161,7 +161,7 @@ const Dashboard = () => {
                 <div className="content">
                     <Graph chartData={chartData} />
                     <hr />
-                    <Filters cohort={cohort} payType={payType} onClick={handleClick} onChange={handleChange} onChangeGroup={handleGroupBy} />
+                    <Filters cohort={cohort} payType={payType} groupBy={groupBy} onClick={handleClick} onChange={handleChange} onChangeGroup={handleGroupBy} />
                 </div>
             </div>
         </div>
