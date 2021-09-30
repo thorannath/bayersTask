@@ -22,6 +22,11 @@ const Dashboard = () => {
     const [filterStates, setFilterStates ] = useState(states);
     const [groupBy, setGroupBy] = useState(constants.groupType.Cohort);
 
+    const [treatment, setTreatment] = useState([]);
+    const [medicalCondition, setMedicalCondition] = useState([]);
+    const [filterTreatment, setFilterTreatment] = useState(treatment);
+    const [filterMedicalCondition, setFilterMedicalCondition] = useState(medicalCondition);
+
     const handleGroupBy = (group) =>{
         if(group == constants.groupType.Cohort){
             setGroupBy(constants.groupType.Cohort);
@@ -53,7 +58,6 @@ const Dashboard = () => {
         let states = filterStates
         if(event.target.checked){
           states.push(event.target.name)
-          console.log(states);
         }
         else{
           states = states.filter(data=> data!= event.target.name);
@@ -61,9 +65,31 @@ const Dashboard = () => {
         setFilterStates([...states]);
     }
 
-    const handleClick = () => {
-        let labelsData = labels;
+    const handleTreatments = (event) => {
+        let treatments = filterTreatment;
+        if(event.target.checked){
+            treatments.push(event.target.value)
+          }
+          else{
+            treatments = treatments.filter(data=> data!= event.target.value);
+          }
+          setFilterTreatment([...treatments]);
+    }
 
+    const handleMedicalConditions = (event) => {
+        let medicalConditions = filterMedicalCondition;
+        if(event.target.checked){
+            medicalConditions.push(event.target.value)
+          }
+          else{
+            medicalConditions = medicalConditions.filter(data=> data!= event.target.value);
+          }
+          setFilterMedicalCondition([...medicalConditions]);
+    }
+
+    const handleClick = () => {
+
+        let labelsData = labels;
             let data = {
                 labels: labelsData.map(res=> res.name),
                 datasets: []
@@ -112,7 +138,7 @@ const Dashboard = () => {
     }, [])
 
     useEffect(() => {
-        handleClick(patients);
+        handleClick();
     }, [patients, labels]);
 
 
@@ -126,8 +152,12 @@ const Dashboard = () => {
     const fetchLabels = () => {
         return axios.get('http://localhost:3000/labels')
             .then(res => {
-                let labelData = res.data.labels.filter(data=> data.label_type ==null);
+                let labelData = res.data.labels;
+                let medicalConditions = labelData.filter(data=> data.label_type=='medical_condition');
+                let treatments = labelData.filter(data=> data.label_type=='treatment');
                 setLabels(labelData);
+                setMedicalCondition([...medicalConditions])
+                setTreatment([...treatments])
             })
     }
 
@@ -144,10 +174,16 @@ const Dashboard = () => {
                     payType={payType} 
                     groupBy={groupBy} 
                     filterStates={filterStates}
+                    treatment={treatment}
+                    medicalCondition ={medicalCondition}
+                    filterTreatment={filterTreatment}
+                    filterMedicalCondition={filterMedicalCondition}
                     onClick={handleClick} 
                     onChange={handleChange} 
                     onChangeGroup={handleGroupBy}
                     onChangeStates ={handleStates}
+                    onChangeTreatment={handleTreatments}
+                    onChangeMedicalCondition={handleMedicalConditions}
                     />
                 </div>
             </div>

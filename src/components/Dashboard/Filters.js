@@ -15,6 +15,10 @@ export const Filters = (props) => {
   const cohort = props.cohort;
   const payType = props.payType;
   const filterStates = props.filterStates;
+  const treatment = props.treatment;
+  const medicalCondition = props.medicalCondition;
+  const filterTreatment = props.filterTreatment;
+  const filterMedicalCondition = props.filterMedicalCondition
 
 
   const GroupData = () => {
@@ -92,6 +96,48 @@ export const Filters = (props) => {
                     name={data} />
                 }
                 label={data}
+              />
+              
+            })
+          }
+        </FormGroup>
+      </div>
+
+      <div className="treatment">
+      <h3>Treatments</h3>
+        <FormGroup>
+          {
+            treatment.map((data) => {
+              return <FormControlLabel
+                control={
+                  <Checkbox
+                  onChange={(e) => props.onChangeTreatment(e)}
+                    checked={!!filterTreatment.find(val=> data.name == val)}
+                    name={data.name}
+                    value={data.name}/>
+                }
+                label={data.name}
+              />
+              
+            })
+          }
+        </FormGroup>
+      </div>
+
+      <div class="medical-conditions">
+      <h3>Medical Conditions</h3>
+        <FormGroup>
+          {
+            medicalCondition.map((data) => {
+              return <FormControlLabel
+                control={
+                  <Checkbox
+                  onChange={(e) => props.onChangeMedicalCondition(e)}
+                    checked={!!filterMedicalCondition.find(val=> data.name == val)}
+                    name={data.name}
+                    value={data.name}/>
+                }
+                label={data.name}
               />
               
             })
