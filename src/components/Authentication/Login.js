@@ -35,17 +35,19 @@ const Login = () => {
                         else {
                             setSeverity('error');
                             setMessage(res.data.message);
+                            setOpen(true);
                         }
                     }
                     else{
                         setMessage("Invalid username or password");
+                        setOpen(true);
                     }
                 })
                 .catch(e=>{
                     setMessage("Invalid username or password");
+                    setOpen(true);
                 })
 
-                setOpen(true);
         }
     }
 

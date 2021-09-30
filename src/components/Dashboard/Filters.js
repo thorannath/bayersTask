@@ -1,45 +1,50 @@
 import React from 'react'
 import * as constants from '../../Constant';
 import FormGroup from '@mui/material/FormGroup';
-import { FormControlLabel, FormLabel } from '@mui/material';
+import { FormControlLabel } from '@mui/material';
 import Checkbox from '@mui/material/Checkbox';
 import { Button } from '@mui/material';
 import Radio from '@mui/material/Radio';
 import RadioGroup from '@mui/material/RadioGroup';
+import { useState, useEffect } from 'react';
+
 
 export const Filters = (props) => {
-
-
-  // const states = constants.States;
   const payerType = constants.Paytype;
   const patientCohort = constants.Patient_Cohort;
-
+  const states = constants.States;
   const cohort = props.cohort;
-  const error = Object.keys(cohort).filter((v) => v).length !== 2;
+  const payType = props.payType;
+  const [filterStates, setfilterStates] = useState(props.filterStates);
 
-  const GroupData = ()=> {
-      if(props.groupBy == 'cohort'){
-        return (
-          <div className="patient-cohort">
+  useEffect(() => {
+    setfilterStates(props.filterStates)
+  }, [props.filterStates])
+
+
+  const GroupData = () => {
+    if (props.groupBy == constants.groupType.Cohort) {
+      return (
+        <div className="patient-cohort">
           <h3>Patient Cohort</h3>
           <FormGroup>
             {
               patientCohort.map((data) => {
                 return <FormControlLabel
                   control={
-                    <Checkbox checked={cohort[data]} onChange={(e) => props.onChange(e, 'cohort')} name={data} />
+                    <Checkbox checked={cohort[data]} onChange={(e) => props.onChange(e, constants.groupType.Cohort)} name={data} />
                   }
-                  label={data}
+                  label={data.toUpperCase()}
                 />
               })
             }
           </FormGroup>
         </div>
-        )
-      }
-      else{
-        return (
-          <div className="payer-type">
+      )
+    }
+    else if (props.groupBy == constants.groupType.PayerType) {
+      return (
+        <div className="payer-type">
           <h3>Payer Type</h3>
           <FormGroup>
             {
@@ -47,8 +52,9 @@ export const Filters = (props) => {
                 return <FormControlLabel
                   control={
                     <Checkbox
-                      // checked={cohort[data]} 
-                      onChange={props.onChange} name={data} />
+                      checked={payType[data]}
+                      onChange={(e) => props.onChange(e, constants.groupType.PayerType)}
+                      name={data} />
                   }
                   label={data}
                 />
@@ -56,26 +62,51 @@ export const Filters = (props) => {
             }
           </FormGroup>
         </div>
-        )
-      }
+      )
+    }
   }
 
   return (
     <div className="filters">
 
       <div className="groupBy">
+        <h3> Group By </h3>
         <RadioGroup
           aria-label="gender"
           defaultValue="cohort"
           name="radio-buttons-group"
+          onClick={(e) => props.onChangeGroup(e.target.value)}
         >
-          <FormControlLabel value="cohort" control={<Radio />} onChange={props.onChangeGroup} label="Cohort" />
-          <FormControlLabel value="paytype" control={<Radio />} onChange={props.onChangeGroup} label="Payer Type " />
+          <FormControlLabel value="cohort" control={<Radio />} label="Cohort" />
+          <FormControlLabel value="paytype" control={<Radio />} label="Payer Type " />
         </RadioGroup>
       </div>
 
-      <GroupData/>
-      <Button color="primary" variant="contained" type="submit" onClick={props.onClick}> Update chart </Button>
+      <GroupData />
+
+      <div className="states">
+        <h3>States</h3>
+        <FormGroup>
+          {
+            states.map((data) => {
+              return <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={!!filterStates.includes(data)}
+                    onChange={(e) => props.onChangeStates(e)}
+                    name={data} />
+                }
+                label={data}
+              />
+              
+            })
+          }
+        </FormGroup>
+      </div>
+
+      <div className="update-button">
+        <Button color="primary" variant="contained" type="submit" onClick={props.onClick}> Update chart </Button>
+      </div>
     </div>
   )
 }

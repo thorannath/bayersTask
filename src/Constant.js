@@ -53,3 +53,10 @@ export const States = [
 ];
 
 export const Patient_Cohort = ['ckd', 'diab', 'both'];
+
+export const groupType = {
+    Cohort: 'cohort',
+    PayerType:'paytype'
+}
+
+export const colors = ['#23B5D3', '#F7B801', '#495F41']
