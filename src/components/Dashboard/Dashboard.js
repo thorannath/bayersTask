@@ -53,11 +53,12 @@ const Dashboard = () => {
         let states = filterStates
         if(event.target.checked){
           states.push(event.target.name)
+          console.log(states);
         }
         else{
           states = states.filter(data=> data!= event.target.name);
         }
-        setFilterStates(states);
+        setFilterStates([...states]);
     }
 
     const handleClick = () => {
@@ -89,7 +90,7 @@ const Dashboard = () => {
                     }
                 })
             }
-            setChartData(data);
+            setChartData({...data});
     }
 
     const getLableData = (val) => {

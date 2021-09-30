@@ -6,7 +6,6 @@ import Checkbox from '@mui/material/Checkbox';
 import { Button } from '@mui/material';
 import Radio from '@mui/material/Radio';
 import RadioGroup from '@mui/material/RadioGroup';
-import { useState, useEffect } from 'react';
 
 
 export const Filters = (props) => {
@@ -15,11 +14,7 @@ export const Filters = (props) => {
   const states = constants.States;
   const cohort = props.cohort;
   const payType = props.payType;
-  const [filterStates, setfilterStates] = useState(props.filterStates);
-
-  useEffect(() => {
-    setfilterStates(props.filterStates)
-  }, [props.filterStates])
+  const filterStates = props.filterStates;
 
 
   const GroupData = () => {
@@ -92,8 +87,8 @@ export const Filters = (props) => {
               return <FormControlLabel
                 control={
                   <Checkbox
+                  onChange={(e) => props.onChangeStates(e)}
                     checked={!!filterStates.includes(data)}
-                    onChange={(e) => props.onChangeStates(e)}
                     name={data} />
                 }
                 label={data}
