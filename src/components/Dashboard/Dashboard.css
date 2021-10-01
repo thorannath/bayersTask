@@ -29,7 +29,7 @@
     overflow-x: scroll;
 }
 
-.states{
+.states, .treatment, .medical-conditions{
     height: 250px;
     overflow-y: scroll;
 }
