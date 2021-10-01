@@ -112,9 +112,9 @@ export const Filters = (props) => {
                 control={
                   <Checkbox
                   onChange={(e) => props.onChangeTreatment(e)}
-                    checked={!!filterTreatment.find(val=> data.name == val)}
+                    checked={!!filterTreatment.find(val=> data.label_val == val)}
                     name={data.name}
-                    value={data.name}/>
+                    value={data.label_val}/>
                 }
                 label={data.name}
               />
@@ -133,9 +133,9 @@ export const Filters = (props) => {
                 control={
                   <Checkbox
                   onChange={(e) => props.onChangeMedicalCondition(e)}
-                    checked={!!filterMedicalCondition.find(val=> data.name == val)}
+                    checked={!!filterMedicalCondition.find(val=> data.label_val == val)}
                     name={data.name}
-                    value={data.name}/>
+                    value={data.label_val}/>
                 }
                 label={data.name}
               />

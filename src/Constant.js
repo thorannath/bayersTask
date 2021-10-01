@@ -1,4 +1,24 @@
-export const Paytype = [ "MCR", "COM" ]
+export const Paytype = [ "MCR", "COM" ];
+
+
+export const Patient_Cohort = ['ckd', 'diab', 'both'];
+
+export const groupType = {
+    Cohort: 'cohort',
+    PayerType:'paytype'
+}
+
+export const groupBy = {
+    POP:'pop',
+    PAY_TYPE:'paytyp'
+}
+
+export const colors = ['#23B5D3', '#F7B801', '#495F41'];
+
+export const labelTypes = {
+    TREATMENT:'treatment',
+    MEDICAL_CONDITION:'medical_condition'
+}
 
 export const States = [
     'WY',
@@ -51,12 +71,3 @@ export const States = [
     'AR',
     'AL'
 ];
-
-export const Patient_Cohort = ['ckd', 'diab', 'both'];
-
-export const groupType = {
-    Cohort: 'cohort',
-    PayerType:'paytype'
-}
-
-export const colors = ['#23B5D3', '#F7B801', '#495F41']
