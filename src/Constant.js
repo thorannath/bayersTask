@@ -13,6 +13,12 @@ export const groupBy = {
     PAY_TYPE:'paytyp'
 }
 
+
+export const Logic = {
+    AND:'AND',
+    OR:'OR'
+}
+
 export const colors = ['#23B5D3', '#F7B801', '#495F41'];
 
 export const labelTypes = {

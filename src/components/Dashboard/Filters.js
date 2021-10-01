@@ -18,7 +18,9 @@ export const Filters = (props) => {
   const treatment = props.treatment;
   const medicalCondition = props.medicalCondition;
   const filterTreatment = props.filterTreatment;
-  const filterMedicalCondition = props.filterMedicalCondition
+  const filterMedicalCondition = props.filterMedicalCondition;
+  const filterTreatmentOR = props.filterTreatmentOR;
+  const filterMedicalConditionOR = props.filterMedicalConditionOR;
 
 
   const GroupData = () => {
@@ -104,14 +106,14 @@ export const Filters = (props) => {
       </div>
 
       <div className="treatment">
-      <h3>Treatments</h3>
+      <h3>Treatments with AND</h3>
         <FormGroup>
           {
             treatment.map((data) => {
               return <FormControlLabel
                 control={
                   <Checkbox
-                  onChange={(e) => props.onChangeTreatment(e)}
+                  onChange={(e) => props.onChangeTreatment(e, constants.Logic.AND)}
                     checked={!!filterTreatment.find(val=> data.label_val == val)}
                     name={data.name}
                     value={data.label_val}/>
@@ -125,15 +127,58 @@ export const Filters = (props) => {
       </div>
 
       <div class="medical-conditions">
-      <h3>Medical Conditions</h3>
+      <h3>Medical Conditions with AND</h3>
         <FormGroup>
           {
             medicalCondition.map((data) => {
               return <FormControlLabel
                 control={
                   <Checkbox
-                  onChange={(e) => props.onChangeMedicalCondition(e)}
+                  onChange={(e) => props.onChangeMedicalCondition(e, constants.Logic.AND)}
                     checked={!!filterMedicalCondition.find(val=> data.label_val == val)}
+                    name={data.name}
+                    value={data.label_val}/>
+                }
+                label={data.name}
+              />
+              
+            })
+          }
+        </FormGroup>
+      </div>
+
+
+      <div className="treatment">
+      <h3>Treatments with OR</h3>
+        <FormGroup>
+          {
+            treatment.map((data) => {
+              return <FormControlLabel
+                control={
+                  <Checkbox
+                  onChange={(e) => props.onChangeTreatment(e, constants.Logic.OR)}
+                    checked={!!filterTreatmentOR.find(val=> data.label_val == val)}
+                    name={data.name}
+                    value={data.label_val}/>
+                }
+                label={data.name}
+              />
+              
+            })
+          }
+        </FormGroup>
+      </div>
+
+      <div class="medical-conditions">
+      <h3>Medical Conditions with OR</h3>
+        <FormGroup>
+          {
+            medicalCondition.map((data) => {
+              return <FormControlLabel
+                control={
+                  <Checkbox
+                  onChange={(e) => props.onChangeMedicalCondition(e, constants.Logic.OR)}
+                    checked={!!filterMedicalConditionOR.find(val=> data.label_val == val)}
                     name={data.name}
                     value={data.label_val}/>
                 }
