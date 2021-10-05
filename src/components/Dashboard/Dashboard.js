@@ -33,11 +33,14 @@ const Dashboard = () => {
     const fetchGraphData = () => {
 
         const request = requestObject();
+        console.log(request);
         const treatmentsChart = createChartData(JSONdata.treatments);
         const medicalChart = createChartData(JSONdata.medical_conditions)
         setTreatmentsChartData({ ...treatmentsChart });
         setMedicalChartData({ ...medicalChart });
-        // return axios.get('data.json')
+
+
+        // return axios.post('http://localhost:3000/view', request)
         //     .then((response) => {
         //         const res = response.data;
         //         const treatmentsChart = createChartData(res.treatments);                
@@ -54,6 +57,8 @@ const Dashboard = () => {
                 let treatments = labelData.filter(data => data.label_type == constants.labelTypes.TREATMENT);
                 setMedicalCondition([...medicalConditions])
                 setTreatment([...treatments])
+                setSelectedTreatmentLabels([...treatments]);
+                setSelectedMedicalConditionLabels([...medicalConditions]);
             })
     }
 
@@ -76,7 +81,7 @@ const Dashboard = () => {
     const requestObject = () => {
         const request = {
             group_condition: {
-                groupBy,
+                groupby:groupBy,
                 selection: (groupBy == constants.groupType.Cohort) ? cohort : payType
             },
             states: filterStates,
@@ -123,7 +128,6 @@ const Dashboard = () => {
     };
 
     const handleStates = (event) => {
-        console.log(event.target, 123);
         let states = filterStates
         if (event.target.checked) {
             states.push(event.target.name)
@@ -136,7 +140,6 @@ const Dashboard = () => {
 
     const handleTreatments = (event, logic) => {
         if (logic === constants.Logic.AND) {
-            console.log(logic, 'logic AND')
             let treatments = filterTreatmentAND;
             if (event.target.checked) {
                 treatments.push(event.target.value)
