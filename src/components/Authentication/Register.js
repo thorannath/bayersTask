@@ -25,7 +25,7 @@ export const Register = () => {
     const handleFormSubmit = (e) => {
         setSeverity('error');
         if (username, password, fullName, email) {
-            axios.post('http://localhost:3000/register', {username, password, fullName, email})
+            axios.post('http://localhost:5000/register', {register_userid: username, register_password: password, register_name: fullName, register_email: email})
                 .then((res) => {
                     console.log(res);
                     if(res){

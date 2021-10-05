@@ -31,26 +31,37 @@ const Dashboard = () => {
     const [filterMedicalConditionOR, setFilterMedicalConditionOR] = useState([]);
 
     const fetchGraphData = () => {
-
+        
         const request = requestObject();
         console.log(request);
+        /*
         const treatmentsChart = createChartData(JSONdata.treatments);
         const medicalChart = createChartData(JSONdata.medical_conditions)
         setTreatmentsChartData({ ...treatmentsChart });
         setMedicalChartData({ ...medicalChart });
+        */
 
-
-        // return axios.post('http://localhost:3000/view', request)
-        //     .then((response) => {
-        //         const res = response.data;
-        //         const treatmentsChart = createChartData(res.treatments);                
-        //         const medicalChart = createChartData(res.medical_conditions)
-        //         setTreatmentsChartData({...treatmentsChart});
-        //         setMedicalChartData({...medicalChart});
-        // });
+        axios.post('http://localhost:5000/view-treatment', request)
+        .then((response) => {
+            const res = response.data;
+            const treatmentsChart = createChartData(res.treatments);                
+            //const medicalChart = createChartData(res.data.medical_conditions)
+            setTreatmentsChartData({...treatmentsChart});
+            //setMedicalChartData({...medicalChart});
+        });
+        axios.post('http://localhost:5000/view-medical', request)
+            .then((response) => {
+                const res = response.data;
+                //const treatmentsChart = createChartData(res.treatments);                
+                const medicalChart = createChartData(res.medical_conditions)
+                //setTreatmentsChartData({...treatmentsChart});
+                setMedicalChartData({...medicalChart});
+         });
+        
+    
     }
     const fetchLabels = () => {
-        return axios.get('http://localhost:3000/labels')
+        return axios.post('http://localhost:5000/labels')
             .then(res => {
                 let labelData = res.data.labels;
                 let medicalConditions = labelData.filter(data => data.label_type == constants.labelTypes.MEDICAL_CONDITION);
