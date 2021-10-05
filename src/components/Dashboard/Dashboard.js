@@ -48,17 +48,15 @@ const Dashboard = () => {
             //const medicalChart = createChartData(res.data.medical_conditions)
             setTreatmentsChartData({...treatmentsChart});
             //setMedicalChartData({...medicalChart});
-        });
-        axios.post('http://localhost:5000/view-medical', request)
+            axios.post('http://localhost:5000/view-medical', request)
             .then((response) => {
                 const res = response.data;
                 //const treatmentsChart = createChartData(res.treatments);                
                 const medicalChart = createChartData(res.medical_conditions)
                 //setTreatmentsChartData({...treatmentsChart});
                 setMedicalChartData({...medicalChart});
-         });
-        
-    
+            });
+        });
     }
     const fetchLabels = () => {
         return axios.post('http://localhost:5000/labels')
@@ -90,19 +88,24 @@ const Dashboard = () => {
     }
 
     const requestObject = () => {
+        
+        const groupKeys = (groupBy == constants.groupType.Cohort) ? cohort : payType;
+        const treatmentLabels = selectedTreatmentLabels.map((e,i)=>{return e["label"]})
+        const medicalConditionLabels = selectedMedicalConditionLabels.map((e,i)=>{return e["label"]})
+        
         const request = {
             group_condition: {
-                groupby:groupBy,
-                selection: (groupBy == constants.groupType.Cohort) ? cohort : payType
+                group_by:groupBy,
+                selection: Object.keys(groupKeys).filter((e,i)=>{return groupKeys[e]})
             },
             states: filterStates,
             treatments: {
-                labels: selectedTreatmentLabels,
+                labels:  treatmentLabels, //selectedTreatmentLabels,
                 OR: filterTreatmentOR,
                 AND: filterTreatmentAND
             },
-            medical_condition: {
-                labels: selectedMedicalConditionLabels,
+            medical_conditions: {
+                labels: medicalConditionLabels, //selectedMedicalConditionLabels,
                 OR: filterMedicalConditionOR,
                 AND: filterMedicalConditionAND
             }
