@@ -1,3 +1,4 @@
+import React from 'react'
 import Sidebar from '../Sidebar/Sidebar';
 import './Dashboard.css';
 import Graph from './Graph';
@@ -6,29 +7,93 @@ import Header from '../Header/Header';
 import axios from 'axios'
 import { useState, useEffect } from 'react';
 import * as constants from '../../Constant';
-
+import JSONdata from './data.json';
 
 const Dashboard = () => {
-    const patientCohort = constants.Patient_Cohort;
-    const payerType = constants.Paytype;
     const states = constants.States;
     const colors = constants.colors;
 
-    const [patients, setPatients] = useState([]);
-    const [labels, setLabels] = useState([]);
+    const [treatmentsChartData, setTreatmentsChartData] = useState({});
+    const [medicalChartData, setMedicalChartData] = useState({});
+
     const [cohort, setCohort] = useState({ ckd: true, diab: true, both: true });
     const [payType, setPayType] = useState({ MCR: true, COM: true })
-    const [chartData, setChartData] = useState(null);
-    const [filterStates, setFilterStates] = useState(states);
     const [groupBy, setGroupBy] = useState(constants.groupType.Cohort);
-
     const [treatment, setTreatment] = useState([]);
     const [medicalCondition, setMedicalCondition] = useState([]);
-    const [filterTreatment, setFilterTreatment] = useState(treatment);
-    const [filterMedicalCondition, setFilterMedicalCondition] = useState(medicalCondition);
 
+    const [filterStates, setFilterStates] = useState(states);
+    const [selectedTreatmentLabels, setSelectedTreatmentLabels] = useState([]);
+    const [selectedMedicalConditionLabels, setSelectedMedicalConditionLabels] = useState([]);
+    const [filterTreatmentAND, setFilterTreatmentAND] = useState(treatment);
+    const [filterMedicalConditionAND, setFilterMedicalConditionAND] = useState(medicalCondition);
     const [filterTreatmentOR, setFilterTreatmentOR] = useState([]);
     const [filterMedicalConditionOR, setFilterMedicalConditionOR] = useState([]);
+
+    const fetchGraphData = () => {
+
+        const request = requestObject();
+        const treatmentsChart = createChartData(JSONdata.treatments);
+        const medicalChart = createChartData(JSONdata.medical_conditions)
+        setTreatmentsChartData({ ...treatmentsChart });
+        setMedicalChartData({ ...medicalChart });
+        // return axios.get('data.json')
+        //     .then((response) => {
+        //         const res = response.data;
+        //         const treatmentsChart = createChartData(res.treatments);                
+        //         const medicalChart = createChartData(res.medical_conditions)
+        //         setTreatmentsChartData({...treatmentsChart});
+        //         setMedicalChartData({...medicalChart});
+        // });
+    }
+    const fetchLabels = () => {
+        return axios.get('http://localhost:3000/labels')
+            .then(res => {
+                let labelData = res.data.labels;
+                let medicalConditions = labelData.filter(data => data.label_type == constants.labelTypes.MEDICAL_CONDITION);
+                let treatments = labelData.filter(data => data.label_type == constants.labelTypes.TREATMENT);
+                setMedicalCondition([...medicalConditions])
+                setTreatment([...treatments])
+            })
+    }
+
+    const createChartData = (obj) => {
+        const chart = {
+            labels: obj.labels,
+            datasets: []
+        }
+
+        obj.data.map((val, index) => {
+            chart.datasets.push({
+                label: val.type,
+                backgroundColor: colors[index],
+                data: val.data
+            })
+        })
+        return chart;
+    }
+
+    const requestObject = () => {
+        const request = {
+            group_condition: {
+                groupBy,
+                selection: (groupBy == constants.groupType.Cohort) ? cohort : payType
+            },
+            states: filterStates,
+            treatments: {
+                labels: selectedTreatmentLabels,
+                OR: filterTreatmentOR,
+                AND: filterTreatmentAND
+            },
+            medical_condition: {
+                labels: selectedMedicalConditionLabels,
+                OR: filterMedicalConditionOR,
+                AND: filterMedicalConditionAND
+            }
+        }
+
+        return request;
+    }
 
     const handleGroupBy = (group) => {
         if (group == constants.groupType.Cohort) {
@@ -37,7 +102,7 @@ const Dashboard = () => {
         else if (group == constants.groupType.PayerType) {
             setGroupBy(constants.groupType.PayerType);
         }
-    }
+    };
 
     const handleChange = (event, filterType) => {
         switch (filterType) {
@@ -58,6 +123,7 @@ const Dashboard = () => {
     };
 
     const handleStates = (event) => {
+        console.log(event.target, 123);
         let states = filterStates
         if (event.target.checked) {
             states.push(event.target.name)
@@ -66,23 +132,21 @@ const Dashboard = () => {
             states = states.filter(data => data != event.target.name);
         }
         setFilterStates([...states]);
-    }
+    };
 
     const handleTreatments = (event, logic) => {
-        if(logic === constants.Logic.AND){
+        if (logic === constants.Logic.AND) {
             console.log(logic, 'logic AND')
-            let treatments = filterTreatment;
+            let treatments = filterTreatmentAND;
             if (event.target.checked) {
                 treatments.push(event.target.value)
             }
             else {
                 treatments = treatments.filter(data => data != event.target.value);
             }
-            setFilterTreatment([...treatments]);
+            setFilterTreatmentAND([...treatments]);
         }
-        else if(logic === constants.Logic.OR){
-            console.log(logic, 'logic OR')
-
+        else if (logic === constants.Logic.OR) {
             let treatments = filterTreatmentOR;
             if (event.target.checked) {
                 treatments.push(event.target.value)
@@ -90,24 +154,22 @@ const Dashboard = () => {
             else {
                 treatments = treatments.filter(data => data != event.target.value);
             }
-            setFilterTreatmentOR([...treatments]); 
+            setFilterTreatmentOR([...treatments]);
         }
-        console.log(filterTreatment, filterTreatmentOR);
-
-    }
+    };
 
     const handleMedicalConditions = (event, logic) => {
-        if(logic === constants.Logic.AND){
-            let medicalConditions = filterMedicalCondition;
+        if (logic === constants.Logic.AND) {
+            let medicalConditions = filterMedicalConditionAND;
             if (event.target.checked) {
                 medicalConditions.push(event.target.value)
             }
             else {
                 medicalConditions = medicalConditions.filter(data => data != event.target.value);
             }
-            setFilterMedicalCondition([...medicalConditions]);
+            setFilterMedicalConditionAND([...medicalConditions]);
         }
-        else if(logic === constants.Logic.OR){
+        else if (logic === constants.Logic.OR) {
             let medicalConditions = filterMedicalConditionOR;
             if (event.target.checked) {
                 medicalConditions.push(event.target.value)
@@ -117,198 +179,17 @@ const Dashboard = () => {
             }
             setFilterMedicalConditionOR([...medicalConditions]);
         }
-
-    }
+    };
 
     const handleClick = () => {
-        let data = {
-            labels: getLabels(),
-            datasets: []
-        };
-
-        if (groupBy == constants.groupType.Cohort) {
-            patientCohort.map((val, i) => {
-                if (cohort[val]) {
-                    data.datasets.push({
-                        label: val.toUpperCase(),
-                        backgroundColor: colors[i],
-                        data: getLableData(val)
-                    })
-                }
-            })
-        }
-        else if (groupBy == constants.groupType.PayerType) {
-            payerType.map((val, i) => {
-                if (payType[val]) {
-                    data.datasets.push({
-                        label: val.toUpperCase(),
-                        backgroundColor: colors[i],
-                        data: getLableData(val)
-                    })
-                }
-            })
-        }
-        setChartData({ ...data });
-    }
-
-    const getLabels = () => {
-        let finalLabels = [];
-
-        if(filterTreatment.length == 0 && filterMedicalCondition.length == 0){
-            return null;
-        }
-        else if(filterTreatment.length == 0){
-            // filterMedicalCondition.map(data => {
-            //     let value = labels.find(val => (val.label_type == constants.labelTypes.MEDICAL_CONDITION && val.label_val == data));
-            //     if (!!value) return value.name;
-            // });
-
-            finalLabels.push('Medical Condition with AND')
-        }
-        else if(filterMedicalCondition.length == 0){
-            // filterTreatment.map(data => {
-            //     let value = labels.find(val => (val.label_type == constants.labelTypes.TREATMENT && val.label_val == data));
-            //     if (!!value) return value.name;
-            // })
-
-            finalLabels.push('Treatments with AND');
-        }
-        else{
-            finalLabels.push('Treatments with AND', 'Medical Condition with AND');
-        }
-
-
-        if(filterTreatmentOR.length == 0 && filterMedicalConditionOR.length == 0){
-            return null;
-        }
-        else if(filterTreatmentOR.length == 0){
-            // filterMedicalCondition.map(data => {
-            //     let value = labels.find(val => (val.label_type == constants.labelTypes.MEDICAL_CONDITION && val.label_val == data));
-            //     if (!!value) return value.name;
-            // });
-            finalLabels.push('Medical Condition with OR')
-        }
-        else if(filterMedicalConditionOR.length == 0){
-            // filterTreatment.map(data => {
-            //     let value = labels.find(val => (val.label_type == constants.labelTypes.TREATMENT && val.label_val == data));
-            //     if (!!value) return value.name;
-            // })
-            finalLabels.push('Treatments with OR');
-        }
-        else{
-            finalLabels.push('Treatments with OR', 'Medical Condition with OR');
-        }
-
-        return finalLabels;
-
-    }
-
-    const getLableData = (val) => {
-        if (groupBy == constants.groupType.Cohort) {
-           return patientCount(val, constants.groupBy.POP)
-        }
-        else if (groupBy == constants.groupType.PayerType) {
-           return patientCount(val, constants.groupBy.PAY_TYPE)
-        }
-    }
-
-    const patientCount = (val, groupBy) => {
-        let finalData = [];
-        if(filterTreatment.length == 0 && filterMedicalCondition.length == 0){
-            //Do Nothing
-        }
-        else if(filterTreatment.length == 0){
-            let medicalConditionNumber = 0;
-            filterMedicalCondition.map((val) =>{
-                medicalConditionNumber += parseInt(val);
-            })
-            finalData.push(patients.filter(patient => (((patient.medical_condition & medicalConditionNumber) == medicalConditionNumber) && (patient[groupBy]==val) && filterStates.includes(patient.state))).length);
-        }
-        else if(filterMedicalCondition.length == 0){
-            let treatmentNumber = 0;
-           filterTreatment.map((val) =>{
-               treatmentNumber += parseInt(val);
-           })
-
-           finalData.push(patients.filter(patient => (((patient.treatment&treatmentNumber) == treatmentNumber) && (patient[groupBy]==val) && filterStates.includes(patient.state))).length);
-        }
-        else if(filterTreatment.length != 0 && filterMedicalCondition.length != 0) {
-            let treatmentNumber = 0;
-            filterTreatment.map((val) =>{
-                treatmentNumber += parseInt(val);
-            })
-            let medicalConditionNumber = 0;
-            filterMedicalCondition.map((val) =>{
-                medicalConditionNumber += parseInt(val);
-            })
-            let count1 = patients.filter(patient => (((patient.treatment & treatmentNumber) == treatmentNumber) && (patient[groupBy]==val) && filterStates.includes(patient.state))).length;
-            let count2 = patients.filter(patient => (((patient.medical_condition & medicalConditionNumber) == medicalConditionNumber) && (patient[groupBy]==val) && filterStates.includes(patient.state))).length;
-            finalData.push(count1, count2);
-        }
-
-        if(filterTreatmentOR.length == 0 && filterMedicalConditionOR.length == 0){
-            //Do Nothing
-        }
-        else if(filterTreatmentOR.length == 0){
-            let medicalConditionNumber = 0;
-            filterMedicalConditionOR.map((val) =>{
-                medicalConditionNumber += parseInt(val);
-            })
-            finalData.push(patients.filter(patient => (((patient.medical_condition & medicalConditionNumber) != 0) && (patient[groupBy]==val) && filterStates.includes(patient.state))).length);
-        }
-        else if(filterMedicalConditionOR.length == 0){
-            let treatmentNumber = 0;
-            filterTreatmentOR.map((val) =>{
-               treatmentNumber += parseInt(val);
-           })
-
-           finalData.push(patients.filter(patient => (((patient.treatment&treatmentNumber) != 0) && (patient[groupBy]==val) && filterStates.includes(patient.state))).length);
-        }
-        else if(filterTreatmentOR.length != 0 && filterMedicalConditionOR.length != 0) {
-            let treatmentNumber = 0;
-            filterTreatmentOR.map((val) =>{
-                treatmentNumber += parseInt(val);
-            })
-            let medicalConditionNumber = 0;
-            filterMedicalConditionOR.map((val) =>{
-                medicalConditionNumber += parseInt(val);
-            })
-            let count1 = patients.filter(patient => (((patient.treatment & treatmentNumber) != 0) && (patient[groupBy]==val) && filterStates.includes(patient.state))).length;
-            let count2 = patients.filter(patient => (((patient.medical_condition & medicalConditionNumber) != 0) && (patient[groupBy]==val) && filterStates.includes(patient.state))).length;
-            finalData.push(count1, count2);
-        }
-
-        return finalData;
+        fetchGraphData();
     }
 
     useEffect(() => {
-        fetchData();
+        fetchGraphData();
         fetchLabels();
     }, [])
 
-    useEffect(() => {
-        handleClick();
-    }, [patients, labels]);
-
-
-    const fetchData = () => {
-        return axios.get('http://localhost:3000/patients')
-            .then((response) => {
-                setPatients(response.data.patients)
-            })
-    }
-
-    const fetchLabels = () => {
-        return axios.get('http://localhost:3000/labels')
-            .then(res => {
-                let labelData = res.data.labels;
-                let medicalConditions = labelData.filter(data => data.label_type == constants.labelTypes.MEDICAL_CONDITION);
-                let treatments = labelData.filter(data => data.label_type == constants.labelTypes.TREATMENT);
-                setLabels(labelData);
-                setMedicalCondition([...medicalConditions])
-                setTreatment([...treatments])
-            })
-    }
 
     return (
         <div className="container">
@@ -316,8 +197,6 @@ const Dashboard = () => {
             <div className="box">
                 <Sidebar />
                 <div className="content">
-                    <Graph chartData={chartData} />
-                    <hr />
                     <Filters
                         cohort={cohort}
                         payType={payType}
@@ -325,8 +204,8 @@ const Dashboard = () => {
                         filterStates={filterStates}
                         treatment={treatment}
                         medicalCondition={medicalCondition}
-                        filterTreatment={filterTreatment}
-                        filterMedicalCondition={filterMedicalCondition}
+                        filterTreatmentAND={filterTreatmentAND}
+                        filterMedicalConditionAND={filterMedicalConditionAND}
                         filterTreatmentOR={filterTreatmentOR}
                         filterMedicalConditionOR={filterMedicalConditionOR}
                         onClick={handleClick}
@@ -336,6 +215,15 @@ const Dashboard = () => {
                         onChangeTreatment={handleTreatments}
                         onChangeMedicalCondition={handleMedicalConditions}
                     />
+                    <div>
+                    <h3> Treatment Chart </h3>
+                    <Graph chartData={treatmentsChartData} />
+                    </div>
+                    <hr />
+                    <div>
+                    <h3> Medical Conditions Chart </h3>
+                    <Graph chartData={medicalChartData} />
+                    </div>
                 </div>
             </div>
         </div>

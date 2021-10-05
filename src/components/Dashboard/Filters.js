@@ -6,27 +6,32 @@ import Checkbox from '@mui/material/Checkbox';
 import { Button } from '@mui/material';
 import Radio from '@mui/material/Radio';
 import RadioGroup from '@mui/material/RadioGroup';
-
+import Chip from '@mui/material/Chip';
+import Select from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
+import CancelIcon from '@mui/icons-material/Cancel';
+import makeAnimated from 'react-select/animated';
 
 export const Filters = (props) => {
   const payerType = constants.Paytype;
   const patientCohort = constants.Patient_Cohort;
   const states = constants.States;
+
   const cohort = props.cohort;
   const payType = props.payType;
-  const filterStates = props.filterStates;
   const treatment = props.treatment;
   const medicalCondition = props.medicalCondition;
-  const filterTreatment = props.filterTreatment;
-  const filterMedicalCondition = props.filterMedicalCondition;
+
+  const filterStates = props.filterStates;
+  const filterTreatmentAND = props.filterTreatmentAND;
+  const filterMedicalConditionAND = props.filterMedicalConditionAND;
   const filterTreatmentOR = props.filterTreatmentOR;
   const filterMedicalConditionOR = props.filterMedicalConditionOR;
-
 
   const GroupData = () => {
     if (props.groupBy == constants.groupType.Cohort) {
       return (
-        <div className="patient-cohort">
+        <div className="groupType">
           <h3>Patient Cohort</h3>
           <FormGroup>
             {
@@ -45,7 +50,7 @@ export const Filters = (props) => {
     }
     else if (props.groupBy == constants.groupType.PayerType) {
       return (
-        <div className="payer-type">
+        <div className="groupType">
           <h3>Payer Type</h3>
           <FormGroup>
             {
@@ -67,9 +72,20 @@ export const Filters = (props) => {
     }
   }
 
+  const handleDelete = (e, val) => {
+    e.preventDefault();
+    let event = {
+      target: {
+        checked: false,
+        name: val
+      }
+    }
+    props.onChangeStates(event)
+  }
+
+
   return (
     <div className="filters">
-
       <div className="groupBy">
         <h3> Group By </h3>
         <RadioGroup
@@ -85,111 +101,153 @@ export const Filters = (props) => {
 
       <GroupData />
 
+      {/* <div className="statesfilter">
+        <h3>New States</h3>
+        <Select multiple
+          value={filterStates}
+          renderValue={(selected) => 
+            (
+              <div>
+              {selected.map((val)=>(
+                <Chip
+                key={val}
+                label={val}
+                name={val}
+                deleteIcon={
+                  <CancelIcon
+                    onMouseDown={(e) => e.stopPropagation()}
+                  />
+                }
+                onDelete={(e)=> handleDelete(e, val)}
+                color="primary"
+                className="chips"
+              />
+              ))}
+              </div>
+            )}
+            sx={{ width: 500, maxHeight:500 ,maxWidth: '100%', height:500}}>
+          {states.map(val=>(
+              <MenuItem key={val} value={val}>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    onChange={(e) => props.onChangeStates(e)}
+                    checked={!!filterStates.includes(val)}
+                    name={val} />
+                }
+                label={val}
+              />
+            </MenuItem>
+          ))}
+        </Select>
+      </div> */}
+
       <div className="states">
-        <h3>States</h3>
-        <FormGroup>
-          {
-            states.map((data) => {
-              return <FormControlLabel
-                control={
-                  <Checkbox
-                  onChange={(e) => props.onChangeStates(e)}
-                    checked={!!filterStates.includes(data)}
-                    name={data} />
-                }
-                label={data}
-              />
-              
-            })
-          }
-        </FormGroup>
+        <div>
+          <h3>States</h3>
+          <FormGroup>
+            {
+              states.map((data) => {
+                return <FormControlLabel
+                  control={
+                    <Checkbox
+                      onChange={(e) => props.onChangeStates(e)}
+                      checked={!!filterStates.includes(data)}
+                      name={data} />
+                  }
+                  label={data}
+                />
+
+              })
+            }
+          </FormGroup>
+        </div>
       </div>
 
       <div className="treatment">
-      <h3>Treatments with AND</h3>
-        <FormGroup>
-          {
-            treatment.map((data) => {
-              return <FormControlLabel
-                control={
-                  <Checkbox
-                  onChange={(e) => props.onChangeTreatment(e, constants.Logic.AND)}
-                    checked={!!filterTreatment.find(val=> data.label_val == val)}
-                    name={data.name}
-                    value={data.label_val}/>
-                }
-                label={data.name}
-              />
-              
-            })
-          }
-        </FormGroup>
+        <div>
+          <h3>Treatments with AND</h3>
+          <FormGroup>
+            {
+              treatment.map((data) => {
+                return <FormControlLabel
+                  control={
+                    <Checkbox
+                      onChange={(e) => props.onChangeTreatment(e, constants.Logic.AND)}
+                      checked={!!filterTreatmentAND.find(val => data.label_val == val)}
+                      name={data.name}
+                      value={data.label_val} />
+                  }
+                  label={data.name}
+                />
+
+              })
+            }
+          </FormGroup>
+        </div>
+        <div>
+          <h3>Treatments with OR</h3>
+          <FormGroup>
+            {
+              treatment.map((data) => {
+                return <FormControlLabel
+                  control={
+                    <Checkbox
+                      onChange={(e) => props.onChangeTreatment(e, constants.Logic.OR)}
+                      checked={!!filterTreatmentOR.find(val => data.label_val == val)}
+                      name={data.name}
+                      value={data.label_val} />
+                  }
+                  label={data.name}
+                />
+              })
+            }
+          </FormGroup>
+        </div>
       </div>
 
-      <div class="medical-conditions">
-      <h3>Medical Conditions with AND</h3>
-        <FormGroup>
-          {
-            medicalCondition.map((data) => {
-              return <FormControlLabel
-                control={
-                  <Checkbox
-                  onChange={(e) => props.onChangeMedicalCondition(e, constants.Logic.AND)}
-                    checked={!!filterMedicalCondition.find(val=> data.label_val == val)}
-                    name={data.name}
-                    value={data.label_val}/>
-                }
-                label={data.name}
-              />
-              
-            })
-          }
-        </FormGroup>
+      <div className="medical-conditions">
+        <div>
+          <h3>Medical Conditions with AND</h3>
+          <FormGroup>
+            {
+              medicalCondition.map((data) => {
+                return <FormControlLabel
+                  control={
+                    <Checkbox
+                      onChange={(e) => props.onChangeMedicalCondition(e, constants.Logic.AND)}
+                      checked={!!filterMedicalConditionAND.find(val => data.label_val == val)}
+                      name={data.name}
+                      value={data.label_val} />
+                  }
+                  label={data.name}
+                />
+
+              })
+            }
+          </FormGroup>
+        </div>
+
+        <div>
+          <h3>Medical Conditions with OR</h3>
+          <FormGroup>
+            {
+              medicalCondition.map((data) => {
+                return <FormControlLabel
+                  control={
+                    <Checkbox
+                      onChange={(e) => props.onChangeMedicalCondition(e, constants.Logic.OR)}
+                      checked={!!filterMedicalConditionOR.find(val => data.label_val == val)}
+                      name={data.name}
+                      value={data.label_val} />
+                  }
+                  label={data.name}
+                />
+              })
+            }
+          </FormGroup>
+        </div>
       </div>
-
-
-      <div className="treatment">
-      <h3>Treatments with OR</h3>
-        <FormGroup>
-          {
-            treatment.map((data) => {
-              return <FormControlLabel
-                control={
-                  <Checkbox
-                  onChange={(e) => props.onChangeTreatment(e, constants.Logic.OR)}
-                    checked={!!filterTreatmentOR.find(val=> data.label_val == val)}
-                    name={data.name}
-                    value={data.label_val}/>
-                }
-                label={data.name}
-              />
-              
-            })
-          }
-        </FormGroup>
-      </div>
-
-      <div class="medical-conditions">
-      <h3>Medical Conditions with OR</h3>
-        <FormGroup>
-          {
-            medicalCondition.map((data) => {
-              return <FormControlLabel
-                control={
-                  <Checkbox
-                  onChange={(e) => props.onChangeMedicalCondition(e, constants.Logic.OR)}
-                    checked={!!filterMedicalConditionOR.find(val=> data.label_val == val)}
-                    name={data.name}
-                    value={data.label_val}/>
-                }
-                label={data.name}
-              />
-              
-            })
-          }
-        </FormGroup>
-      </div>
-
       <div className="update-button">
         <Button color="primary" variant="contained" type="submit" onClick={props.onClick}> Update chart </Button>
       </div>
