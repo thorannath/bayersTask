@@ -2,6 +2,7 @@ import { Button } from "@mui/material"
 import './Header.css';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import { useHistory } from "react-router-dom";
+import Cookies from 'js-cookie';
 
 const Header = () => {
     const history = useHistory();
@@ -12,6 +13,7 @@ const Header = () => {
     }
 
     const logout = () => {
+        Cookies.remove("userData");
         history.push("/");
         console.log("Successfully Logout");
     }

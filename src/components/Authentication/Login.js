@@ -5,8 +5,8 @@ import { useState, forwardRef } from 'react';
 import axios from 'axios';
 import { useHistory } from "react-router-dom";
 import Snackbar from '@mui/material/Snackbar';
-
 import MuiAlert from '@mui/material/Alert';
+import Cookies from 'js-cookie';
 
 const Alert = forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
@@ -24,12 +24,14 @@ const Login = () => {
 
     const handleFormSubmit = () => {
         if (username && password) {
-            axios.post('http://localhost:3000/login', { username, password })
+            axios.post('http://localhost:5000/login', { login_userid: username, login_password: password })
                 .then((res) => {
                     if(res){
                         if (res.data.success) {
                             setMessage(res.data.message);
                             setSeverity('success');
+                            /* --- FIXME => Later: change this to user_id & auth-token --- */
+                            Cookies.set('userData', { userid: username, password: password }, {path:''}); 
                             history.push("/dashboard");
                         }
                         else {
