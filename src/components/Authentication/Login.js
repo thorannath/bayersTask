@@ -31,7 +31,7 @@ const Login = () => {
                             setMessage(res.data.message);
                             setSeverity('success');
                             /* --- FIXME => Later: change this to user_id & auth-token --- */
-                            Cookies.set('userData', { userid: username, password: password }, {path:''}); 
+                            Cookies.set('userData', { userid: username, password: password }, {path:'/'}); 
                             history.push("/dashboard");
                         }
                         else {
