@@ -6,17 +6,18 @@ import Checkbox from '@mui/material/Checkbox';
 import { Button } from '@mui/material';
 import Radio from '@mui/material/Radio';
 import RadioGroup from '@mui/material/RadioGroup';
-import Chip from '@mui/material/Chip';
-import Select from '@mui/material/Select';
-import MenuItem from '@mui/material/MenuItem';
-import CancelIcon from '@mui/icons-material/Cancel';
 import makeAnimated from 'react-select/animated';
+import Select, { StylesConfig } from 'react-select';
+
 
 export const Filters = (props) => {
   const payerType = constants.Paytype;
   const patientCohort = constants.Patient_Cohort;
-  const states = constants.States;
+  const states = constants.States.map(data=>{
+    return {value:data, label:data}
+  });
 
+  const animatedComponents = makeAnimated();
   const cohort = props.cohort;
   const payType = props.payType;
   const treatment = props.treatment;
@@ -27,6 +28,7 @@ export const Filters = (props) => {
   const filterMedicalConditionAND = props.filterMedicalConditionAND;
   const filterTreatmentOR = props.filterTreatmentOR;
   const filterMedicalConditionOR = props.filterMedicalConditionOR;
+
 
   const GroupData = () => {
     if (props.groupBy == constants.groupType.Cohort) {
@@ -83,6 +85,10 @@ export const Filters = (props) => {
     props.onChangeStates(event)
   }
 
+  const handleStateChange = (e)=>{
+    console.log(e);
+  }
+
 
   return (
     <div className="filters">
@@ -92,6 +98,7 @@ export const Filters = (props) => {
           aria-label="gender"
           defaultValue="cohort"
           name="radio-buttons-group"
+          color="primary"
           onClick={(e) => props.onChangeGroup(e.target.value)}
         >
           <FormControlLabel value="cohort" control={<Radio />} label="Cohort" />
@@ -101,67 +108,16 @@ export const Filters = (props) => {
 
       <GroupData />
 
-      {/* <div className="statesfilter">
-        <h3>New States</h3>
-        <Select multiple
-          value={filterStates}
-          renderValue={(selected) => 
-            (
-              <div>
-              {selected.map((val)=>(
-                <Chip
-                key={val}
-                label={val}
-                name={val}
-                deleteIcon={
-                  <CancelIcon
-                    onMouseDown={(e) => e.stopPropagation()}
-                  />
-                }
-                onDelete={(e)=> handleDelete(e, val)}
-                color="primary"
-                className="chips"
-              />
-              ))}
-              </div>
-            )}
-            sx={{ width: 500, maxHeight:500 ,maxWidth: '100%', height:500}}>
-          {states.map(val=>(
-              <MenuItem key={val} value={val}>
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    onChange={(e) => props.onChangeStates(e)}
-                    checked={!!filterStates.includes(val)}
-                    name={val} />
-                }
-                label={val}
-              />
-            </MenuItem>
-          ))}
-        </Select>
-      </div> */}
-
-      <div className="states">
-        <div>
-          <h3>States</h3>
-          <FormGroup>
-            {
-              states.map((data) => {
-                return <FormControlLabel
-                  control={
-                    <Checkbox
-                      onChange={(e) => props.onChangeStates(e)}
-                      checked={!!filterStates.includes(data)}
-                      name={data} />
-                  }
-                  label={data}
-                />
-
-              })
-            }
-          </FormGroup>
-        </div>
+      <div className="">
+        <h3> States </h3>
+        <Select
+          defaultValue={states}
+          isMulti
+          name="colors"
+          options={states}
+          onChange={(e) => props.onChangeStates(e)}
+          classNamePrefix="select"
+        />
       </div>
 
       <div className="treatment">

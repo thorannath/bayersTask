@@ -20,11 +20,6 @@
     color: coral;
 }
 
-.statesfilter{
-    width: 50%;
-    overflow-x: scroll;
-}
-
 .update-button{
     margin-top: 30px;
 }
@@ -39,10 +34,6 @@
     padding: 20px;
     margin: 10px;
     overflow-y:scroll
-}
-
-.states{
-    height: 250px; 
 }
 
  .treatment, .medical-conditions{

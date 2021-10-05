@@ -128,13 +128,7 @@ const Dashboard = () => {
     };
 
     const handleStates = (event) => {
-        let states = filterStates
-        if (event.target.checked) {
-            states.push(event.target.name)
-        }
-        else {
-            states = states.filter(data => data != event.target.name);
-        }
+        let states = event.map((data)=> data.value);
         setFilterStates([...states]);
     };
 
