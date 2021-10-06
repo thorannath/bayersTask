@@ -31,7 +31,7 @@ const Dashboard = () => {
     const [filterMedicalConditionOR, setFilterMedicalConditionOR] = useState([]);
 
     const fetchGraphData = () => {
-        
+
         const request = requestObject();
         console.log(request);
         /*
@@ -42,21 +42,21 @@ const Dashboard = () => {
         */
 
         axios.post('http://localhost:5000/view-treatment', request)
-        .then((response) => {
-            const res = response.data;
-            const treatmentsChart = createChartData(res.treatments);                
-            //const medicalChart = createChartData(res.data.medical_conditions)
-            setTreatmentsChartData({...treatmentsChart});
-            //setMedicalChartData({...medicalChart});
-            axios.post('http://localhost:5000/view-medical', request)
             .then((response) => {
                 const res = response.data;
-                //const treatmentsChart = createChartData(res.treatments);                
-                const medicalChart = createChartData(res.medical_conditions)
-                //setTreatmentsChartData({...treatmentsChart});
-                setMedicalChartData({...medicalChart});
+                const treatmentsChart = createChartData(res.treatments);
+                //const medicalChart = createChartData(res.data.medical_conditions)
+                setTreatmentsChartData({ ...treatmentsChart });
+                //setMedicalChartData({...medicalChart});
+                axios.post('http://localhost:5000/view-medical', request)
+                    .then((response) => {
+                        const res = response.data;
+                        //const treatmentsChart = createChartData(res.treatments);                
+                        const medicalChart = createChartData(res.medical_conditions)
+                        //setTreatmentsChartData({...treatmentsChart});
+                        setMedicalChartData({ ...medicalChart });
+                    });
             });
-        });
     }
     const fetchLabels = () => {
         return axios.post('http://localhost:5000/labels')
@@ -88,19 +88,19 @@ const Dashboard = () => {
     }
 
     const requestObject = () => {
-        
+
         const groupKeys = (groupBy == constants.groupType.Cohort) ? cohort : payType;
-        const treatmentLabels = selectedTreatmentLabels.map((e,i)=>{return e["label"]})
-        const medicalConditionLabels = selectedMedicalConditionLabels.map((e,i)=>{return e["label"]})
-        
+        const treatmentLabels = selectedTreatmentLabels.map((e, i) => { return e["label"] })
+        const medicalConditionLabels = selectedMedicalConditionLabels.map((e, i) => { return e["label"] })
+
         const request = {
             group_condition: {
-                group_by:groupBy,
-                selection: Object.keys(groupKeys).filter((e,i)=>{return groupKeys[e]})
+                group_by: groupBy,
+                selection: Object.keys(groupKeys).filter((e, i) => { return groupKeys[e] })
             },
             states: filterStates,
             treatments: {
-                labels:  treatmentLabels, //selectedTreatmentLabels,
+                labels: treatmentLabels, //selectedTreatmentLabels,
                 OR: filterTreatmentOR,
                 AND: filterTreatmentAND
             },
@@ -142,7 +142,7 @@ const Dashboard = () => {
     };
 
     const handleStates = (event) => {
-        let states = event.map((data)=> data.value);
+        let states = event.map((data) => data.value);
         setFilterStates([...states]);
     };
 
@@ -204,38 +204,32 @@ const Dashboard = () => {
 
     return (
         <div className="container">
-            <Header />
-            <div className="box">
-                <Sidebar />
-                <div className="content">
-                    <Filters
-                        cohort={cohort}
-                        payType={payType}
-                        groupBy={groupBy}
-                        filterStates={filterStates}
-                        treatment={treatment}
-                        medicalCondition={medicalCondition}
-                        filterTreatmentAND={filterTreatmentAND}
-                        filterMedicalConditionAND={filterMedicalConditionAND}
-                        filterTreatmentOR={filterTreatmentOR}
-                        filterMedicalConditionOR={filterMedicalConditionOR}
-                        onClick={handleClick}
-                        onChange={handleChange}
-                        onChangeGroup={handleGroupBy}
-                        onChangeStates={handleStates}
-                        onChangeTreatment={handleTreatments}
-                        onChangeMedicalCondition={handleMedicalConditions}
-                    />
-                    <div>
-                    <h3> Treatment Chart </h3>
-                    <Graph chartData={treatmentsChartData} />
-                    </div>
-                    <hr />
-                    <div>
-                    <h3> Medical Conditions Chart </h3>
-                    <Graph chartData={medicalChartData} />
-                    </div>
-                </div>
+            <Filters
+                cohort={cohort}
+                payType={payType}
+                groupBy={groupBy}
+                filterStates={filterStates}
+                treatment={treatment}
+                medicalCondition={medicalCondition}
+                filterTreatmentAND={filterTreatmentAND}
+                filterMedicalConditionAND={filterMedicalConditionAND}
+                filterTreatmentOR={filterTreatmentOR}
+                filterMedicalConditionOR={filterMedicalConditionOR}
+                onClick={handleClick}
+                onChange={handleChange}
+                onChangeGroup={handleGroupBy}
+                onChangeStates={handleStates}
+                onChangeTreatment={handleTreatments}
+                onChangeMedicalCondition={handleMedicalConditions}
+            />
+            <div>
+                <h3> Treatment Chart </h3>
+                <Graph chartData={treatmentsChartData} />
+            </div>
+            <hr />
+            <div>
+                <h3> Medical Conditions Chart </h3>
+                <Graph chartData={medicalChartData} />
             </div>
         </div>
     )
