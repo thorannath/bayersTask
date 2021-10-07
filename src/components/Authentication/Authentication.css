@@ -5,7 +5,7 @@
 
 .image{
     width: 55%;
-    background-image: url('../Authentication/login.png');
+    background-color: royalblue;
     background-size: cover;
     display: flex;
     align-items: center;
@@ -14,8 +14,12 @@
 
 .image h2{
     font-style: italic;
-    text-shadow: 2px 2px #b5b5b5;
-    font-size: 40px;
+    color: seashell;
+    font-size: 45px;
+}
+
+.logo{
+    font-size: larger;
 }
 
 .card{
