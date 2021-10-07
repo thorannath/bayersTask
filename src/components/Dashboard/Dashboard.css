@@ -7,15 +7,6 @@
     height: 100vh;
 }
 
-.content{
-    display: flex;
-    flex-direction: column;
-    width: 75%;
-    float: right;
-    padding: 40px;
-    padding-top: 100px;
-}
-
 .chips{
     color: coral;
 }

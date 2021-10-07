@@ -5,6 +5,7 @@ import './Authentication.css';
 import ButtonGroup from '@mui/material/ButtonGroup';
 import Button from '@mui/material/Button';
 import { NavLink } from 'react-router-dom';
+import BlurOnIcon from '@mui/icons-material/BlurOn';
 
 const Authentication = () => {
 
@@ -27,6 +28,8 @@ const Authentication = () => {
     return (
         <div className="container-fluid">
             <div className="image">
+                <div className="logo"><BlurOnIcon sx={{ color: 'seashell', fontSize:100}}/></div>
+                
                 <h2> Bayer Project </h2>
             </div>
             <div className="card">
@@ -44,7 +47,7 @@ const Authentication = () => {
                 <br/>
                 <br/>
                 <hr/>
-                <div class="auth-container">
+                <div className="auth-container">
                     <Auth />
                 </div>
             </div>

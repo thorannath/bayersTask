@@ -32,7 +32,7 @@ const Login = () => {
                             setSeverity('success');
                             /* --- FIXME => Later: change this to user_id & auth-token --- */
                             Cookies.set('userData', { userid: username, password: password }, {path:'/'}); 
-                            history.push("/app/dashboard");
+                            history.push("/app/patient-finder");
                         }
                         else {
                             setSeverity('error');

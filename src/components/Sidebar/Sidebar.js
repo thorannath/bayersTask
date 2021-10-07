@@ -1,18 +1,53 @@
 import {Button} from '@mui/material';
 import {Link} from 'react-router-dom';
 import React from 'react'
+import MenuList from '@mui/material/MenuList';
+import MenuItem from '@mui/material/MenuItem';
+import ListItemText from '@mui/material/ListItemText';
+import { useHistory } from "react-router-dom";
+
 import './Sidebar.css';
 
-const Sidebar = () => {
+
+export const structure = [
+    { id: 0, label: "Introduction", link: "/app/introduction", icon: null },
+    { id: 1, label: "Patient Finder", link: "/app/patient-finder", icon: null }
+]
+
+
+const Sidebar = (props) => {
+    
+    /*const history = useHistory();
+    const handleRoute = (label) =>{
+        let route = structure.find(val=> val.label === label);
+        if(route) history.push(route.link);
+    }*/
+
     return (
         <div className="sidebar">
-            <ul className="list">
-                <li><Link to="/app/introduction"><Button>Introduction</Button></Link></li>
-                <li><Link to="/app/home"><Button>Home</Button></Link></li>
-                <li><Link to="/app/dashboard"><Button>Patient Finder</Button></Link></li>
-                <li><Link to="/app/page2"><Button>Page 2</Button></Link></li>
-                <li><Link to="/app/page3"><Button >Page 3</Button></Link></li>
-            </ul>
+            <MenuList className="menu-list">
+                <MenuItem className="menu-item" /*onClick={()=>handleRoute('Introduction')}*/>
+                    <ListItemText disableTypography className="list-item-text">
+                        <Link to="/app/introduction">Introduction</Link>
+                    </ListItemText>
+                </MenuItem>
+                <MenuItem className="menu-item">
+                    <ListItemText disableTypography className="list-item-text">
+                        <Link to="/app/home">Home</Link>
+                    </ListItemText>
+                </MenuItem>
+                <MenuItem className="menu-item">
+                    <ListItemText disableTypography className="list-item-text" /*onClick={()=>handleRoute('Patient Finder')}*/>
+                        <Link to="/app/patient-finder">Patient Finder</Link>
+                    </ListItemText>
+                </MenuItem>
+                <MenuItem className="menu-item">
+                    <ListItemText disableTypography className="list-item-text">
+                        <Link to="/app/dashboard">Dashboard</Link>
+                    </ListItemText>
+                </MenuItem>
+
+            </MenuList>
         </div>
     )
 }

@@ -24,7 +24,7 @@ const Header = () => {
                 <div className="menu-icons">
                     <Button onClick={onClickProfile} > <AccountCircleIcon/> </Button>
                     
-                    <Button variant="outlined" onClick={logout}> Logout </Button>
+                    <Button variant="outlined" sx={{border:'1px solid seashell'}} onClick={logout}> Logout </Button>
                 </div>
             </nav>
         )
