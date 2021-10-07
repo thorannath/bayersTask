@@ -51,7 +51,7 @@ const Dashboard = () => {
                 axios.post('http://localhost:5000/view-medical', request)
                     .then((response) => {
                         const res = response.data;
-                        //const treatmentsChart = createChartData(res.treatments);                
+                        //const treatmentsChart = createChartData(res.treatments);
                         const medicalChart = createChartData(res.medical_conditions)
                         //setTreatmentsChartData({...treatmentsChart});
                         setMedicalChartData({ ...medicalChart });
@@ -202,6 +202,24 @@ const Dashboard = () => {
     }, [])
 
 
+
+    let medicalChartComponent, treatmentsChartComponent;
+    if(treatmentsChartData){
+        treatmentsChartComponent = (
+            <div>
+                <h3> Treatment Chart </h3>
+                <Graph chartData={treatmentsChartData} />
+            </div>
+        );
+    } 
+    if(medicalChartData){
+        medicalChartComponent = (
+            <div>
+                <h3> Medical Conditions Chart </h3>
+                <Graph chartData={medicalChartData} />
+            </div>
+        );
+    }
     return (
         <div className="container">
             <Filters
@@ -222,15 +240,9 @@ const Dashboard = () => {
                 onChangeTreatment={handleTreatments}
                 onChangeMedicalCondition={handleMedicalConditions}
             />
-            <div>
-                <h3> Treatment Chart </h3>
-                <Graph chartData={treatmentsChartData} />
-            </div>
+            {treatmentsChartComponent}
             <hr />
-            <div>
-                <h3> Medical Conditions Chart </h3>
-                <Graph chartData={medicalChartData} />
-            </div>
+            {medicalChartComponent}
         </div>
     )
 }
