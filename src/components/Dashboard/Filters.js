@@ -37,10 +37,13 @@ export const Filters = (props) => {
           <h3>Patient Cohort</h3>
           <FormGroup>
             {
-              patientCohort.map((data) => {
-                return <FormControlLabel
+              patientCohort.map((data,i) => {
+                return <FormControlLabel key={`cohort-formgrp-${i}`}
                   control={
-                    <Checkbox checked={cohort[data]} onChange={(e) => props.onChange(e, constants.groupType.Cohort)} name={data} />
+                    <Checkbox 
+                      checked={cohort[data]} 
+                      onChange={(e) => props.onChange(e, constants.groupType.Cohort)} 
+                      name={data} />
                   }
                   label={data.toUpperCase()}
                 />
@@ -56,11 +59,10 @@ export const Filters = (props) => {
           <h3>Payer Type</h3>
           <FormGroup>
             {
-              payerType.map((data) => {
-                return <FormControlLabel
+              payerType.map((data,i) => {
+                return <FormControlLabel key={`paytyp-formgrp-${i}`}
                   control={
-                    <Checkbox
-                      checked={payType[data]}
+                    <Checkbox checked={payType[data]}
                       onChange={(e) => props.onChange(e, constants.groupType.PayerType)}
                       name={data} />
                   }
