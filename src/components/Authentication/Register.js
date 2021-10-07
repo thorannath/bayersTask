@@ -38,11 +38,11 @@ export const Register = () => {
                         }
                     }
                     else{
-                        setMessage("Invalid username or password");
+                        setMessage("Please enter valid information to register!");
                     }
                 })
                 .catch(e=>{
-                    setMessage("Invalid username or password");
+                    setMessage("Please enter valid information to register!");
                 })
         }
         else{
@@ -61,18 +61,17 @@ export const Register = () => {
 
     return (
         <div>
-            <h1> Register </h1>
             <Form>
             <Form.Group className="form-group" controlId="username">
-                <TextField type="text" className="form-input" label="Username" variant="outlined" onChange={(e) => setUsername(e.target.value)} required />
+                <TextField type="text" className="form-input" label="Username" variant="standard"  onChange={(e) => setUsername(e.target.value)} required />
             </Form.Group>
 
             <Form.Group className="form-group" controlId="email">
-                <TextField type="email" className="form-input" label="Email" variant="outlined" onChange={(e) => setEmail(e.target.value)} required />
+                <TextField type="email" className="form-input" label="Email" variant="standard" onChange={(e) => setEmail(e.target.value)} required />
             </Form.Group>
 
             <Form.Group className="form-group" controlId="fullName">
-                <TextField type="text" className="form-input" label="Full Name" variant="outlined" onChange={(e) => setFullName(e.target.value)} required />
+                <TextField type="text" className="form-input" label="Full Name" variant="standard" onChange={(e) => setFullName(e.target.value)} required />
             </Form.Group>
 
             <Form.Group className="form-group" controlId="password">
@@ -80,12 +79,13 @@ export const Register = () => {
                     label="Password"
                     type="password"
                     className="form-input"
+                    variant="standard"
                     autoComplete="current-password"
                     onChange={(e) => setPassword(e.target.value)}
                     required
                 />
             </Form.Group>
-            <Button type="submit" color="secondary" variant="contained" onClick={handleFormSubmit}>Register</Button>
+            <Button type="submit" sx={{width:'50%'}} color="primary" variant="contained" onClick={handleFormSubmit}>Register</Button>
             </Form>
             
             <Snackbar

@@ -49,7 +49,6 @@ const Login = () => {
                     setMessage("Invalid username or password");
                     setOpen(true);
                 })
-
         }
     }
 
@@ -57,30 +56,41 @@ const Login = () => {
         if (reason === 'clickaway') {
           return;
         }
-    
         setOpen(false);
-      };
+    };
 
+    const inputStyles = {
+        backgroundColor:'red'
+    }
 
     return (
-        <div>
-            <h1> Login </h1>
+        <div className="login-cls">
             <Form.Group className="form-group" controlId="username">
-                <TextField id="outlined-basic" className="form-input" label="Username" variant="outlined" onChange={(e) => setUsername(e.target.value)} required />
+                <TextField 
+                id="outlined-basic" 
+                type="text"
+                className="form-input" 
+                variant="standard"  
+                label="Username" 
+                onChange={(e) => setUsername(e.target.value)} required 
+                />
             </Form.Group>
             <Form.Group className="form-group" controlId="password">
                 <TextField
                     id="outlined-password-input"
                     label="Password"
                     className="form-input"
+                    variant="standard" 
                     type="password"
                     autoComplete="current-password"
                     onChange={(e) => setPassword(e.target.value)}
                     required
                 />
             </Form.Group>
-            <Button type="submit" variant="contained" onClick={handleFormSubmit}>Login</Button>
-
+            <div>
+            <Button type="submit" sx={{width:'50%'}} variant="contained" onClick={handleFormSubmit}>Login</Button>
+            <Button sx={{width:'50%'}}>Forget Password</Button>
+            </div>
             <Snackbar
                 open={open}
                 autoHideDuration={6000}
