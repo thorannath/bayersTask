@@ -21,6 +21,10 @@
     text-decoration: none;
 }
 
+.btn-active{
+    background-color: whitesmoke !important;
+}
+
 .btn-active .list-item-text{
     color: royalblue;
 }

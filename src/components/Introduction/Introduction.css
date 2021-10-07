@@ -1,0 +1,28 @@
+.section{
+    padding: 45px;
+}
+
+#content ul{
+    list-style: none;
+}
+
+a:visited{
+    color: blue;
+}
+
+h2{
+    padding: 0 0 10px 0;
+}
+
+h3{
+    padding: 10px 0 10px 0;
+}
+
+p, li{
+    line-height: 30px;
+}
+
+.back{
+    color: gray;
+    font-size: 14px;
+}
