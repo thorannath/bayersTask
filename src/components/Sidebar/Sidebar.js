@@ -8,7 +8,7 @@ import { useHistory } from "react-router-dom";
 
 import './Sidebar.css';
 
-
+ 
 export const structure = [
     { id: 0, label: "Introduction", link: "/app/introduction", icon: null },
     { id: 1, label: "Patient Finder", link: "/app/patient-finder", icon: null }
@@ -43,10 +43,9 @@ const Sidebar = (props) => {
                 </MenuItem>
                 <MenuItem className="menu-item">
                     <ListItemText disableTypography className="list-item-text">
-                        <Link to="/app/dashboard">Dashboard</Link>
+                        <Link to="/app/preference">Preferences</Link>
                     </ListItemText>
                 </MenuItem>
-
             </MenuList>
         </div>
     )

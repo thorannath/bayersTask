@@ -31,7 +31,8 @@ const Login = () => {
                             setMessage(res.data.message);
                             setSeverity('success');
                             /* --- FIXME => Later: change this to user_id & auth-token --- */
-                            Cookies.set('userData', { userid: username, password: password }, {path:'/'}); 
+                            Cookies.set('userid', username, {expires: 1, path:'/'}); 
+                            Cookies.set('password', password, {expires: 1, path:'/'});
                             history.push("/app/patient-finder");
                         }
                         else {
