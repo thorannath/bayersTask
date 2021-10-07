@@ -16,3 +16,12 @@
     font-weight: 500;
     color: gray;
 }
+
+.list-link{
+    text-decoration: none;
+}
+
+.btn-active .list-item-text{
+    color: royalblue;
+}
+
