@@ -26,6 +26,13 @@ export const labelTypes = {
     MEDICAL_CONDITION:'medical_condition'
 }
 
+export const routes = {
+    Introduction: '/app/introduction',
+    Dashboard: '/app/dashboard',
+    Patient_Finder: '/app/patient-finder',
+    Home:'/app/home',
+}
+
 export const States = [
     'WY',
     'WV',
