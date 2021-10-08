@@ -101,7 +101,7 @@ export const Filters = (props) => {
           link.href = canvas.toDataURL('image/jpg');   //function blocks CORS
           link.download = './medical_chart.jpg';
           link.click();
-    });*/
+    });h*/
   };
 
   return (
