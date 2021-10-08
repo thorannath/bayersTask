@@ -8,7 +8,8 @@ import Radio from '@mui/material/Radio';
 import RadioGroup from '@mui/material/RadioGroup';
 import makeAnimated from 'react-select/animated';
 import Select, { StylesConfig } from 'react-select';
-import html2canvas from 'html2canvas';
+import html2canvas from "html2canvas";
+import jsPdf from "jspdf";
 
 
 export const Filters = (props) => {
@@ -93,16 +94,36 @@ export const Filters = (props) => {
 
 
   const takeScreenshot = (e)=>{
-    /*
-    html2canvas(document.getElementById("medical-chart")).then(function(canvas) {
-        var context=canvas.getContext('2d');
-        context.drawImage(canvas);
-          var link=document.createElement("a");
-          link.href = canvas.toDataURL('image/jpg');   //function blocks CORS
-          link.download = './medical_chart.jpg';
-          link.click();
-    });h*/
+      html2canvas(document.getElementById("medical-chart"), {
+        onclone: document => {
+          document.getElementById("image-render-medical").style.visibility = "hidden";
+        }
+      }).then(canvas => {
+        
+        const imgData = canvas.toDataURL("image/png");
+        const pdf = new jsPdf("l", "mm", "a4");
+        const width = pdf.internal.pageSize.getWidth();
+        const height = pdf.internal.pageSize.getHeight();
+        pdf.addImage(imgData, "JPEG", 0, 0, width, height);
+        pdf.save(`medical-chart_${new Date().toISOString()}.pdf`);
+      });
+
+      html2canvas(document.getElementById("treatment-chart"), {
+        onclone: document => {
+          document.getElementById("image-render-treatment").style.visibility = "hidden";
+        }
+      }).then(canvas => {
+        
+        const imgData = canvas.toDataURL("image/png");
+        const pdf = new jsPdf("l", "mm", "a4");
+        const width = pdf.internal.pageSize.getWidth();
+        const height = pdf.internal.pageSize.getHeight();
+        pdf.addImage(imgData, "JPEG", 0, 0, width, height);
+        pdf.save(`treatment-chart_${new Date().toISOString()}.pdf`);
+      });
   };
+
+  
 
   return (
     <div className="filters">
@@ -224,6 +245,8 @@ export const Filters = (props) => {
         {/* Please view this button when the the graph data is available*/}
         <span style={{paddingLeft:"15px"}}><Button color="primary" variant="outlined"  onClick={(e)=>{takeScreenshot(e)}}>Take Screenshot</Button></span>
       </div>
+      <div id="image-render-medical"></div>
+      <div id="image-render-treatment"></div>
     </div>
   )
 }
