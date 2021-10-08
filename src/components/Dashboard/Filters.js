@@ -93,20 +93,14 @@ export const Filters = (props) => {
 
 
   const takeScreenshot = (e)=>{
-      html2canvas(document.getElementById("medical-chart"), {
-          onrendered: function (canvas) {
-              var tempcanvas=document.createElement('canvas');
-              tempcanvas.width=350;
-              tempcanvas.height=350;
-              var context=tempcanvas.getContext('2d');
-              context.drawImage(canvas,0,0,tempcanvas.width,tempcanvas.width,0,0,tempcanvas.width,tempcanvas.width);
+    html2canvas(document.getElementById("medical-chart")).then(function(canvas) {
+        var context=canvas.getContext('2d');
+        context.drawImage(canvas);
               var link=document.createElement("a");
-              link.href = tempcanvas.toDataURL('image/jpg');   //function blocks CORS
+              link.href = canvas.toDataURL('image/jpg');   //function blocks CORS
               link.download = './medical_chart.jpg';
               link.click();
-              console.log("screenshot is taken!");
-          }
-      });
+    });
   };
 
   return (
