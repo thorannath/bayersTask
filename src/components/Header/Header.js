@@ -21,8 +21,9 @@ const Header = () => {
 
         return (
             <nav className="navbar">
-                <h1> React Assignment </h1> <span style={{paddingLeft: "30px"}}>Hello { Cookies.get("userid",{path: "/"}) },</span>
+                <h1> React Assignment </h1>
                 <div className="menu-icons">
+                    <span style={{paddingTop:"9px",paddingRight: "5px"}}>Hello { Cookies.get("userid",{path: "/"}) },</span>
                     <Button onClick={onClickProfile} > <AccountCircleIcon/> </Button>
                     <Button variant="outlined" sx={{border:'1px solid seashell'}} onClick={logout}> Logout </Button>
                 </div>

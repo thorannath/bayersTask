@@ -49,13 +49,28 @@ const Dashboard = () => {
         axios.post('http://localhost:5000/view-treatment', request)
             .then((response) => {
                 const res = response.data;
+                res.treatments.labels.shift();
+                res.treatments.data = res.treatments.data.map((e,i)=>{
+                    const ALL_DATA = e.data.shift();
+                    const result = e.data.map((ele,i)=>(ele/ALL_DATA * 100));
+                    return {type: e.type, data: result};
+                });
+
                 const treatmentsChart = createChartData(res.treatments);
                 //const medicalChart = createChartData(res.data.medical_conditions)
+
                 setTreatmentsChartData({ ...treatmentsChart });
                 //setMedicalChartData({...medicalChart});
                 axios.post('http://localhost:5000/view-medical', request)
                     .then((response) => {
                         const res = response.data;
+                        res.medical_conditions.labels.shift();
+                        res.medical_conditions.data = res.medical_conditions.data.map((e,i)=>{
+                            const ALL_DATA = e.data.shift();
+                            const result = e.data.map((ele,i)=>(ele/ALL_DATA * 100));
+                            return {type: e.type, data: result};
+                        });
+
                         //const treatmentsChart = createChartData(res.treatments);
                         const medicalChart = createChartData(res.medical_conditions)
                         //setTreatmentsChartData({...treatmentsChart});
