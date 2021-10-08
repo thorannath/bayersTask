@@ -8,6 +8,7 @@ import Radio from '@mui/material/Radio';
 import RadioGroup from '@mui/material/RadioGroup';
 import makeAnimated from 'react-select/animated';
 import Select, { StylesConfig } from 'react-select';
+import html2canvas from 'html2canvas';
 
 
 export const Filters = (props) => {
@@ -28,7 +29,6 @@ export const Filters = (props) => {
   const filterMedicalConditionAND = props.filterMedicalConditionAND;
   const filterTreatmentOR = props.filterTreatmentOR;
   const filterMedicalConditionOR = props.filterMedicalConditionOR;
-
 
   const GroupData = () => {
     if (props.groupBy == constants.groupType.Cohort) {
@@ -91,6 +91,18 @@ export const Filters = (props) => {
     console.log(e);
   }
 
+
+  const takeScreenshot = (e)=>{
+    /*
+    html2canvas(document.getElementById("medical-chart")).then(function(canvas) {
+        var context=canvas.getContext('2d');
+        context.drawImage(canvas);
+          var link=document.createElement("a");
+          link.href = canvas.toDataURL('image/jpg');   //function blocks CORS
+          link.download = './medical_chart.jpg';
+          link.click();
+    });h*/
+  };
 
   return (
     <div className="filters">
@@ -207,7 +219,10 @@ export const Filters = (props) => {
         </div>
       </div>
       <div className="update-button">
-        <Button color="primary" variant="contained" type="submit" onClick={props.onClick}> Update chart </Button>
+        <span><Button color="primary" variant="contained" type="submit" onClick={props.onClick}> Update chart </Button></span>
+
+        {/* Please view this button when the the graph data is available*/}
+        <span style={{paddingLeft:"15px"}}><Button color="primary" variant="outlined"  onClick={(e)=>{takeScreenshot(e)}}>Take Screenshot</Button></span>
       </div>
     </div>
   )

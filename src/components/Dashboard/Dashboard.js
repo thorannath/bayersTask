@@ -8,6 +8,7 @@ import axios from 'axios'
 import { useState, useEffect } from 'react';
 import * as constants from '../../Constant';
 import JSONdata from './data.json';
+import Cookies from 'js-cookie';
 
 const Dashboard = () => {
     const states = constants.States;
@@ -41,6 +42,10 @@ const Dashboard = () => {
         setMedicalChartData({ ...medicalChart });
         */
 
+        /* Later: Introduce  Authentication and Posting mechanism*/
+        request.userid = Cookies.get("userid", {path: '/'});
+        console.log(Cookies.get("userid", {path: '/'}));
+
         axios.post('http://localhost:5000/view-treatment', request)
             .then((response) => {
                 const res = response.data;
@@ -68,7 +73,7 @@ const Dashboard = () => {
                 setTreatment([...treatments])
                 setSelectedTreatmentLabels([...treatments]);
                 setSelectedMedicalConditionLabels([...medicalConditions]);
-            })
+            });
     }
 
     const createChartData = (obj) => {
@@ -202,24 +207,21 @@ const Dashboard = () => {
     }, [])
 
 
-
     let medicalChartComponent, treatmentsChartComponent;
-    if(treatmentsChartData){
-        treatmentsChartComponent = (
-            <div>
-                <h3> Treatment Chart </h3>
-                <Graph chartData={treatmentsChartData} />
-            </div>
-        );
-    } 
-    if(medicalChartData){
-        medicalChartComponent = (
-            <div>
-                <h3> Medical Conditions Chart </h3>
-                <Graph chartData={medicalChartData} />
-            </div>
-        );
-    }
+    treatmentsChartComponent = (
+        <div id="treatment-chart">
+            <h3> Treatment Chart </h3>
+            <Graph chartData={treatmentsChartData} />
+        </div>
+    ); 
+    
+    medicalChartComponent = (
+        <div id="medical-chart">
+            <h3> Medical Conditions Chart </h3>
+            <Graph chartData={medicalChartData} />
+        </div>
+    );
+
     return (
         <div className="container">
             <Filters

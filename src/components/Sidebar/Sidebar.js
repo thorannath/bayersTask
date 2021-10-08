@@ -9,7 +9,7 @@ import * as constants from '../../Constant';
 
 import './Sidebar.css';
 
-
+ 
 export const structure = [
     { id: 0, label: "Introduction", link: "/app/introduction", icon: null },
     { id: 1, label: "Patient Finder", link: "/app/patient-finder", icon: null }
