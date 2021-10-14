@@ -1,12 +1,19 @@
 .container-fluid{
     height: 100vh;
     display: flex;
+    overflow-y: hidden;
+}
+
+.image_bg{
+    object-position: center;
+    object-fit:cover contain ;
+    max-width:100%;
+    max-height:100%;
 }
 
 .image{
     width: 55%;
-    background-color: royalblue;
-    background-size: cover;
+    background-color: cornsilk;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -24,9 +31,10 @@
 
 .card{
     width: 45%;
-    background-color: whitesmoke;
+    background-color: white;
     padding: 5em;
     text-align: center; 
+    box-shadow: 0px 2px 5px #888;
 }
 
 .card h2{

@@ -6,8 +6,7 @@ import Checkbox from '@mui/material/Checkbox';
 import { Button } from '@mui/material';
 import Radio from '@mui/material/Radio';
 import RadioGroup from '@mui/material/RadioGroup';
-import makeAnimated from 'react-select/animated';
-import Select, { StylesConfig } from 'react-select';
+import Select from 'react-select';
 import html2canvas from "html2canvas";
 import jsPdf from "jspdf";
 
@@ -19,7 +18,6 @@ export const Filters = (props) => {
     return {value:data, label:data}
   });
 
-  const animatedComponents = makeAnimated();
   const cohort = props.cohort;
   const payType = props.payType;
   const treatment = props.treatment;

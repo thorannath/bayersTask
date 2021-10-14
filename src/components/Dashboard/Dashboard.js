@@ -1,14 +1,25 @@
 import React from 'react'
-import Sidebar from '../Sidebar/Sidebar';
 import './Dashboard.css';
 import Graph from './Graph';
 import Filters from './Filters';
-import Header from '../Header/Header';
 import axios from 'axios'
 import { useState, useEffect } from 'react';
 import * as constants from '../../Constant';
-import JSONdata from './data.json';
 import Cookies from 'js-cookie';
+import Button from '@mui/material/Button';
+import Stack from '@mui/material/Stack';
+import Backdrop from '@mui/material/Backdrop';
+import Modal from '@mui/material/Modal';
+import ViewPreferences from '../Preferences/ViewPreferences';
+import CreatePreferences from '../Preferences/CreatePreferences';
+
+
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
+import FormControl from '@mui/material/FormControl';
+import Select from '@mui/material/Select';
+import { textAlign } from '@mui/system';
+
 
 const Dashboard = () => {
     const states = constants.States;
@@ -22,6 +33,8 @@ const Dashboard = () => {
     const [groupBy, setGroupBy] = useState(constants.groupType.Cohort);
     const [treatment, setTreatment] = useState([]);
     const [medicalCondition, setMedicalCondition] = useState([]);
+    const [openViewModal, setOpenViewModal] = useState(false);
+    const [openCreateModal, setOpenCreateModal] = useState(false);
 
     const [filterStates, setFilterStates] = useState(states);
     const [selectedTreatmentLabels, setSelectedTreatmentLabels] = useState([]);
@@ -31,33 +44,28 @@ const Dashboard = () => {
     const [filterTreatmentOR, setFilterTreatmentOR] = useState([]);
     const [filterMedicalConditionOR, setFilterMedicalConditionOR] = useState([]);
 
+    const handleOpenModal = (type) => (type == 'create') ? setOpenCreateModal(true) : setOpenViewModal(true);
+    const handleCloseModal = (type) => (type == 'create') ? setOpenCreateModal(false) : setOpenViewModal(false);
+
     const fetchGraphData = () => {
 
         const request = requestObject();
-        console.log(request);
-        /*
-        const treatmentsChart = createChartData(JSONdata.treatments);
-        const medicalChart = createChartData(JSONdata.medical_conditions)
-        setTreatmentsChartData({ ...treatmentsChart });
-        setMedicalChartData({ ...medicalChart });
-        */
 
         /* Later: Introduce  Authentication and Posting mechanism*/
-        request.userid = Cookies.get("userid", {path: '/'});
-        console.log(Cookies.get("userid", {path: '/'}));
+        request.userid = Cookies.get("userid", { path: '/' });
+        console.log(Cookies.get("userid", { path: '/' }));
 
         axios.post('http://localhost:5000/view-treatment', request)
             .then((response) => {
                 const res = response.data;
                 res.treatments.labels.shift();
-                res.treatments.data = res.treatments.data.map((e,i)=>{
+                res.treatments.data = res.treatments.data.map((e, i) => {
                     const ALL_DATA = e.data.shift();
-                    const result = e.data.map((ele,i)=>(ele/ALL_DATA * 100));
-                    return {type: e.type, data: result};
+                    const result = e.data.map((ele, i) => (ele / ALL_DATA * 100));
+                    return { type: e.type, data: result };
                 });
 
                 const treatmentsChart = createChartData(res.treatments);
-                //const medicalChart = createChartData(res.data.medical_conditions)
 
                 setTreatmentsChartData({ ...treatmentsChart });
                 //setMedicalChartData({...medicalChart});
@@ -65,10 +73,10 @@ const Dashboard = () => {
                     .then((response) => {
                         const res = response.data;
                         res.medical_conditions.labels.shift();
-                        res.medical_conditions.data = res.medical_conditions.data.map((e,i)=>{
+                        res.medical_conditions.data = res.medical_conditions.data.map((e, i) => {
                             const ALL_DATA = e.data.shift();
-                            const result = e.data.map((ele,i)=>(ele/ALL_DATA * 100));
-                            return {type: e.type, data: result};
+                            const result = e.data.map((ele, i) => (ele / ALL_DATA * 100));
+                            return { type: e.type, data: result };
                         });
 
                         //const treatmentsChart = createChartData(res.treatments);
@@ -216,6 +224,10 @@ const Dashboard = () => {
         fetchGraphData();
     }
 
+    const handlePreferences = () => {
+
+    }
+
     useEffect(() => {
         fetchGraphData();
         fetchLabels();
@@ -228,8 +240,8 @@ const Dashboard = () => {
             <h3> Treatment Chart </h3>
             <Graph chartData={treatmentsChartData} />
         </div>
-    ); 
-    
+    );
+
     medicalChartComponent = (
         <div id="medical-chart">
             <h3> Medical Conditions Chart </h3>
@@ -239,6 +251,31 @@ const Dashboard = () => {
 
     return (
         <div className="container">
+            <div className="page_header">
+                <h1> Patient Finder </h1>
+                <FormControl sx={{ textAlign: 'center' }} variant="standard" sx={{ m: 1, minWidth: 200 }}>
+                    <InputLabel id="demo-simple-select-standard-label">Choose a Preference</InputLabel>
+                    <Select
+                        labelId="demo-simple-select-standard-label"
+                        id="demo-simple-select-standard"
+                        value={10}
+                        // onChange={handleChange}
+                        label="Age"
+                    >
+                        <MenuItem value="">
+                            <em>None</em>
+                        </MenuItem>
+                        <MenuItem value={10}>Ten</MenuItem>
+                        <MenuItem value={20}>Twenty</MenuItem>
+                        <MenuItem value={30}>Thirty</MenuItem>
+                    </Select>
+                </FormControl>
+                <Stack className="btn-stack" spacing={2} direction="row">
+                    <Button variant="contained" color="warning" onClick={() => { handleOpenModal('create') }}> Create PREFRENCE </Button>
+                    <Button variant="contained" color="info" onClick={() => { handleOpenModal('view') }}> VIEW PREFRENCES </Button>
+                </Stack>
+            </div>
+
             <Filters
                 cohort={cohort}
                 payType={payType}
@@ -260,6 +297,45 @@ const Dashboard = () => {
             {treatmentsChartComponent}
             <hr />
             {medicalChartComponent}
+
+            <Modal
+                open={openCreateModal}
+                onClose={() => handleCloseModal('create')}
+                closeAfterTransition
+                BackdropComponent={Backdrop}
+                BackdropProps={{
+                    timeout: 500,
+                }}>
+                <CreatePreferences
+                    cohort={cohort}
+                    payType={payType}
+                    groupBy={groupBy}
+                    filterStates={filterStates}
+                    treatment={treatment}
+                    medicalCondition={medicalCondition}
+                    filterTreatmentAND={filterTreatmentAND}
+                    filterMedicalConditionAND={filterMedicalConditionAND}
+                    filterTreatmentOR={filterTreatmentOR}
+                    filterMedicalConditionOR={filterMedicalConditionOR}
+                    onClick={handleClick}
+                    onChange={handleChange}
+                    onChangeGroup={handleGroupBy}
+                    onChangeStates={handleStates}
+                    onChangeTreatment={handleTreatments}
+                    onChangeMedicalCondition={handleMedicalConditions}
+                    onCreatePreference={handlePreferences} />
+            </Modal>
+
+            <Modal
+                open={openViewModal}
+                onClose={() => handleCloseModal('view')}
+                closeAfterTransition
+                BackdropComponent={Backdrop}
+                BackdropProps={{
+                    timeout: 500,
+                }}>
+                <ViewPreferences openModal={openViewModal} />
+            </Modal>
         </div>
     )
 }
