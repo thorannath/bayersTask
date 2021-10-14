@@ -228,6 +228,10 @@ const Dashboard = () => {
 
     }
 
+    const handlePreferenceChange = ()=>{
+        
+    }
+
     useEffect(() => {
         fetchGraphData();
         fetchLabels();
@@ -259,15 +263,15 @@ const Dashboard = () => {
                         labelId="demo-simple-select-standard-label"
                         id="demo-simple-select-standard"
                         value={10}
-                        // onChange={handleChange}
+                        onChange={handlePreferenceChange}
                         label="Age"
                     >
                         <MenuItem value="">
-                            <em>None</em>
+                            <em>Please Select</em>
                         </MenuItem>
-                        <MenuItem value={10}>Ten</MenuItem>
-                        <MenuItem value={20}>Twenty</MenuItem>
-                        <MenuItem value={30}>Thirty</MenuItem>
+                        <MenuItem value={10}>Preference 1</MenuItem>
+                        <MenuItem value={20}>Preference 2</MenuItem>
+                        <MenuItem value={30}>Preference 3</MenuItem>
                     </Select>
                 </FormControl>
                 <Stack className="btn-stack" spacing={2} direction="row">
@@ -317,6 +321,7 @@ const Dashboard = () => {
                     filterMedicalConditionAND={filterMedicalConditionAND}
                     filterTreatmentOR={filterTreatmentOR}
                     filterMedicalConditionOR={filterMedicalConditionOR}
+                    closeModal={(type)=>handleCloseModal(type)}
                     onClick={handleClick}
                     onChange={handleChange}
                     onChangeGroup={handleGroupBy}
@@ -334,7 +339,7 @@ const Dashboard = () => {
                 BackdropProps={{
                     timeout: 500,
                 }}>
-                <ViewPreferences openModal={openViewModal} />
+                <ViewPreferences openModal={openViewModal} closeModal={(type)=>handleCloseModal(type)}/>
             </Modal>
         </div>
     )

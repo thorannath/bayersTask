@@ -11,6 +11,7 @@ import Select from 'react-select';
 import './Preferences.css';
 import * as constants from '../../Constant';
 import { useState, useEffect } from 'react';
+import axios from 'axios'
 
 
 const style = {
@@ -27,24 +28,53 @@ const style = {
 };
 
 const customStyles = {
+    menu: (provided, state) => ({
+        ...provided,
+        width: state.selectProps.width,
+        borderBottom: '1px solid grey',
+        color: state.selectProps.menuColor,
+        width:'50%',
+      }),
     option: (provided, state) => ({
       ...provided,
-      borderBottom: '1px dotted pink',
-      color: state.isSelected ? 'red' : 'blue',
       padding: 20,
     }),
-    control: () => ({
-      // none of react-select's styles are passed to <Control />
-      backgroundColor:'red',
-      width: '100%',
+
+    control: (control, state)=>({
+        ...control,
+        border:'none',
+        boxShadow: 'none',
+        borderBottom:'0.5px solid grey',
+        ':hover':{
+            borderBottom:'2px solid black',
+        }
     }),
     singleValue: (provided, state) => {
       const opacity = state.isDisabled ? 0.5 : 1;
       const transition = 'opacity 300ms';
-  
       return { ...provided, opacity, transition };
-    }
+    },
+    multiValue: (styles, { data }) => {
+        return {
+          ...styles,
+          backgroundColor: '#ffae42',
+          color:'whitesmoke',
+        };
+      },
+      multiValueLabel: (styles, { data }) => ({
+        ...styles,
+        color: data.color,
+      }),
+      multiValueRemove: (styles, { data }) => ({
+        ...styles,
+        color: data.color,
+        ':hover': {
+          backgroundColor: data.color,
+          color: 'white',
+        },
+      }),
   }
+
 
 
 //get /preferences?username=value
@@ -55,6 +85,7 @@ const CreatePreferences = (props) => {
     const [cohort, setCohort] = useState({ ckd: true, diab: true, both: true });
     const [payType, setPayType] = useState({ MCR: true, COM: true })
     const [groupBy, setGroupBy] = useState(constants.groupType.Cohort);
+    const [name, setName] = useState('');
 
     const payerType = constants.Paytype;
     const states = constants.States.map(data => {
@@ -75,6 +106,9 @@ const CreatePreferences = (props) => {
     const [filterTreatmentOR, setFilterTreatmentOR] = useState([]);
     const [filterMedicalConditionOR, setFilterMedicalConditionOR] = useState([]);
 
+    const handleName = (event)=>{
+        setName(event.target.value);
+    }
     const handleStates = (event) => {
         let states = event.map((data) => data.value);
         setFilterStates([...states]);
@@ -109,47 +143,22 @@ const CreatePreferences = (props) => {
     };
 
     const handleTreatment = (event, logic) =>{
+        let treatments = event.map(data=> data.value);
         if (logic === constants.Logic.AND) {
-            let treatments = filterTreatmentAND;
-            if (event.target.checked) {
-                treatments.push(event.target.value)
-            }
-            else {
-                treatments = treatments.filter(data => data != event.target.value);
-            }
-            setFilterTreatmentAND([...treatments]);
+            setFilterTreatmentAND(treatments);
+
         }
         else if (logic === constants.Logic.OR) {
-            let treatments = filterTreatmentOR;
-            if (event.target.checked) {
-                treatments.push(event.target.value)
-            }
-            else {
-                treatments = treatments.filter(data => data != event.target.value);
-            }
             setFilterTreatmentOR([...treatments]);
         }
     }
 
     const handleMedicalCondition = (event, logic) => {
+        let medicalConditions = event.map(data=> data.value);
         if (logic === constants.Logic.AND) {
-            let medicalConditions = filterMedicalConditionAND;
-            if (event.target.checked) {
-                medicalConditions.push(event.target.value)
-            }
-            else {
-                medicalConditions = medicalConditions.filter(data => data != event.target.value);
-            }
             setFilterMedicalConditionAND([...medicalConditions]);
         }
         else if (logic === constants.Logic.OR) {
-            let medicalConditions = filterMedicalConditionOR;
-            if (event.target.checked) {
-                medicalConditions.push(event.target.value)
-            }
-            else {
-                medicalConditions = medicalConditions.filter(data => data != event.target.value);
-            }
             setFilterMedicalConditionOR([...medicalConditions]);
         }
     };
@@ -197,16 +206,45 @@ const CreatePreferences = (props) => {
         }
     }
 
-    const handleFormSubmit = () => {
+    const handleDefault = (event) =>{
+        console.log(event.target.checked)
 
     }
+
+    const requestObject = () => {
+        console.log(name, 'name');
+        console.log(filtersStates, 'filterStates');
+        console.log(cohort, 'cohort');
+        console.log(payerType, 'payerType');
+        console.log(groupBy, 'groupBy');
+        console.log(filterTreatmentAND,'filterTreatmentAND');
+        console.log(filterTreatmentOR, 'filterTreatmentOR');
+        console.log(filterMedicalConditionAND, 'filterMedicalConditionAND');
+        console.log(filterMedicalConditionOR,'filterMedicalConditionOR');
+    }
+    
+
+    const handleFormSubmit = () => {
+        requestObject();
+        props.closeModal('create');
+    }
+
+    const handleCancel = ()=>{
+        props.closeModal('create');
+    }
+
+    
 
     return (
         <div>
             <Box sx={style}>
                 <h2> Create a Preference </h2>
                 <FormGroup className="form-group">
-                    <TextField id="standard-basic" label="Preference Name" variant="standard" />
+                    <TextField 
+                    id="standard-basic" 
+                    label="Preference Name" 
+                    onChange={handleName}
+                    variant="standard" />
                 </FormGroup>
                 <FormGroup classsName="form-group">
                     <FormLabel component="legend">Group By</FormLabel>
@@ -274,17 +312,16 @@ const CreatePreferences = (props) => {
                         name="colors"
                         styles={customStyles}
                         options={medicalCondition}
-                        onChange={(e) => handleMedicalCondition(e, constants.Logic.AND)}
+                        onChange={(e) => handleMedicalCondition(e, constants.Logic.OR)}
                         classNamePrefix="select"
                     />
                 </FormGroup>
-                <br/>
                 <FormGroup className="form-group">
-                    <FormControlLabel control={<Checkbox />} label="Make this as default" />
+                    <FormControlLabel control={<Checkbox onChange={handleDefault}/>} label="Make this as default" />
                 </FormGroup>
                 <div align="right">
                     <Button type="submit" sx={{ width: '25%' }} variant="contained" onClick={handleFormSubmit}>Save</Button>
-                    <Button type="submit" sx={{ width: '25%' }} color="warning">Cancel</Button>
+                    <Button type="submit" sx={{ width: '25%' }} color="warning" onClick={handleCancel}>Cancel</Button>
                 </div>
             </Box>
         </div>

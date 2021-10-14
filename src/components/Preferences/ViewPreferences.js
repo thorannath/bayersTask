@@ -1,4 +1,5 @@
 import * as React from 'react';
+import Box from '@mui/material/Box'
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -11,6 +12,8 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import Button from '@mui/material/Button';
 import TablePagination from '@mui/material/TablePagination';
 import { useState } from 'react';
+import CloseIcon from '@mui/icons-material/Close';
+import VisibilityIcon from '@mui/icons-material/Visibility';
 import Switch from '@mui/material/Switch';
 
 
@@ -44,7 +47,6 @@ const style = {
     width: '50%',
     bgcolor: 'background.paper',
     boxShadow: 24,
-    p: 4,
 };
 
 
@@ -61,50 +63,59 @@ const ViewPreferences = (props) => {
         setPage(0);
     };
 
+    const handleCancel = ()=>{
+        props.closeModal('view');
+    }
+
 
     return (
-        <TableContainer sx={style} component={Paper}>
-            <Table stickyHeader sx={{ minWidth: 650 }} size="small" aria-label="a dense table">
-                <TableHead>
-                    <TableRow>
-                        <TableCell>Preference Name</TableCell>
-                        <TableCell>Default</TableCell>
-                        <TableCell align="center">Actions</TableCell>
-                    </TableRow>
-                </TableHead>
-                <TableBody>
-                    {rows
-                        .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                        .map((row) => (
-                            <TableRow
-                                key={row.name}
-                                sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-                            >
-                                <TableCell component="th" scope="row">
-                                    {row.name}
-                                </TableCell>
-                                <TableCell component="th" scope="row">
-                                    <Switch defaultChecked />
-                                </TableCell>
-                                <TableCell align="center">
-                                    <Button color="info"> <EditIcon /> </Button>
-                                    <Button color="warning"> <DeleteIcon /> </Button>
-                                </TableCell>
-                            </TableRow>
-                        ))}
-                </TableBody>
-            </Table>
-            <TablePagination
-                rowsPerPageOptions={[10, 25, 100]}
-                component="div"
-                count={rows.length}
-                rowsPerPage={rowsPerPage}
-                page={page}
-                onPageChange={handleChangePage}
-                onRowsPerPageChange={handleChangeRowsPerPage}
-            />
-        </TableContainer>
-
+        <Box sx={style}>
+            <div align="right">
+            <Button type="submit" onClick={handleCancel}><CloseIcon/></Button>
+            </div>
+            <TableContainer sx={{padding:2}}>
+                <Table stickyHeader sx={{ minWidth: 650 }} size="small" aria-label="a dense table">
+                    <TableHead>
+                        <TableRow>
+                            <TableCell>Preference Name</TableCell>
+                            <TableCell>Default</TableCell>
+                            <TableCell align="center">Actions</TableCell>
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {rows
+                            .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                            .map((row) => (
+                                <TableRow
+                                    key={row.name}
+                                    sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                                >
+                                    <TableCell component="th" scope="row">
+                                        {row.name}
+                                    </TableCell>
+                                    <TableCell component="th" scope="row">
+                                        <p>Thu, 14 Oct 2021 21:11:16 GMT</p>
+                                    </TableCell>
+                                    <TableCell align="center">
+                                        <Button color="primary"> <VisibilityIcon /> </Button>
+                                        <Button color="info"> <EditIcon /> </Button>
+                                        <Button color="warning"> <DeleteIcon /> </Button>
+                                    </TableCell>
+                                </TableRow>
+                            ))}
+                    </TableBody>
+                </Table>
+                <TablePagination
+                    rowsPerPageOptions={[10, 25, 100]}
+                    component="div"
+                    count={rows.length}
+                    rowsPerPage={rowsPerPage}
+                    page={page}
+                    onPageChange={handleChangePage}
+                    onRowsPerPageChange={handleChangeRowsPerPage}
+                />
+            </TableContainer>
+        </Box>
     )
 }
 
