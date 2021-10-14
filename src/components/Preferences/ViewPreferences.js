@@ -15,6 +15,7 @@ import { useState } from 'react';
 import CloseIcon from '@mui/icons-material/Close';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import Switch from '@mui/material/Switch';
+import Tooltip from '@mui/material/Tooltip';
 
 
 function createData(name, calories, fat, carbs, protein) {
@@ -22,7 +23,7 @@ function createData(name, calories, fat, carbs, protein) {
 }
 
 const rows = [
-    createData('Frozen yoghurt', 159, 6.0, 24, 4.0),
+    createData('Frozen yoghurt[Default]', 159, 6.0, 24, 4.0),
     createData('Ice cream sandwich', 237, 9.0, 37, 4.3),
     createData('Eclair', 262, 16.0, 24, 6.0),
     createData('Cupcake', 305, 3.7, 67, 4.3),
@@ -63,17 +64,28 @@ const ViewPreferences = (props) => {
         setPage(0);
     };
 
-    const handleCancel = ()=>{
-        props.closeModal('view');
+    const handleCancel = () => {
+        props.closeModal({type:'view', action:'close'});
     }
 
+    const openSettings = (row) =>{
+
+    }
+
+    const editSettings = (row)=>{
+        props.closeModal({type:'view', action:'edit', data:row});
+    }
+
+    const deleteSettings = (row)=>{
+        
+    }
 
     return (
         <Box sx={style}>
             <div align="right">
-            <Button type="submit" onClick={handleCancel}><CloseIcon/></Button>
+                <Button type="submit" onClick={handleCancel}><CloseIcon /></Button>
             </div>
-            <TableContainer sx={{padding:2}}>
+            <TableContainer sx={{ padding: 2 }}>
                 <Table stickyHeader sx={{ minWidth: 650 }} size="small" aria-label="a dense table">
                     <TableHead>
                         <TableRow>
@@ -88,8 +100,7 @@ const ViewPreferences = (props) => {
                             .map((row) => (
                                 <TableRow
                                     key={row.name}
-                                    sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-                                >
+                                    sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
                                     <TableCell component="th" scope="row">
                                         {row.name}
                                     </TableCell>
@@ -97,9 +108,9 @@ const ViewPreferences = (props) => {
                                         <p>Thu, 14 Oct 2021 21:11:16 GMT</p>
                                     </TableCell>
                                     <TableCell align="center">
-                                        <Button color="primary"> <VisibilityIcon /> </Button>
-                                        <Button color="info"> <EditIcon /> </Button>
-                                        <Button color="warning"> <DeleteIcon /> </Button>
+                                        <Tooltip title="Apply"><Button color="primary" onClick={()=>openSettings(row)}> <VisibilityIcon /></Button></Tooltip>
+                                        <Tooltip title="Edit"><Button color="info" onClick={()=>editSettings(row)}><EditIcon /></Button></Tooltip>
+                                        <Tooltip title="Delete"><Button color="warning" onClick={()=>deleteSettings(row)}><DeleteIcon /></Button></Tooltip>
                                     </TableCell>
                                 </TableRow>
                             ))}

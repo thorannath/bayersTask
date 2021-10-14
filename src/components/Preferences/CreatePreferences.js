@@ -13,6 +13,7 @@ import * as constants from '../../Constant';
 import { useState, useEffect } from 'react';
 import axios from 'axios'
 
+import CloseIcon from '@mui/icons-material/Close';
 
 const style = {
     position: 'absolute',
@@ -21,10 +22,11 @@ const style = {
     transform: 'translate(-50%, -50%)',
     overflowY: 'scroll',
     width: '50%',
-    height: '100%',
+    height: '90%',
+    borderRadius:2,
     bgcolor: 'background.paper',
     boxShadow: 24,
-    p: 4,
+    p: 3,
 };
 
 const customStyles = {
@@ -39,16 +41,10 @@ const customStyles = {
       ...provided,
       padding: 20,
     }),
-
-    control: (control, state)=>({
+    control: (control)=>({
         ...control,
-        border:'none',
-        boxShadow: 'none',
-        borderBottom:'0.5px solid grey',
-        ':hover':{
-            borderBottom:'2px solid black',
-        }
-    }),
+        padding:4
+      }),
     singleValue: (provided, state) => {
       const opacity = state.isDisabled ? 0.5 : 1;
       const transition = 'opacity 300ms';
@@ -98,7 +94,7 @@ const CreatePreferences = (props) => {
 
     const medicalCondition = props.medicalCondition.map(data => {
         return { value: data.label_val, label: data.name }
-    });;
+    });
 
     const [filtersStates, setFilterStates] = useState([]);
     const [filterTreatmentAND, setFilterTreatmentAND] = useState([]);
@@ -174,14 +170,12 @@ const CreatePreferences = (props) => {
                                 control={
                                     <Checkbox
                                         checked={cohort[data]}
-                                        onChange={(e)=>handleGroupBy(e, 'cohort')}
+                                        onChange={(e)=>handleGroupBy(e, constants.groupType.Cohort)}
                                         name={data} />
                                 }
-                                label={data.toUpperCase()}
-                            />
+                                label={data.toUpperCase()}/>
                         })}
                     </div>
-
                 </FormGroup>
             )
         }
@@ -194,7 +188,7 @@ const CreatePreferences = (props) => {
                             return <FormControlLabel key={`paytyp-formgrp-${i}`}
                                 control={
                                     <Checkbox checked={payType[data]}
-                                    onChange={(e)=>handleGroupBy(e, 'cohort')}
+                                    onChange={(e)=>handleGroupBy(e, constants.groupType.PayerType)}
                                     name={data} />
                                 }
                                 label={data}
@@ -226,11 +220,11 @@ const CreatePreferences = (props) => {
 
     const handleFormSubmit = () => {
         requestObject();
-        props.closeModal('create');
+        props.closeModal({type:'create', action:'add', success:true, message:'Preference added sucessfully' });
     }
 
     const handleCancel = ()=>{
-        props.closeModal('create');
+        props.closeModal({type:'create', action:'add'});
     }
 
     
@@ -238,6 +232,9 @@ const CreatePreferences = (props) => {
     return (
         <div>
             <Box sx={style}>
+            <div align="right">
+                <Button type="submit" onClick={handleCancel}><CloseIcon /></Button>
+            </div>
                 <h2> Create a Preference </h2>
                 <FormGroup className="form-group">
                     <TextField 

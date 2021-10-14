@@ -12,8 +12,6 @@ import Backdrop from '@mui/material/Backdrop';
 import Modal from '@mui/material/Modal';
 import ViewPreferences from '../Preferences/ViewPreferences';
 import CreatePreferences from '../Preferences/CreatePreferences';
-
-
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
@@ -44,8 +42,28 @@ const Dashboard = () => {
     const [filterTreatmentOR, setFilterTreatmentOR] = useState([]);
     const [filterMedicalConditionOR, setFilterMedicalConditionOR] = useState([]);
 
-    const handleOpenModal = (type) => (type == 'create') ? setOpenCreateModal(true) : setOpenViewModal(true);
-    const handleCloseModal = (type) => (type == 'create') ? setOpenCreateModal(false) : setOpenViewModal(false);
+    const handleOpenModal = (res) =>{
+        if(res.type=='create'){
+            setOpenCreateModal(true)
+        }
+        else{
+            setOpenViewModal(true)
+        }
+    };
+
+    const handleCloseModal = (res) =>{
+        if(res.type=='create'){
+            if(res.success){
+            }
+            setOpenCreateModal(false)
+        }
+        else{
+            if(res.action =='edit'){
+                setOpenCreateModal(true)
+            }
+            setOpenViewModal(false)
+        }
+    };
 
     const fetchGraphData = () => {
 
@@ -175,47 +193,22 @@ const Dashboard = () => {
     };
 
     const handleTreatments = (event, logic) => {
+        let treatments = event.map(data=> data.value);
         if (logic === constants.Logic.AND) {
-            let treatments = filterTreatmentAND;
-            if (event.target.checked) {
-                treatments.push(event.target.value)
-            }
-            else {
-                treatments = treatments.filter(data => data != event.target.value);
-            }
-            setFilterTreatmentAND([...treatments]);
+            setFilterTreatmentAND(treatments);
+
         }
         else if (logic === constants.Logic.OR) {
-            let treatments = filterTreatmentOR;
-            if (event.target.checked) {
-                treatments.push(event.target.value)
-            }
-            else {
-                treatments = treatments.filter(data => data != event.target.value);
-            }
             setFilterTreatmentOR([...treatments]);
         }
     };
 
     const handleMedicalConditions = (event, logic) => {
+        let medicalConditions = event.map(data=> data.value);
         if (logic === constants.Logic.AND) {
-            let medicalConditions = filterMedicalConditionAND;
-            if (event.target.checked) {
-                medicalConditions.push(event.target.value)
-            }
-            else {
-                medicalConditions = medicalConditions.filter(data => data != event.target.value);
-            }
             setFilterMedicalConditionAND([...medicalConditions]);
         }
         else if (logic === constants.Logic.OR) {
-            let medicalConditions = filterMedicalConditionOR;
-            if (event.target.checked) {
-                medicalConditions.push(event.target.value)
-            }
-            else {
-                medicalConditions = medicalConditions.filter(data => data != event.target.value);
-            }
             setFilterMedicalConditionOR([...medicalConditions]);
         }
     };
@@ -224,12 +217,8 @@ const Dashboard = () => {
         fetchGraphData();
     }
 
-    const handlePreferences = () => {
-
-    }
-
     const handlePreferenceChange = ()=>{
-        
+
     }
 
     useEffect(() => {
@@ -275,8 +264,8 @@ const Dashboard = () => {
                     </Select>
                 </FormControl>
                 <Stack className="btn-stack" spacing={2} direction="row">
-                    <Button variant="contained" color="warning" onClick={() => { handleOpenModal('create') }}> Create PREFRENCE </Button>
-                    <Button variant="contained" color="info" onClick={() => { handleOpenModal('view') }}> VIEW PREFRENCES </Button>
+                    <Button variant="contained" color="warning" onClick={() => { handleOpenModal({type:'create'}) }}> CREATE PREFRENCE </Button>
+                    <Button variant="contained" color="info" onClick={() => { handleOpenModal({type:'view'})}}> VIEW PREFRENCES </Button>
                 </Stack>
             </div>
 
@@ -284,13 +273,8 @@ const Dashboard = () => {
                 cohort={cohort}
                 payType={payType}
                 groupBy={groupBy}
-                filterStates={filterStates}
                 treatment={treatment}
                 medicalCondition={medicalCondition}
-                filterTreatmentAND={filterTreatmentAND}
-                filterMedicalConditionAND={filterMedicalConditionAND}
-                filterTreatmentOR={filterTreatmentOR}
-                filterMedicalConditionOR={filterMedicalConditionOR}
                 onClick={handleClick}
                 onChange={handleChange}
                 onChangeGroup={handleGroupBy}
@@ -314,21 +298,9 @@ const Dashboard = () => {
                     cohort={cohort}
                     payType={payType}
                     groupBy={groupBy}
-                    filterStates={filterStates}
                     treatment={treatment}
                     medicalCondition={medicalCondition}
-                    filterTreatmentAND={filterTreatmentAND}
-                    filterMedicalConditionAND={filterMedicalConditionAND}
-                    filterTreatmentOR={filterTreatmentOR}
-                    filterMedicalConditionOR={filterMedicalConditionOR}
-                    closeModal={(type)=>handleCloseModal(type)}
-                    onClick={handleClick}
-                    onChange={handleChange}
-                    onChangeGroup={handleGroupBy}
-                    onChangeStates={handleStates}
-                    onChangeTreatment={handleTreatments}
-                    onChangeMedicalCondition={handleMedicalConditions}
-                    onCreatePreference={handlePreferences} />
+                    closeModal={(type)=>handleCloseModal(type)}/>
             </Modal>
 
             <Modal
