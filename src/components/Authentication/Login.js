@@ -33,6 +33,7 @@ const Login = () => {
                             /* --- FIXME => Later: change this to user_id & auth-token --- */
                             Cookies.set('userid', username, {expires: 1, path:'/'}); 
                             Cookies.set('password', password, {expires: 1, path:'/'});
+                            Cookies.set('auth', res.data.userData.authToken, {expires: 1, path:'/'});
                             history.push("/app/patient-finder");
                         }
                         else {

@@ -3,14 +3,9 @@ import Box from '@mui/material/Box'
 import FormGroup from '@mui/material/FormGroup';
 import Checkbox from '@mui/material/Checkbox';
 import { Button, TextField } from '@mui/material';
-import Radio from '@mui/material/Radio';
-import RadioGroup from '@mui/material/RadioGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
-import FormLabel from '@mui/material/FormLabel';
-import Select from 'react-select';
 import './Preferences.css';
-import * as constants from '../../Constant';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import axios from 'axios'
 
 import CloseIcon from '@mui/icons-material/Close';
@@ -76,23 +71,9 @@ const customStyles = {
 
 const CreatePreferences = (props) => {
 
-    const states = constants.States;
-    
-    const initialData = {
-        preferenceName: null,
-        groupBy: constants.groupType.Cohort,
-        states,
-        cohorts: { ckd: true, diab: true, both: true },
-        payType: { MCR: true, COM: true },
-        treatmentsOR: null,
-        treatmentsAND: null,
-        medicalConditionsAND: null,
-        medicalConditionsOR: null,
-        default:false,
-    }
-
-    const [name, setName] = useState(initialData.preferenceName);
-    const [defaultVal, setDefaultVal] = useState(initialData.default);
+    const initialData = props.loadFormData;
+    const [name, setName] = useState('');
+    const [defaultVal, setDefaultVal] = useState(false);
 
     const [formData, setFormData] = useState({...initialData});
 
@@ -122,13 +103,18 @@ const CreatePreferences = (props) => {
         // console.log(filterTreatmentOR, 'filterTreatmentOR');
         // console.log(filterMedicalConditionAND, 'filterMedicalConditionAND');
         // console.log(filterMedicalConditionOR,'filterMedicalConditionOR');
+        formData.default = defaultVal;
+        formData.preferenceName = name;
     }
     
     const handleFormSubmit = () => {
-        formData.default = defaultVal;
-        formData.preferenceName = name;
-        requestObject();
-        console.log(formData, 'Create Preference');
+        const req = requestObject(); 
+        if(initialData.id){
+            //TODO: Add the API PUT request for preference
+        }
+        else{
+            //TODO: Add the API to POST the preferences
+        }
         props.closeModal({type:'create', action:'add', success:true, message:'Preference added sucessfully' });
     }
 

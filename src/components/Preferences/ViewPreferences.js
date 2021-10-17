@@ -101,12 +101,10 @@ const ViewPreferences = (props) => {
     }
 
     const onConfirmDelete = () =>{
-        //send backend request
         let preference = deletePreference;
+        //TODO: send backend request use the above preference value
         handleCloseDeleteModal();
     }
-
-
 
     return (
         <Box sx={style}>
@@ -144,7 +142,7 @@ const ViewPreferences = (props) => {
                             ))}
                     </TableBody>
                 </Table>
-                <TablePagination
+                {/* <TablePagination
                     rowsPerPageOptions={[10, 25, 100]}
                     component="div"
                     count={rows.length}
@@ -152,7 +150,7 @@ const ViewPreferences = (props) => {
                     page={page}
                     onPageChange={handleChangePage}
                     onRowsPerPageChange={handleChangeRowsPerPage}
-                />
+                /> */}
             </TableContainer>
             <Modal
                 open={openDeleteModal}

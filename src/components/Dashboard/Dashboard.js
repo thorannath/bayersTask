@@ -33,6 +33,7 @@ const Dashboard = () => {
     const [openCreateModal, setOpenCreateModal] = useState(false);
     const [selectedTreatmentLabels, setSelectedTreatmentLabels] = useState([]);
     const [selectedMedicalConditionLabels, setSelectedMedicalConditionLabels] = useState([]);
+    const [preferences, setPreferences] = useState([]);
 
     const initialData = {
         preferenceName: null,
@@ -45,6 +46,9 @@ const Dashboard = () => {
         medicalConditionsAND: null,
         medicalConditionsOR: null
     }
+
+    const [loadFormData, setLoadFormData] = useState({...initialData});
+
 
     const [formData, setFormData] = useState({ ...initialData });
 
@@ -65,7 +69,7 @@ const Dashboard = () => {
         }
         else {
             if (res.action == 'edit') {
-                console.log(res.data);
+                setLoadFormData({...res.data})
                 setOpenCreateModal(true)
             }
             setOpenViewModal(false)
@@ -159,13 +163,16 @@ const Dashboard = () => {
     }
 
     const handleClick = () => {
-        console.log(formData, 'Dashboard');
         fetchGraphData();
     }
 
     const handlePreferenceChange = (name) => {
-        formData.preferenceName = name;
-        setFormData({ ...formData });
+        let preference = preferences.find(data=> data.name == name);
+        //Apply this preference to formData;
+    }
+
+    const getPreferences = () =>{
+        //TODO: Write API connection to get preferences and setPreferences value
     }
 
     const takeScreenshot = (e) => {
@@ -269,6 +276,7 @@ const Dashboard = () => {
                     timeout: 500,
                 }}>
                 <CreatePreferences
+                    loadFormData={loadFormData}
                     treatment={treatment}
                     medicalCondition={medicalCondition}
                     closeModal={(type) => handleCloseModal(type)} />
@@ -281,7 +289,10 @@ const Dashboard = () => {
                 BackdropProps={{
                     timeout: 500,
                 }}>
-                <ViewPreferences openModal={openViewModal} closeModal={(type) => handleCloseModal(type)} />
+                <ViewPreferences 
+                openModal={openViewModal}
+                closeModal={(type) => handleCloseModal(type)} 
+                preferences={preferences}/>
             </Modal>
         </div>
     )
