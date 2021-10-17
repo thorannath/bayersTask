@@ -6,7 +6,6 @@ import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
-import Paper from '@mui/material/Paper';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import Button from '@mui/material/Button';
@@ -14,8 +13,10 @@ import TablePagination from '@mui/material/TablePagination';
 import { useState } from 'react';
 import CloseIcon from '@mui/icons-material/Close';
 import VisibilityIcon from '@mui/icons-material/Visibility';
-import Switch from '@mui/material/Switch';
 import Tooltip from '@mui/material/Tooltip';
+import Stack from '@mui/material/Stack';
+import Typography from '@mui/material/Typography';
+import Modal from '@mui/material/Modal';
 
 
 function createData(name, calories, fat, carbs, protein) {
@@ -50,11 +51,29 @@ const style = {
     boxShadow: 24,
 };
 
+const deleteModalstyle = {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    width: 400,
+    bgcolor: 'background.paper',
+    boxShadow: 24,
+    p: 3,
+};
+
 
 const ViewPreferences = (props) => {
 
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
+
+    const [openDeleteModal, setOpenDeleteModal] = useState(false);
+    const handleOpenDeleteModal = () => setOpenDeleteModal(true);
+    const handleCloseDeleteModal = () => setOpenDeleteModal(false);
+
+    const [deletePreference, setDeletePreference] = useState({});
+
     const handleChangePage = (event, newPage) => {
         setPage(newPage);
     };
@@ -65,20 +84,29 @@ const ViewPreferences = (props) => {
     };
 
     const handleCancel = () => {
-        props.closeModal({type:'view', action:'close'});
+        props.closeModal({ type: 'view', action: 'close' });
     }
 
-    const openSettings = (row) =>{
-
+    const openSettings = (row) => {
+        props.closeModal({ type: 'view', action: 'view', data:row});
     }
 
-    const editSettings = (row)=>{
-        props.closeModal({type:'view', action:'edit', data:row});
+    const editSettings = (row) => {
+        props.closeModal({ type: 'view', action: 'edit', data:row});
     }
 
-    const deleteSettings = (row)=>{
-        
+    const deleteSettings = (row) => {
+        setDeletePreference({...row});
+        handleOpenDeleteModal();
     }
+
+    const onConfirmDelete = () =>{
+        //send backend request
+        let preference = deletePreference;
+        handleCloseDeleteModal();
+    }
+
+
 
     return (
         <Box sx={style}>
@@ -108,9 +136,9 @@ const ViewPreferences = (props) => {
                                         <p>Thu, 14 Oct 2021 21:11:16 GMT</p>
                                     </TableCell>
                                     <TableCell align="center">
-                                        <Tooltip title="Apply"><Button color="primary" onClick={()=>openSettings(row)}> <VisibilityIcon /></Button></Tooltip>
-                                        <Tooltip title="Edit"><Button color="info" onClick={()=>editSettings(row)}><EditIcon /></Button></Tooltip>
-                                        <Tooltip title="Delete"><Button color="warning" onClick={()=>deleteSettings(row)}><DeleteIcon /></Button></Tooltip>
+                                        <Tooltip title="Apply"><Button color="primary" onClick={() => openSettings(row)}> <VisibilityIcon /></Button></Tooltip>
+                                        <Tooltip title="Edit"><Button color="info" onClick={() => editSettings(row)}><EditIcon /></Button></Tooltip>
+                                        <Tooltip title="Delete"><Button color="warning" onClick={() => deleteSettings(row)}><DeleteIcon /></Button></Tooltip>
                                     </TableCell>
                                 </TableRow>
                             ))}
@@ -126,6 +154,20 @@ const ViewPreferences = (props) => {
                     onRowsPerPageChange={handleChangeRowsPerPage}
                 />
             </TableContainer>
+            <Modal
+                open={openDeleteModal}
+                onClose={handleCloseDeleteModal}>
+                <Box sx={deleteModalstyle}>
+                    <Typography id="modal-modal-title" variant="h6" component="h4">
+                        Are you sure you want to delete the preference ?
+                    </Typography>
+                    <div align="right">
+                        <Button variant="contained" sx={{marginRight:1}} color="warning" onClick={onConfirmDelete}> Yes </Button>
+                        <Button variant="contained" color="info" onClick={handleCloseDeleteModal}> No </Button>
+                    </div>
+
+                </Box>
+            </Modal>
         </Box>
     )
 }

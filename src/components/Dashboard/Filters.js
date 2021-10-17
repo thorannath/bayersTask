@@ -4,12 +4,10 @@ import FormGroup from '@mui/material/FormGroup';
 import FormLabel from '@mui/material/FormLabel';
 import { FormControlLabel } from '@mui/material';
 import Checkbox from '@mui/material/Checkbox';
-import { Button } from '@mui/material';
 import Radio from '@mui/material/Radio';
 import RadioGroup from '@mui/material/RadioGroup';
 import Select from 'react-select';
-import html2canvas from "html2canvas";
-import jsPdf from "jspdf";
+import { useEffect } from 'react';
 
 const customStyles = {
   menu: (provided, state) => ({
@@ -23,9 +21,9 @@ const customStyles = {
     ...provided,
     padding: 20,
   }),
-  control: (control)=>({
+  control: (control) => ({
     ...control,
-    padding:4
+    padding: 4
   }),
   singleValue: (provided, state) => {
     const opacity = state.isDisabled ? 0.5 : 1;
@@ -54,14 +52,19 @@ const customStyles = {
 }
 
 export const Filters = (props) => {
+
+  const formData = props.formData;
   const payerType = constants.Paytype;
   const patientCohort = constants.Patient_Cohort;
-  const states = constants.States.map(data => {
+
+  const states = formData.states.map(data => {
     return { value: data, label: data }
   });
 
-  const cohort = props.cohort;
-  const payType = props.payType;
+  const defaultTreatmentsOR = formData.treatmentsOR ? formData.treatmentsOR.map(data => { return { value: data.label_val, label: data.name } }) : null;
+  const defaultTreatmentsAND = formData.treatmentsOR ? formData.treatmentsAND.map(data => { return { value: data.label_val, label: data.name } }) : null;
+  const defaultMedicalConditionsOR = formData.medicalConditionsOR ? formData.medicalConditionsOR.map(data => { return { value: data.label_val, label: data.name } }) : null;
+  const defaultMedicalConditionsAND = formData.medicalConditionsAND ? formData.medicalConditionsAND.map(data => { return { value: data.label_val, label: data.name } }) : null;
 
   const treatment = props.treatment.map(data => {
     return { value: data.label_val, label: data.name }
@@ -71,11 +74,59 @@ export const Filters = (props) => {
     return { value: data.label_val, label: data.name }
   });
 
+  const onChangeGroup = (groupType) => {
+    formData.groupBy = (groupType === constants.groupType.Cohort) ? constants.groupType.Cohort : constants.groupType.PayerType;
+  }
 
+  const onChangeGroupBy = (event, filterType) => {
+    switch (filterType) {
+      case constants.groupType.Cohort:
+        formData.cohorts = {
+          ...formData.cohorts,
+          [event.target.name]: event.target.checked,
+        }
+        break;
 
+      case constants.groupType.PayerType:
+        formData.payerType = {
+          ...formData.payerType,
+          [event.target.name]: event.target.checked,
+        };
+        break;
+    }
+  }
+
+  const onChangeStates = (event) => {
+    formData.states= event.map((data) => data.value);
+  }
+
+  const onChangeTreatment = (event, logic) =>{
+    let treatments = event.map(data=> data.value);
+    if (logic === constants.Logic.AND) {
+        formData.treatmentsAND = treatments;
+
+    }
+    else if (logic === constants.Logic.OR) {
+        formData.treatmentsOR = treatments;
+    }
+  }
+
+  const onChangeMedicalCondition = (event, logic) =>{
+    let medicalConditions = event.map(data=> data.value);
+    if (logic === constants.Logic.AND) {
+        formData.medicalConditionsAND = medicalConditions;
+    }
+    else if (logic === constants.Logic.OR) {
+        formData.medicalConditionsOR = medicalConditions;
+    }
+  }
+
+  useEffect(() => {
+    props.onChangeFormData(formData);
+  }, [formData])
 
   const GroupData = () => {
-    if (props.groupBy == constants.groupType.Cohort) {
+    if (formData.groupBy == constants.groupType.Cohort) {
       return (
         <FormGroup className="form-group">
           <FormLabel component="legend">Cohort Type</FormLabel>
@@ -84,8 +135,8 @@ export const Filters = (props) => {
               return <FormControlLabel key={`cohort-formgrp-${i}`}
                 control={
                   <Checkbox
-                    checked={cohort[data]}
-                    onChange={(e) => props.onChange(e, constants.groupType.Cohort)}
+                    checked={formData.cohorts[data]}
+                    onChange={(e) => onChangeGroupBy(e, constants.groupType.Cohort)}
                     name={data} />
                 }
                 label={data.toUpperCase()}
@@ -95,7 +146,7 @@ export const Filters = (props) => {
         </FormGroup>
       )
     }
-    else if (props.groupBy == constants.groupType.PayerType) {
+    else if (formData.groupBy == constants.groupType.PayerType) {
       return (
         <FormGroup className="form-group" >
           <FormLabel component="legend">Payer Type</FormLabel>
@@ -103,8 +154,8 @@ export const Filters = (props) => {
             {payerType.map((data, i) => {
               return <FormControlLabel key={`paytyp-formgrp-${i}`}
                 control={
-                  <Checkbox checked={payType[data]}
-                    onChange={(e) => props.onChange(e, constants.groupType.PayerType)}
+                  <Checkbox checked={formData.payType[data]}
+                    onChange={(e) => onChangeGroupBy(e, constants.groupType.PayerType)}
                     name={data} />
                 }
                 label={data} />
@@ -115,48 +166,16 @@ export const Filters = (props) => {
     }
   }
 
-  const takeScreenshot = (e) => {
-    html2canvas(document.getElementById("medical-chart"), {
-      onclone: document => {
-        document.getElementById("image-render-medical").style.visibility = "hidden";
-      }
-    }).then(canvas => {
-
-      const imgData = canvas.toDataURL("image/png");
-      const pdf = new jsPdf("l", "mm", "a4");
-      const width = pdf.internal.pageSize.getWidth();
-      const height = pdf.internal.pageSize.getHeight();
-      pdf.addImage(imgData, "JPEG", 0, 0, width, height);
-      pdf.save(`medical-chart_${new Date().toISOString()}.pdf`);
-    });
-
-    html2canvas(document.getElementById("treatment-chart"), {
-      onclone: document => {
-        document.getElementById("image-render-treatment").style.visibility = "hidden";
-      }
-    }).then(canvas => {
-
-      const imgData = canvas.toDataURL("image/png");
-      const pdf = new jsPdf("l", "mm", "a4");
-      const width = pdf.internal.pageSize.getWidth();
-      const height = pdf.internal.pageSize.getHeight();
-      pdf.addImage(imgData, "JPEG", 0, 0, width, height);
-      pdf.save(`treatment-chart_${new Date().toISOString()}.pdf`);
-    });
-  };
-
-
-
   return (
     <div className="filters">
       <FormGroup classsName="form-group">
         <FormLabel component="legend">Group By</FormLabel>
         <RadioGroup row
-          defaultValue="cohort"
-          onClick={(e) => props.onChangeGroup(e.target.value)}
+          defaultValue={formData.groupBy}
+          onClick={(e) => onChangeGroup(e.target.value)}
           name="radio-buttons-group">
-          <FormControlLabel value="cohort" control={<Radio />} label="Cohort" />
-          <FormControlLabel value="paytype" control={<Radio />} label="Payer" />
+          <FormControlLabel value={constants.groupType.Cohort} control={<Radio />} label="Cohort" />
+          <FormControlLabel value={constants.groupType.PayerType} control={<Radio />} label="Payer" />
         </RadioGroup>
       </FormGroup>
 
@@ -170,18 +189,19 @@ export const Filters = (props) => {
           name="states"
           styles={customStyles}
           options={states}
-          onChange={(e) => props.onChangeStates(e)}
+          onChange={(e) => onChangeStates(e)}
           classNamePrefix="select" />
       </FormGroup>
-
+      <br />
       <FormGroup classsName="form-group">
         <FormLabel component="legend">Treatment with AND</FormLabel>
         <Select
           isMulti
           name="treatmentAND"
+          defaultValue={defaultTreatmentsAND}
           styles={customStyles}
           options={treatment}
-          onChange={(e) => props.onChangeTreatment(e, constants.Logic.AND)}
+          onChange={(e) => onChangeTreatment(e, constants.Logic.AND)}
           classNamePrefix="select"
         />
       </FormGroup>
@@ -191,21 +211,23 @@ export const Filters = (props) => {
         <Select
           isMulti
           name="treatmentOR"
+          defaultValue={defaultTreatmentsOR}
           styles={customStyles}
           options={treatment}
-          onChange={(e) => props.onChangeTreatment(e, constants.Logic.OR)}
+          onChange={(e) => onChangeTreatment(e, constants.Logic.OR)}
           classNamePrefix="select"
         />
       </FormGroup>
-
+      <br />
       <FormGroup classsName="form-group">
         <FormLabel component="legend">Medical Conditions with AND</FormLabel>
         <Select
           isMulti
           name="colors"
+          defaultValue={defaultMedicalConditionsOR}
           styles={customStyles}
           options={medicalCondition}
-          onChange={(e) => props.onChangeMedicalCondition(e, constants.Logic.AND)}
+          onChange={(e) => onChangeMedicalCondition(e, constants.Logic.AND)}
           classNamePrefix="select"
         />
       </FormGroup>
@@ -215,21 +237,13 @@ export const Filters = (props) => {
         <Select
           isMulti
           name="colors"
+          defaultValue={defaultMedicalConditionsAND}
           styles={customStyles}
           options={medicalCondition}
-          onChange={(e) => props.onChangeMedicalCondition(e, constants.Logic.OR)}
+          onChange={(e) => onChangeMedicalCondition(e, constants.Logic.OR)}
           classNamePrefix="select"
         />
       </FormGroup>
-
-      <div className="update-button">
-        <span><Button color="primary" variant="contained" type="submit" onClick={props.onClick}> Update chart </Button></span>
-
-        {/* Please view this button when the the graph data is available*/}
-        <span style={{ paddingLeft: "15px" }}><Button color="primary" variant="outlined" onClick={(e) => { takeScreenshot(e) }}>Take Screenshot</Button></span>
-      </div>
-      <div id="image-render-medical"></div>
-      <div id="image-render-treatment"></div>
     </div>
   )
 }

@@ -4,15 +4,16 @@ import Register from './Register';
 import './Authentication.css';
 import ButtonGroup from '@mui/material/ButtonGroup';
 import Button from '@mui/material/Button';
-import { NavLink } from 'react-router-dom';
-import BlurOnIcon from '@mui/icons-material/BlurOn';
 import Cookies from 'js-cookie';
 import { Redirect } from 'react-router-dom';
-import backgroundImage  from './backgroud_image.png'
+import Snackbar from '../Snackbar/Snackbar';
+
 
 const Authentication = () => {
 
     const [authType, setAuthType] = useState('login');
+    // const [snackbarObj, setSnackbarObj] = useState({isOpen:false, severity:'error', message:''});
+
 
     const Auth = (type) => {
         if (authType === 'login') {
@@ -30,9 +31,6 @@ const Authentication = () => {
     if (!Cookies.get('userid', { path: '/' }) || !Cookies.get('password', { path: '/' })) { /* Later: use auth-token and perform authentication from backend*/
         return (
             <div className="container-fluid">
-                <div className="image">
-                    <img className="image_bg" src={backgroundImage}/>
-                </div>
                 <div className="card">
                     <ButtonGroup className="btn-group" variant="outlined">
                         <Button
@@ -51,6 +49,7 @@ const Authentication = () => {
                         <Auth />
                     </div>
                 </div>
+                {/* <Snackbar isOpen={snackbarObj.isOpen} severity={snackbarObj.severity} message={snackbarObj.message}></Snackbar> */}
             </div>
         );
     } else {

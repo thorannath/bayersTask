@@ -33,6 +33,11 @@ export const routes = {
     Home:'/app/home',
 }
 
+export const messageTypes = {
+    SUCCESS:'success',
+    ERROR:'error'
+}
+
 export const States = [
     'WY',
     'WV',

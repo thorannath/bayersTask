@@ -92,10 +92,8 @@ export const Register = () => {
                 open={open}
                 autoHideDuration={3000}
                 onClose={handleClose}
-                anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-            >
+                anchorOrigin={{ vertical: 'top', horizontal: 'right' }}>
                 <Alert severity={severity}>{message}</Alert>
-
             </Snackbar>
         </div>
     )
