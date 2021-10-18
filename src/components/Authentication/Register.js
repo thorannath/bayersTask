@@ -22,30 +22,20 @@ export const Register = () => {
     const [severity, setSeverity] = useState('error');
 
 
-    const handleFormSubmit = (e) => {
-        setSeverity('error');
+    const handleFormSubmit = async (e) => {
         if (username, password, fullName, email) {
-            axios.post('http://localhost:5000/register', {register_userid: username, register_password: password, register_name: fullName, register_email: email})
-                .then((res) => {
-                    console.log(res);
-                    if(res){
-                        if (res.data.success) {
-                            setMessage('Successfully registered. Please login!');
-                            setSeverity('success');
-                        }
-                        else {
-                            setMessage(res.data.message);
-                        }
-                    }
-                    else{
-                        setMessage("Please enter valid information to register!");
-                    }
-                })
-                .catch(e=>{
-                    setMessage("Please enter valid information to register!");
-                })
+            const response = await axios.post('http://localhost:3000/users/register', {userid: username, password, fullName, email})
+            if (response && response.data.success) {
+                setMessage('Successfully registered. Please login!');
+                setSeverity('success');
+            }
+            else {
+                setSeverity('error');
+                setMessage(response.data.message);
+            }
         }
         else{
+            setSeverity('error');
             setMessage("Please enter valid information to register!");
         }
         setOpen(true);
@@ -55,7 +45,6 @@ export const Register = () => {
         if (reason === 'clickaway') {
           return;
         }
-    
         setOpen(false);
       };
 

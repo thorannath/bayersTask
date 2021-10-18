@@ -22,35 +22,23 @@ const Login = () => {
     const [message, setMessage] = useState('');
     const [severity, setSeverity] = useState('error');
 
-    const handleFormSubmit = () => {
+    const handleFormSubmit = async () => {
         if (username && password) {
-            axios.post('http://localhost:5000/login', { login_userid: username, login_password: password })
-                .then((res) => {
-                    if(res){
-                        if (res.data.success) {
-                            setMessage(res.data.message);
-                            setSeverity('success');
-                            /* --- FIXME => Later: change this to user_id & auth-token --- */
-                            Cookies.set('userid', username, {expires: 1, path:'/'}); 
-                            Cookies.set('password', password, {expires: 1, path:'/'});
-                            Cookies.set('auth', res.data.userData.authToken, {expires: 1, path:'/'});
-                            history.push("/app/patient-finder");
-                        }
-                        else {
-                            setSeverity('error');
-                            setMessage(res.data.message);
-                            setOpen(true);
-                        }
-                    }
-                    else{
-                        setMessage("Invalid username or password");
-                        setOpen(true);
-                    }
-                })
-                .catch(e=>{
-                    setMessage("Invalid username or password");
-                    setOpen(true);
-                })
+            const response = await axios.put('http://localhost:3000/users', { userid: username, password: password})
+            if (response && response.data.success) {
+                setMessage(response.data.message);
+                setSeverity('success');
+                /* --- FIXME => Later: change this to user_id & auth-token --- */
+                Cookies.set('userid', username, {expires: 1, path:'/'}); 
+                Cookies.set('password', password, {expires: 1, path:'/'});
+                Cookies.set('authToken', response.data.userData.authToken, {expires: 1, path:'/'});
+                history.push("/app/patient-finder");
+            }
+            else {
+                setSeverity('error');
+                setMessage(response.data.message);
+            }
+            setOpen(true);
         }
     }
 

@@ -61,10 +61,10 @@ export const Filters = (props) => {
     return { value: data, label: data }
   });
 
-  const defaultTreatmentsOR = formData.treatmentsOR ? formData.treatmentsOR.map(data => { return { value: data.label_val, label: data.name } }) : null;
-  const defaultTreatmentsAND = formData.treatmentsOR ? formData.treatmentsAND.map(data => { return { value: data.label_val, label: data.name } }) : null;
-  const defaultMedicalConditionsOR = formData.medicalConditionsOR ? formData.medicalConditionsOR.map(data => { return { value: data.label_val, label: data.name } }) : null;
-  const defaultMedicalConditionsAND = formData.medicalConditionsAND ? formData.medicalConditionsAND.map(data => { return { value: data.label_val, label: data.name } }) : null;
+  const defaultTreatmentsOR = formData.treatmentsOR;
+  const defaultTreatmentsAND = formData.treatmentsAND;
+  const defaultMedicalConditionsOR = formData.medicalConditionsOR;
+  const defaultMedicalConditionsAND = formData.medicalConditionsAND;
 
   const treatment = props.treatment.map(data => {
     return { value: data.label_val, label: data.name }
@@ -103,21 +103,21 @@ export const Filters = (props) => {
   const onChangeTreatment = (event, logic) =>{
     let treatments = event.map(data=> data.value);
     if (logic === constants.Logic.AND) {
-        formData.treatmentsAND = treatments;
+        formData.treatmentsAND =  treatment.filter(data=> treatments.includes(data.label_val));
 
     }
     else if (logic === constants.Logic.OR) {
-        formData.treatmentsOR = treatments;
+        formData.treatmentsOR = treatment.filter(data=> treatments.includes(data.label_val)) ;;
     }
   }
 
   const onChangeMedicalCondition = (event, logic) =>{
     let medicalConditions = event.map(data=> data.value);
     if (logic === constants.Logic.AND) {
-        formData.medicalConditionsAND = medicalConditions;
+        formData.medicalConditionsAND = medicalCondition.filter(data=> medicalConditions.includes(data.label_val));
     }
     else if (logic === constants.Logic.OR) {
-        formData.medicalConditionsOR = medicalConditions;
+        formData.medicalConditionsOR = medicalCondition.filter(data=> medicalConditions.includes(data.label_val));
     }
   }
 

@@ -17,29 +17,13 @@ import Tooltip from '@mui/material/Tooltip';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import Modal from '@mui/material/Modal';
+import axios from 'axios'
+import Cookies from 'js-cookie';
 
 
-function createData(name, calories, fat, carbs, protein) {
-    return { name, calories, fat, carbs, protein };
+function createData(id, name, createdAt) {
+    return { id, name, createdAt };
 }
-
-const rows = [
-    createData('Frozen yoghurt[Default]', 159, 6.0, 24, 4.0),
-    createData('Ice cream sandwich', 237, 9.0, 37, 4.3),
-    createData('Eclair', 262, 16.0, 24, 6.0),
-    createData('Cupcake', 305, 3.7, 67, 4.3),
-    createData('Gingerbread', 356, 16.0, 49, 3.9),
-    createData('Frozen yoghurt', 159, 6.0, 24, 4.0),
-    createData('Ice cream sandwich', 237, 9.0, 37, 4.3),
-    createData('Eclair', 262, 16.0, 24, 6.0),
-    createData('Cupcake', 305, 3.7, 67, 4.3),
-    createData('Gingerbread', 356, 16.0, 49, 3.9),
-    createData('Frozen yoghurt', 159, 6.0, 24, 4.0),
-    createData('Ice cream sandwich', 237, 9.0, 37, 4.3),
-    createData('Eclair', 262, 16.0, 24, 6.0),
-    createData('Cupcake', 305, 3.7, 67, 4.3),
-    createData('Gingerbread', 356, 16.0, 49, 3.9),
-];
 
 const style = {
     position: 'absolute',
@@ -64,9 +48,21 @@ const deleteModalstyle = {
 
 
 const ViewPreferences = (props) => {
-
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
+    const handleChangePage = (event, newPage) => { setPage(newPage) };
+    const handleChangeRowsPerPage = (event) => {
+        setRowsPerPage(+event.target.value);
+        setPage(0)
+    };
+
+
+    const [rowData, setRowData] = useState([]);
+
+    let prefData = props.preferences.map(data => {
+        return createData(data.id, data.saveName, data.createdAt);
+    });
+    setRowData([...prefData]);
 
     const [openDeleteModal, setOpenDeleteModal] = useState(false);
     const handleOpenDeleteModal = () => setOpenDeleteModal(true);
@@ -74,35 +70,34 @@ const ViewPreferences = (props) => {
 
     const [deletePreference, setDeletePreference] = useState({});
 
-    const handleChangePage = (event, newPage) => {
-        setPage(newPage);
-    };
-
-    const handleChangeRowsPerPage = (event) => {
-        setRowsPerPage(+event.target.value);
-        setPage(0);
-    };
-
     const handleCancel = () => {
         props.closeModal({ type: 'view', action: 'close' });
     }
 
     const openSettings = (row) => {
-        props.closeModal({ type: 'view', action: 'view', data:row});
+        props.closeModal({ type: 'view', action: 'view', data: row });
     }
 
     const editSettings = (row) => {
-        props.closeModal({ type: 'view', action: 'edit', data:row});
+        props.closeModal({ type: 'view', action: 'edit', data: row });
     }
 
     const deleteSettings = (row) => {
-        setDeletePreference({...row});
+        setDeletePreference({ ...row });
         handleOpenDeleteModal();
     }
 
-    const onConfirmDelete = () =>{
+    const onConfirmDelete = async () => {
         let preference = deletePreference;
-        //TODO: send backend request use the above preference value
+        let userid = Cookies.get('userid', { path: '/' });
+        let authToken = Cookies.get('authToken', { path: '/' });
+        const response = await axios.delete('http://localhost:3000/users/preferences', { userid, authToken, preferenceId: preference.id });
+        if (response.success) {
+
+        }
+        else {
+
+        }
         handleCloseDeleteModal();
     }
 
@@ -121,17 +116,17 @@ const ViewPreferences = (props) => {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {rows
-                            .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                        {rowData
+                            // .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                             .map((row) => (
                                 <TableRow
-                                    key={row.name}
+                                    key={row.saveName}
                                     sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
                                     <TableCell component="th" scope="row">
-                                        {row.name}
+                                        {row.saveName}
                                     </TableCell>
                                     <TableCell component="th" scope="row">
-                                        <p>Thu, 14 Oct 2021 21:11:16 GMT</p>
+                                        <p>{row.createdAt}</p>
                                     </TableCell>
                                     <TableCell align="center">
                                         <Tooltip title="Apply"><Button color="primary" onClick={() => openSettings(row)}> <VisibilityIcon /></Button></Tooltip>
@@ -160,7 +155,7 @@ const ViewPreferences = (props) => {
                         Are you sure you want to delete the preference ?
                     </Typography>
                     <div align="right">
-                        <Button variant="contained" sx={{marginRight:1}} color="warning" onClick={onConfirmDelete}> Yes </Button>
+                        <Button variant="contained" sx={{ marginRight: 1 }} color="warning" onClick={onConfirmDelete}> Yes </Button>
                         <Button variant="contained" color="info" onClick={handleCloseDeleteModal}> No </Button>
                     </div>
 

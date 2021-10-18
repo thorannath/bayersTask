@@ -35,6 +35,8 @@ const Dashboard = () => {
     const [selectedMedicalConditionLabels, setSelectedMedicalConditionLabels] = useState([]);
     const [preferences, setPreferences] = useState([]);
 
+    const [defaultPreference, setDefaultPreference] = useState(null);
+
     const initialData = {
         preferenceName: null,
         groupBy: constants.groupType.Cohort,
@@ -47,9 +49,7 @@ const Dashboard = () => {
         medicalConditionsOR: null
     }
 
-    const [loadFormData, setLoadFormData] = useState({...initialData});
-
-
+    const [loadFormData, setLoadFormData] = useState({ ...initialData });
     const [formData, setFormData] = useState({ ...initialData });
 
     const handleOpenModal = (res) => {
@@ -69,20 +69,55 @@ const Dashboard = () => {
         }
         else {
             if (res.action == 'edit') {
-                setLoadFormData({...res.data})
+                let data  = loadPreferenceForm(res.data.id);
+                setLoadFormData({ ...data })
                 setOpenCreateModal(true)
+            }
+            else if(res.action == 'view') {
+                let data  = loadPreferenceForm(res.data.id);
+                setFormData({...data});
             }
             setOpenViewModal(false)
         }
     };
 
+    const loadPreferenceForm = (id)=>{
+        let preference = preferences.find(data => data.id == id);
+        let jsonData = preferences.jsonData;
+        const  data = {
+            preferenceName: preference.saveName,
+            groupBy: jsonData.group_condition.group_by,
+            states: jsonData.states,
+            cohorts: { ckd: false, diab: false, both: false },
+            payType: { MCR: true, COM: true },
+            treatmentsOR: treatment.map(data => { if (jsonData.treatments.OR.includes(data.label_val)) return { value: data.label_val, label: data.name } }),
+            treatmentsAND: treatment.map(data => { if (jsonData.treatments.AND.includes(data.label_val)) return { value: data.label_val, label: data.name } }),
+            medicalConditionsAND: medicalCondition.map(data => { if (jsonData.medical_conditions.AND.includes(data.label_val)) return { value: data.label_val, label: data.name } }),
+            medicalConditionsOR: medicalCondition.map(data => { if (jsonData.medical_conditions.OR.includes(data.label_val)) return { value: data.label_val, label: data.name } }),
+        };
+        if (jsonData.group_condition.group_by == 'cohort') {
+            for (const [type, bool] of Object.entries(data.cohorts)) {
+                if (jsonData.group_condition.selection.includes(type)) {
+                    data.cohorts[type] = true;
+                }
+            }
+        }
+        else {
+            for (const [type, bool] of Object.entries(data.payType)) {
+                if (jsonData.group_condition.selection.includes(type)) {
+                    data.payType[type] = true;
+                }
+            }
+        }
+        return data;
+    }
+
     const fetchGraphData = async () => {
         const request = requestObject();
         /* Later: Introduce  Authentication and Posting mechanism*/
         request.userid = Cookies.get("userid", { path: '/' });
-        console.log(Cookies.get("userid", { path: '/' }));
-
-        const treatmentResponse = await axios.post('http://localhost:5000/view-treatment', request);
+        request.authToken = Cookies.get('authToken', {path:'/'});
+        const treatmentResponse = await axios.post('http://localhost:3000/patientfinder/treatments', request);
         const res = treatmentResponse.data;
         res.treatments.labels.shift();
         res.treatments.data = res.treatments.data.map((e, i) => {
@@ -93,7 +128,7 @@ const Dashboard = () => {
         const treatmentsChart = createChartData(res.treatments);
         setTreatmentsChartData({ ...treatmentsChart });
 
-        const medicalResponse = await axios.post('http://localhost:5000/view-medical', request);
+        const medicalResponse = await axios.post('http://localhost:3000/patientfinder/medicals', request);
         const res2 = medicalResponse.data;
         res2.medical_conditions.labels.shift();
         res2.medical_conditions.data = res2.medical_conditions.data.map((e, i) => {
@@ -105,15 +140,18 @@ const Dashboard = () => {
         const medicalChart = createChartData(res2.medical_conditions)
         setMedicalChartData({ ...medicalChart });
     }
+
     const fetchLabels = async () => {
-        const labelsResponse = await axios.post('http://localhost:5000/labels');
-        const labelData = labelsResponse.data.labels;
+        let req = {
+            userid:Cookies.get("userid", { path: '/' }),
+            authToken:Cookies.get('authToken', {path:'/'}),
+        }
+        const labelsResponse = await axios.post('http://localhost:3000/patientfinder/labels', req);
+        const labelData = labelsResponse.labelData;
         let medicalConditions = labelData.filter(data => data.label_type == constants.labelTypes.MEDICAL_CONDITION);
         let treatments = labelData.filter(data => data.label_type == constants.labelTypes.TREATMENT);
         setMedicalCondition([...medicalConditions])
         setTreatment([...treatments])
-        setSelectedTreatmentLabels([...treatments]);
-        setSelectedMedicalConditionLabels([...medicalConditions]);
     }
 
     const createChartData = (obj) => {
@@ -134,8 +172,8 @@ const Dashboard = () => {
 
     const requestObject = () => {
         const groupKeys = (formData.groupBy == constants.groupType.Cohort) ? formData.cohorts : formData.payType;
-        const treatmentLabels = selectedTreatmentLabels.map((e, i) => { return e["label"] })
-        const medicalConditionLabels = selectedMedicalConditionLabels.map((e, i) => { return e["label"] })
+        const treatmentLabels = treatment.map((e, i) => { return e["label"] })
+        const medicalConditionLabels = medicalCondition.map((e, i) => { return e["label"] })
 
         const request = {
             group_condition: {
@@ -145,69 +183,78 @@ const Dashboard = () => {
             states: formData.states,
             treatments: {
                 labels: treatmentLabels, //selectedTreatmentLabels,
-                OR: formData.treatmentsOR,
-                AND: formData.treatmentsAND,
+                OR: formData.treatmentsOR?formData.treatmentsOR.map(data=> data.value):null,
+                AND: formData.treatmentsAND?formData.treatmentsAND.map(data=> data.value):null,
             },
             medical_conditions: {
                 labels: medicalConditionLabels, //selectedMedicalConditionLabels,
-                OR: formData.medicalConditionsOR,
-                AND: formData.medicalConditionsAND,
+                OR: formData.medicalConditionsOR?formData.medicalConditionsOR.map(data=> data.value):null,
+                AND: formData.medicalConditionsAND?formData.medicalConditionsAND.map(data=> data.value):null,
             }
         }
 
         return request;
     }
 
-    const handleFormData = (data)=>{
-        setFormData({...data});
+    const handleFormData = (data) => {
+        setFormData({ ...data });
     }
 
     const handleClick = () => {
         fetchGraphData();
     }
 
-    const handlePreferenceChange = (name) => {
-        let preference = preferences.find(data=> data.name == name);
-        //Apply this preference to formData;
+    const handlePreferenceChange = (value) => {
+        const data = loadPreferenceForm(value);
+        setFormData({ ...data });
     }
 
-    const getPreferences = () =>{
-        //TODO: Write API connection to get preferences and setPreferences value
+    const getPreferences = async () => {
+        const userid = Cookies.get('userid');
+        const authToken = Cookies.get('authToken');
+        const response = await axios.get('http://localhost:3000/users/preferences', { userid, authToken });
+        const preferencesData = response.preferenceData;
+
+        if (response.defaultPreferenceId){
+            handlePreferenceChange(response.defaultPreferenceId);
+            setDefaultPreference(response.defaultPreferenceId);
+        }
+        setPreferences([...preferencesData]);
     }
 
     const takeScreenshot = (e) => {
         html2canvas(document.getElementById("medical-chart"), {
-          onclone: document => {
-            document.getElementById("image-render-medical").style.visibility = "hidden";
-          }
+            onclone: document => {
+                document.getElementById("image-render-medical").style.visibility = "hidden";
+            }
         }).then(canvas => {
-    
-          const imgData = canvas.toDataURL("image/png");
-          const pdf = new jsPdf("l", "mm", "a4");
-          const width = pdf.internal.pageSize.getWidth();
-          const height = pdf.internal.pageSize.getHeight();
-          pdf.addImage(imgData, "JPEG", 0, 0, width, height);
-          pdf.save(`medical-chart_${new Date().toISOString()}.pdf`);
+
+            const imgData = canvas.toDataURL("image/png");
+            const pdf = new jsPdf("l", "mm", "a4");
+            const width = pdf.internal.pageSize.getWidth();
+            const height = pdf.internal.pageSize.getHeight();
+            pdf.addImage(imgData, "JPEG", 0, 0, width, height);
+            pdf.save(`medical-chart_${new Date().toISOString()}.pdf`);
         });
-    
+
         html2canvas(document.getElementById("treatment-chart"), {
-          onclone: document => {
-            document.getElementById("image-render-treatment").style.visibility = "hidden";
-          }
+            onclone: document => {
+                document.getElementById("image-render-treatment").style.visibility = "hidden";
+            }
         }).then(canvas => {
-    
-          const imgData = canvas.toDataURL("image/png");
-          const pdf = new jsPdf("l", "mm", "a4");
-          const width = pdf.internal.pageSize.getWidth();
-          const height = pdf.internal.pageSize.getHeight();
-          pdf.addImage(imgData, "JPEG", 0, 0, width, height);
-          pdf.save(`treatment-chart_${new Date().toISOString()}.pdf`);
+
+            const imgData = canvas.toDataURL("image/png");
+            const pdf = new jsPdf("l", "mm", "a4");
+            const width = pdf.internal.pageSize.getWidth();
+            const height = pdf.internal.pageSize.getHeight();
+            pdf.addImage(imgData, "JPEG", 0, 0, width, height);
+            pdf.save(`treatment-chart_${new Date().toISOString()}.pdf`);
         });
-      };
+    };
 
     useEffect(() => {
-        fetchGraphData();
         fetchLabels();
+        getPreferences();
     }, []);
 
     const treatmentsChartComponent = (
@@ -233,15 +280,17 @@ const Dashboard = () => {
                     <Select
                         labelId="demo-simple-select-standard-label"
                         id="demo-simple-select-standard"
-                        value={10}
+                        value={defaultPreference}
                         onChange={handlePreferenceChange}
-                        label="Age">
+                        label="Choose Preference">
                         <MenuItem value="">
                             <em>Please Select</em>
                         </MenuItem>
-                        <MenuItem value={10}>Preference 1</MenuItem>
-                        <MenuItem value={20}>Preference 2</MenuItem>
-                        <MenuItem value={30}>Preference 3</MenuItem>
+                        {preferences.map(data => {
+                            return (
+                                <MenuItem value={data.id}>{data.save_name}</MenuItem>
+                            )
+                        })}
                     </Select>
                 </FormControl>
                 <Stack className="btn-stack" spacing={2} direction="row">
@@ -251,8 +300,8 @@ const Dashboard = () => {
             </div>
 
             <Filters
-                formData={initialData}
-                onChangeFormData= {handleFormData}
+                formData={formData}
+                onChangeFormData={handleFormData}
                 treatment={treatment}
                 medicalCondition={medicalCondition}
             />
@@ -289,10 +338,10 @@ const Dashboard = () => {
                 BackdropProps={{
                     timeout: 500,
                 }}>
-                <ViewPreferences 
-                openModal={openViewModal}
-                closeModal={(type) => handleCloseModal(type)} 
-                preferences={preferences}/>
+                <ViewPreferences
+                    openModal={openViewModal}
+                    closeModal={(type) => handleCloseModal(type)}
+                    preferences={preferences} />
             </Modal>
         </div>
     )

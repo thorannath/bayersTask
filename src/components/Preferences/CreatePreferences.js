@@ -7,9 +7,10 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 import './Preferences.css';
 import { useState } from 'react';
 import axios from 'axios'
-
+import Cookies from 'js-cookie';
 import CloseIcon from '@mui/icons-material/Close';
 import Filters from '../Dashboard/Filters';
+import * as constants from '../../Constant';
 
 const style = {
     position: 'absolute',
@@ -74,7 +75,6 @@ const CreatePreferences = (props) => {
     const initialData = props.loadFormData;
     const [name, setName] = useState('');
     const [defaultVal, setDefaultVal] = useState(false);
-
     const [formData, setFormData] = useState({...initialData});
 
     const treatment = props.treatment.map(data => {
@@ -94,28 +94,58 @@ const CreatePreferences = (props) => {
     }
 
     const requestObject = () => {
-        // console.log(name, 'name');
-        // console.log(filtersStates, 'filterStates');
-        // console.log(cohort, 'cohort');
-        // console.log(payerType, 'payerType');
-        // console.log(groupBy, 'groupBy');
-        // console.log(filterTreatmentAND,'filterTreatmentAND');
-        // console.log(filterTreatmentOR, 'filterTreatmentOR');
-        // console.log(filterMedicalConditionAND, 'filterMedicalConditionAND');
-        // console.log(filterMedicalConditionOR,'filterMedicalConditionOR');
-        formData.default = defaultVal;
-        formData.preferenceName = name;
+        const groupKeys = (formData.groupBy == constants.groupType.Cohort) ? formData.cohorts : formData.payType;
+        const treatmentLabels = props.treatment.map((e, i) => { return e["label"] })
+        const medicalConditionLabels = props.medicalCondition.map((e, i) => { return e["label"] })
+
+        const request = {
+            userid: Cookies.get('userid', { path: '/' }),
+            authToken: Cookies.get('authToken', { path: '/' }),
+            saveName:name,
+            makeDefault:defaultVal,
+            jsonData:{
+                group_condition:{
+                    group_by: formData.groupBy,
+                    selection: Object.keys(groupKeys).filter((e, i) => { return groupKeys[e] })
+                },
+                states:formData.states,
+                treatments: {
+                    labels: treatmentLabels, //selectedTreatmentLabels,
+                    OR: formData.treatmentsOR?formData.treatmentsOR.map(data=> data.value):null,
+                    AND: formData.treatmentsAND?formData.treatmentsAND.map(data=> data.value):null,
+                },
+                medical_conditions: {
+                    labels: medicalConditionLabels, //selectedMedicalConditionLabels,
+                    OR: formData.medicalConditionsOR?formData.medicalConditionsOR.map(data=> data.value):null,
+                    AND: formData.medicalConditionsAND?formData.medicalConditionsAND.map(data=> data.value):null,
+                }
+            }
+        }
+
+        return request;
     }
     
-    const handleFormSubmit = () => {
+    const handleFormSubmit = async () => {
         const req = requestObject(); 
         if(initialData.id){
-            //TODO: Add the API PUT request for preference
+            req.preferenceId = initialData.id;
+            let response = await axios.put('http://localhost:3000/users/preferences', req);
+            if(response.success){
+                props.closeModal({type:'create', action:'add', success:true, message:'Preference Edited sucessfully' });
+            }
+            else{
+                props.closeModal({type:'create', action:'add', success:false, message:'Unable to add preference' });
+            }
         }
         else{
-            //TODO: Add the API to POST the preferences
+            let response = await axios.post('http://localhost:3000/users/preferences', req);
+            if(response.success){
+                props.closeModal({type:'create', action:'add', success:true, message:'Preference Added sucessfully' });
+            }
+            else{
+                props.closeModal({type:'create', action:'add', success:false, message:'Unable to add preference' });
+            }
         }
-        props.closeModal({type:'create', action:'add', success:true, message:'Preference added sucessfully' });
     }
 
     const handleCancel = ()=>{
