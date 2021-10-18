@@ -9,20 +9,18 @@ import TableRow from '@mui/material/TableRow';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import Button from '@mui/material/Button';
-import TablePagination from '@mui/material/TablePagination';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import CloseIcon from '@mui/icons-material/Close';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import Tooltip from '@mui/material/Tooltip';
-import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import Modal from '@mui/material/Modal';
 import axios from 'axios'
 import Cookies from 'js-cookie';
 
 
-function createData(id, name, createdAt) {
-    return { id, name, createdAt };
+function createData(id, saveName, createdAt) {
+    return { id, saveName, createdAt };
 }
 
 const style = {
@@ -48,22 +46,8 @@ const deleteModalstyle = {
 
 
 const ViewPreferences = (props) => {
-    const [page, setPage] = useState(0);
-    const [rowsPerPage, setRowsPerPage] = useState(10);
-    const handleChangePage = (event, newPage) => { setPage(newPage) };
-    const handleChangeRowsPerPage = (event) => {
-        setRowsPerPage(+event.target.value);
-        setPage(0)
-    };
-
-
     const [rowData, setRowData] = useState([]);
-
-    let prefData = props.preferences.map(data => {
-        return createData(data.id, data.saveName, data.createdAt);
-    });
-    setRowData([...prefData]);
-
+    const [preferences, setPreferences]=  useState([]);
     const [openDeleteModal, setOpenDeleteModal] = useState(false);
     const handleOpenDeleteModal = () => setOpenDeleteModal(true);
     const handleCloseDeleteModal = () => setOpenDeleteModal(false);
@@ -87,13 +71,34 @@ const ViewPreferences = (props) => {
         handleOpenDeleteModal();
     }
 
+    useEffect(() => {
+        getPreferences();
+    }, [])
+
+    const getPreferences = async () => {
+        const userid = Cookies.get('userid');
+        const authToken = Cookies.get('authToken');
+        const response = await axios.post('http://localhost:3000/users/preferences', { userid, authToken });
+        if (response.data.success) {
+            const preferencesData = response.data.preferenceData;
+
+            let prefData = preferencesData? preferences.map(data => {
+                return createData(data.id, data.saveName, data.createdAt);
+            }):null;
+            
+            console.log(prefData);
+            setRowData([...prefData]);
+            setPreferences([...preferencesData]);
+        }
+    }
+
     const onConfirmDelete = async () => {
         let preference = deletePreference;
         let userid = Cookies.get('userid', { path: '/' });
         let authToken = Cookies.get('authToken', { path: '/' });
         const response = await axios.delete('http://localhost:3000/users/preferences', { userid, authToken, preferenceId: preference.id });
         if (response.success) {
-
+            getPreferences();
         }
         else {
 
@@ -117,7 +122,6 @@ const ViewPreferences = (props) => {
                     </TableHead>
                     <TableBody>
                         {rowData
-                            // .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                             .map((row) => (
                                 <TableRow
                                     key={row.saveName}
@@ -137,15 +141,6 @@ const ViewPreferences = (props) => {
                             ))}
                     </TableBody>
                 </Table>
-                {/* <TablePagination
-                    rowsPerPageOptions={[10, 25, 100]}
-                    component="div"
-                    count={rows.length}
-                    rowsPerPage={rowsPerPage}
-                    page={page}
-                    onPageChange={handleChangePage}
-                    onRowsPerPageChange={handleChangeRowsPerPage}
-                /> */}
             </TableContainer>
             <Modal
                 open={openDeleteModal}

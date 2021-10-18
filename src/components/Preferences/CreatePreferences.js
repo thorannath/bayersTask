@@ -73,20 +73,17 @@ const customStyles = {
 const CreatePreferences = (props) => {
 
     const initialData = props.loadFormData;
-    const [name, setName] = useState('');
+
+    const [name, setName] = useState(initialData.preferenceName);
     const [defaultVal, setDefaultVal] = useState(false);
     const [formData, setFormData] = useState({...initialData});
 
-    const treatment = props.treatment.map(data => {
-        return { value: data.label_val, label: data.name }
-    });
+    const treatment = props.treatment;
 
-    const medicalCondition = props.medicalCondition.map(data => {
-        return { value: data.label_val, label: data.name }
-    });
+    const medicalCondition = props.medicalCondition;
 
     const handleName = (event)=>{
-        setName(event);
+        setName(event.target.value);
     }
 
     const handleDefault = (event) =>{
@@ -108,7 +105,7 @@ const CreatePreferences = (props) => {
                     group_by: formData.groupBy,
                     selection: Object.keys(groupKeys).filter((e, i) => { return groupKeys[e] })
                 },
-                states:formData.states,
+                states:formData.states.map(data=> data.value),
                 treatments: {
                     labels: treatmentLabels, //selectedTreatmentLabels,
                     OR: formData.treatmentsOR?formData.treatmentsOR.map(data=> data.value):null,
@@ -127,7 +124,7 @@ const CreatePreferences = (props) => {
     
     const handleFormSubmit = async () => {
         const req = requestObject(); 
-        if(initialData.id){
+        if(initialData.saveName){
             req.preferenceId = initialData.id;
             let response = await axios.put('http://localhost:3000/users/preferences', req);
             if(response.success){
@@ -138,7 +135,7 @@ const CreatePreferences = (props) => {
             }
         }
         else{
-            let response = await axios.post('http://localhost:3000/users/preferences', req);
+            let response = await axios.post('http://localhost:3000/users/preferences/create', req);
             if(response.success){
                 props.closeModal({type:'create', action:'add', success:true, message:'Preference Added sucessfully' });
             }
@@ -171,7 +168,7 @@ const CreatePreferences = (props) => {
                     variant="standard" />
                 </FormGroup>
                 <Filters
-                formData={initialData}
+                formData={formData}
                 onChangeFormData= {handleFormData}
                 treatment={treatment}
                 medicalCondition={medicalCondition}

@@ -12,16 +12,55 @@ import Backdrop from '@mui/material/Backdrop';
 import Modal from '@mui/material/Modal';
 import ViewPreferences from '../Preferences/ViewPreferences';
 import CreatePreferences from '../Preferences/CreatePreferences';
-import InputLabel from '@mui/material/InputLabel';
-import MenuItem from '@mui/material/MenuItem';
-import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import html2canvas from "html2canvas";
 import jsPdf from "jspdf";
-
+import FormGroup from '@mui/material/FormGroup';
+import FormLabel from '@mui/material/FormLabel';
+import { FormControlLabel } from '@mui/material';
+const customStyles = {
+    menu: (provided, state) => ({
+      ...provided,
+      width: state.selectProps.width,
+      borderBottom: '1px solid grey',
+      color: state.selectProps.menuColor,
+      width: '50%',
+    }),
+    option: (provided, state) => ({
+      ...provided,
+      padding: 20,
+    }),
+    control: (control) => ({
+      ...control,
+      padding: 4
+    }),
+    singleValue: (provided, state) => {
+      const opacity = state.isDisabled ? 0.5 : 1;
+      const transition = 'opacity 300ms';
+      return { ...provided, opacity, transition };
+    },
+    multiValue: (styles, { data }) => {
+      return {
+        ...styles,
+        backgroundColor: '#ffae42',
+        color: 'whitesmoke',
+      };
+    },
+    multiValueLabel: (styles, { data }) => ({
+      ...styles,
+      color: data.color,
+    }),
+    multiValueRemove: (styles, { data }) => ({
+      ...styles,
+      color: data.color,
+      ':hover': {
+        backgroundColor: data.color,
+        color: 'white',
+      },
+    }),
+  }
 
 const Dashboard = () => {
-    const states = constants.States;
     const colors = constants.colors;
 
     const [treatmentsChartData, setTreatmentsChartData] = useState({});
@@ -31,22 +70,20 @@ const Dashboard = () => {
     const [medicalCondition, setMedicalCondition] = useState([]);
     const [openViewModal, setOpenViewModal] = useState(false);
     const [openCreateModal, setOpenCreateModal] = useState(false);
-    const [selectedTreatmentLabels, setSelectedTreatmentLabels] = useState([]);
-    const [selectedMedicalConditionLabels, setSelectedMedicalConditionLabels] = useState([]);
     const [preferences, setPreferences] = useState([]);
-
-    const [defaultPreference, setDefaultPreference] = useState(null);
+    const [preferenceFormData, setPreferenceFormData] = useState([]);
+    const [defaultPreference, setDefaultPreference] = useState({value:'', label:'Please Select'});
 
     const initialData = {
         preferenceName: null,
         groupBy: constants.groupType.Cohort,
-        states,
+        states: constants.States.map(data => { return { value: data, label: data } }),
         cohorts: { ckd: true, diab: true, both: true },
         payType: { MCR: true, COM: true },
-        treatmentsOR: null,
-        treatmentsAND: null,
-        medicalConditionsAND: null,
-        medicalConditionsOR: null
+        treatmentsOR: [],
+        treatmentsAND: [],
+        medicalConditionsAND: [],
+        medicalConditionsOR: []
     }
 
     const [loadFormData, setLoadFormData] = useState({ ...initialData });
@@ -64,36 +101,42 @@ const Dashboard = () => {
     const handleCloseModal = (res) => {
         if (res.type == 'create') {
             if (res.success) {
+                getPreferences();
             }
             setOpenCreateModal(false)
         }
         else {
             if (res.action == 'edit') {
-                let data  = loadPreferenceForm(res.data.id);
+                let data = loadPreferenceForm(res.data.id);
+                console.log(data);
                 setLoadFormData({ ...data })
                 setOpenCreateModal(true)
+                getPreferences();
             }
-            else if(res.action == 'view') {
-                let data  = loadPreferenceForm(res.data.id);
-                setFormData({...data});
+            else if (res.action == 'view') {
+                let data = loadPreferenceForm(res.data.id);
+                setFormData({ ...data });
             }
             setOpenViewModal(false)
         }
     };
 
-    const loadPreferenceForm = (id)=>{
+    const loadPreferenceForm = (id) => {
         let preference = preferences.find(data => data.id == id);
-        let jsonData = preferences.jsonData;
-        const  data = {
+        if(!preference) return null;
+
+        let jsonData = preference.jsonData;
+        
+        const data = {
             preferenceName: preference.saveName,
             groupBy: jsonData.group_condition.group_by,
             states: jsonData.states,
             cohorts: { ckd: false, diab: false, both: false },
             payType: { MCR: true, COM: true },
-            treatmentsOR: treatment.map(data => { if (jsonData.treatments.OR.includes(data.label_val)) return { value: data.label_val, label: data.name } }),
-            treatmentsAND: treatment.map(data => { if (jsonData.treatments.AND.includes(data.label_val)) return { value: data.label_val, label: data.name } }),
-            medicalConditionsAND: medicalCondition.map(data => { if (jsonData.medical_conditions.AND.includes(data.label_val)) return { value: data.label_val, label: data.name } }),
-            medicalConditionsOR: medicalCondition.map(data => { if (jsonData.medical_conditions.OR.includes(data.label_val)) return { value: data.label_val, label: data.name } }),
+            treatmentsOR: treatment.map(data => { if (jsonData.treatments.OR.includes(data.label_val)) return { value: data.label_val, label: data.name } }).filter(data=> data),
+            treatmentsAND: treatment.map(data => { if (jsonData.treatments.AND.includes(data.label_val)) return { value: data.label_val, label: data.name } }).filter(data=> data),
+            medicalConditionsAND: medicalCondition.map(data => { if (jsonData.medical_conditions.AND.includes(data.label_val)) return { value: data.label_val, label: data.name } }).filter(data=> data),
+            medicalConditionsOR: medicalCondition.map(data => { if (jsonData.medical_conditions.OR.includes(data.label_val)) return { value: data.label_val, label: data.name } }).filter(data=> data),
         };
         if (jsonData.group_condition.group_by == 'cohort') {
             for (const [type, bool] of Object.entries(data.cohorts)) {
@@ -116,7 +159,7 @@ const Dashboard = () => {
         const request = requestObject();
         /* Later: Introduce  Authentication and Posting mechanism*/
         request.userid = Cookies.get("userid", { path: '/' });
-        request.authToken = Cookies.get('authToken', {path:'/'});
+        request.authToken = Cookies.get('authToken', { path: '/' });
         const treatmentResponse = await axios.post('http://localhost:3000/patientfinder/treatments', request);
         const res = treatmentResponse.data;
         res.treatments.labels.shift();
@@ -142,16 +185,19 @@ const Dashboard = () => {
     }
 
     const fetchLabels = async () => {
-        let req = {
-            userid:Cookies.get("userid", { path: '/' }),
-            authToken:Cookies.get('authToken', {path:'/'}),
+        let params = {
+            userid: Cookies.get("userid", { path: '/' }),
+            authToken: Cookies.get('authToken', { path: '/' }),
         }
-        const labelsResponse = await axios.post('http://localhost:3000/patientfinder/labels', req);
-        const labelData = labelsResponse.labelData;
-        let medicalConditions = labelData.filter(data => data.label_type == constants.labelTypes.MEDICAL_CONDITION);
-        let treatments = labelData.filter(data => data.label_type == constants.labelTypes.TREATMENT);
-        setMedicalCondition([...medicalConditions])
-        setTreatment([...treatments])
+        const labelsResponse = await axios.post('http://localhost:3000/patientfinder/labels', {...params});
+
+        if (labelsResponse.status == 200) {
+            const labelData = labelsResponse.data.labelData;
+            let medicalConditions = labelData.filter(data => data.label_type == constants.labelTypes.MEDICAL_CONDITION);
+            let treatments = labelData.filter(data => data.label_type == constants.labelTypes.TREATMENT);
+            setMedicalCondition([...medicalConditions])
+            setTreatment([...treatments])
+        }
     }
 
     const createChartData = (obj) => {
@@ -183,13 +229,13 @@ const Dashboard = () => {
             states: formData.states,
             treatments: {
                 labels: treatmentLabels, //selectedTreatmentLabels,
-                OR: formData.treatmentsOR?formData.treatmentsOR.map(data=> data.value):null,
-                AND: formData.treatmentsAND?formData.treatmentsAND.map(data=> data.value):null,
+                OR: formData.treatmentsOR ? formData.treatmentsOR.map(data => data.value) : null,
+                AND: formData.treatmentsAND ? formData.treatmentsAND.map(data => data.value) : null,
             },
             medical_conditions: {
                 labels: medicalConditionLabels, //selectedMedicalConditionLabels,
-                OR: formData.medicalConditionsOR?formData.medicalConditionsOR.map(data=> data.value):null,
-                AND: formData.medicalConditionsAND?formData.medicalConditionsAND.map(data=> data.value):null,
+                OR: formData.medicalConditionsOR ? formData.medicalConditionsOR.map(data => data.value) : null,
+                AND: formData.medicalConditionsAND ? formData.medicalConditionsAND.map(data => data.value) : null,
             }
         }
 
@@ -206,20 +252,27 @@ const Dashboard = () => {
 
     const handlePreferenceChange = (value) => {
         const data = loadPreferenceForm(value);
-        setFormData({ ...data });
+        if(data){
+            setFormData({ ...data });
+        }
     }
 
     const getPreferences = async () => {
         const userid = Cookies.get('userid');
         const authToken = Cookies.get('authToken');
-        const response = await axios.get('http://localhost:3000/users/preferences', { userid, authToken });
-        const preferencesData = response.preferenceData;
-
-        if (response.defaultPreferenceId){
-            handlePreferenceChange(response.defaultPreferenceId);
-            setDefaultPreference(response.defaultPreferenceId);
+        const response = await axios.post('http://localhost:3000/users/preferences', { userid, authToken });
+        if (response.data.success) {
+            const preferencesData = response.data.preferenceData;
+            let data = preferencesData.map(data=> { return {value:data.id, label:data.saveName}});
+            setPreferenceFormData([...data]);
+            setPreferences([...preferencesData]);
+            if (response.data.defaultPreferenceId) {
+                handlePreferenceChange(response.data.defaultPreferenceId);
+                let preference = preferencesData.find(data=> data.id == response.defaultPreferenceId);
+                if(preference) setDefaultPreference({value:preference.id, label:preference.saveName});
+            }
+            handlePreferenceChange(preferencesData[0].id);
         }
-        setPreferences([...preferencesData]);
     }
 
     const takeScreenshot = (e) => {
@@ -275,24 +328,17 @@ const Dashboard = () => {
         <div className="container">
             <div className="page_header">
                 <h1> Patient Finder </h1>
-                <FormControl sx={{ textAlign: 'center' }} variant="standard" sx={{ m: 1, minWidth: 200 }}>
-                    <InputLabel id="demo-simple-select-standard-label">Choose a Preference</InputLabel>
+                {/* <FormGroup classsName="form-group">
+                    <FormLabel name="preferences">Select Preference</FormLabel>
                     <Select
-                        labelId="demo-simple-select-standard-label"
-                        id="demo-simple-select-standard"
-                        value={defaultPreference}
-                        onChange={handlePreferenceChange}
-                        label="Choose Preference">
-                        <MenuItem value="">
-                            <em>Please Select</em>
-                        </MenuItem>
-                        {preferences.map(data => {
-                            return (
-                                <MenuItem value={data.id}>{data.save_name}</MenuItem>
-                            )
-                        })}
-                    </Select>
-                </FormControl>
+                        name="preferences"
+                        defaultValue={defaultPreference}
+                        styles={customStyles}
+                        options={preferenceFormData}
+                        onChange={(e)=>handlePreferenceChange(e.value)}
+                        classNamePrefix="select"
+                    />
+                </FormGroup> */}
                 <Stack className="btn-stack" spacing={2} direction="row">
                     <Button variant="contained" color="warning" onClick={() => { handleOpenModal({ type: 'create' }) }}> CREATE PREFRENCE </Button>
                     <Button variant="contained" color="info" onClick={() => { handleOpenModal({ type: 'view' }) }}> VIEW PREFRENCES </Button>
@@ -341,7 +387,7 @@ const Dashboard = () => {
                 <ViewPreferences
                     openModal={openViewModal}
                     closeModal={(type) => handleCloseModal(type)}
-                    preferences={preferences} />
+                />
             </Modal>
         </div>
     )

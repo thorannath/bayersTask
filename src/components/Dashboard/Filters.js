@@ -57,14 +57,15 @@ export const Filters = (props) => {
   const payerType = constants.Paytype;
   const patientCohort = constants.Patient_Cohort;
 
-  const states = formData.states.map(data => {
-    return { value: data, label: data }
-  });
-
+  const defaultStates = formData.states;
   const defaultTreatmentsOR = formData.treatmentsOR;
   const defaultTreatmentsAND = formData.treatmentsAND;
   const defaultMedicalConditionsOR = formData.medicalConditionsOR;
   const defaultMedicalConditionsAND = formData.medicalConditionsAND;
+
+  const states = constants.States.map(data => {
+    return { value: data, label: data }
+  });
 
   const treatment = props.treatment.map(data => {
     return { value: data.label_val, label: data.name }
@@ -97,32 +98,44 @@ export const Filters = (props) => {
   }
 
   const onChangeStates = (event) => {
-    formData.states= event.map((data) => data.value);
+    
+    let statesData = event.map((data) => data.value);
+
+    formData.states = states.filter(data=> statesData.includes(data.value)) 
   }
 
   const onChangeTreatment = (event, logic) =>{
     let treatments = event.map(data=> data.value);
     if (logic === constants.Logic.AND) {
-        formData.treatmentsAND =  treatment.filter(data=> treatments.includes(data.label_val));
+        formData.treatmentsAND =  treatment.filter(data=> treatments.includes(data.value));
 
     }
     else if (logic === constants.Logic.OR) {
-        formData.treatmentsOR = treatment.filter(data=> treatments.includes(data.label_val)) ;;
+        formData.treatmentsOR = treatment.filter(data=> treatments.includes(data.value)) ;;
     }
   }
 
   const onChangeMedicalCondition = (event, logic) =>{
     let medicalConditions = event.map(data=> data.value);
     if (logic === constants.Logic.AND) {
-        formData.medicalConditionsAND = medicalCondition.filter(data=> medicalConditions.includes(data.label_val));
+        formData.medicalConditionsAND = medicalCondition.filter(data=> medicalConditions.includes(data.value));
     }
     else if (logic === constants.Logic.OR) {
-        formData.medicalConditionsOR = medicalCondition.filter(data=> medicalConditions.includes(data.label_val));
+        formData.medicalConditionsOR = medicalCondition.filter(data=> medicalConditions.includes(data.value));
     }
   }
 
+  const validateFormData = (formData) =>{
+    if(formData.groupBy && formData.treatmentsAND.length!=0 && formData.treatmentsOR.length!=0 && formData.medicalConditionsAND.length!=0 && formData.medicalConditionsOR.length!=0){
+      return true;
+    }
+    return false;
+  }
+
   useEffect(() => {
-    props.onChangeFormData(formData);
+    if(validateFormData(formData)){
+      props.onChangeFormData(formData);
+    }
   }, [formData])
 
   const GroupData = () => {
@@ -184,7 +197,7 @@ export const Filters = (props) => {
       <FormGroup classsName="form-group">
         <FormLabel component="legend">States</FormLabel>
         <Select
-          defaultValue={states}
+          defaultValue={defaultStates}
           isMulti
           name="states"
           styles={customStyles}
