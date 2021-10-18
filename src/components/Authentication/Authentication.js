@@ -4,57 +4,55 @@ import Register from './Register';
 import './Authentication.css';
 import ButtonGroup from '@mui/material/ButtonGroup';
 import Button from '@mui/material/Button';
-import { NavLink } from 'react-router-dom';
-import BlurOnIcon from '@mui/icons-material/BlurOn';
 import Cookies from 'js-cookie';
-import {Redirect} from 'react-router-dom';
+import { Redirect } from 'react-router-dom';
+import Snackbar from '../Snackbar/Snackbar';
+
 
 const Authentication = () => {
 
     const [authType, setAuthType] = useState('login');
+    // const [snackbarObj, setSnackbarObj] = useState({isOpen:false, severity:'error', message:''});
+
 
     const Auth = (type) => {
-        if(authType === 'login'){
-            return (<Login/>)
+        if (authType === 'login') {
+            return (<Login />)
         }
-        else{
+        else {
             return (<Register />)
         }
     }
 
-    const handleAuth = (type) =>{
+    const handleAuth = (type) => {
         setAuthType(type);
     }
 
-    if(!Cookies.get('userid', {path: '/'}) || !Cookies.get('password', {path: '/'})){ /* Later: use auth-token and perform authentication from backend*/
+    if (!Cookies.get('userid', { path: '/' }) || !Cookies.get('password', { path: '/' })) { /* Later: use auth-token and perform authentication from backend*/
         return (
             <div className="container-fluid">
-                <div className="image">
-                    <div className="logo"><BlurOnIcon sx={{ color: 'seashell', fontSize:100}}/></div>
-                    
-                    <h2> Bayer Project </h2>
-                </div>
                 <div className="card">
-                    <ButtonGroup className="btn-group"  variant="outlined">
+                    <ButtonGroup className="btn-group" variant="outlined">
                         <Button
-                        className={authType === 'login' ? 'active' : ''}
-                        onClick={()=> handleAuth('login')} ><h3>Login</h3></Button>
+                            className={authType === 'login' ? 'active' : ''}
+                            onClick={() => handleAuth('login')} ><h3>Login</h3></Button>
                         <Button
-                        className={authType === 'register' ? 'active' : ''}
-                        onClick={()=> handleAuth('register')}><h3>New User</h3></Button>
+                            className={authType === 'register' ? 'active' : ''}
+                            onClick={() => handleAuth('register')}><h3>New User</h3></Button>
                     </ButtonGroup>
-                    <br/>
-                    <br/>
+                    <br />
+                    <br />
                     <h2> Welcome to the Patients Finder!</h2>
-                    <br/>
-                    <hr/>
+                    <br />
+                    <hr />
                     <div className="auth-container">
                         <Auth />
                     </div>
                 </div>
+                {/* <Snackbar isOpen={snackbarObj.isOpen} severity={snackbarObj.severity} message={snackbarObj.message}></Snackbar> */}
             </div>
         );
-    }else{
+    } else {
         return <Redirect to="/app/introduction" />;
     }
 }

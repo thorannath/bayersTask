@@ -1,252 +1,262 @@
 import React from 'react'
 import * as constants from '../../Constant';
 import FormGroup from '@mui/material/FormGroup';
+import FormLabel from '@mui/material/FormLabel';
 import { FormControlLabel } from '@mui/material';
 import Checkbox from '@mui/material/Checkbox';
-import { Button } from '@mui/material';
 import Radio from '@mui/material/Radio';
 import RadioGroup from '@mui/material/RadioGroup';
-import makeAnimated from 'react-select/animated';
-import Select, { StylesConfig } from 'react-select';
-import html2canvas from "html2canvas";
-import jsPdf from "jspdf";
+import Select from 'react-select';
+import { useEffect } from 'react';
 
+const customStyles = {
+  menu: (provided, state) => ({
+    ...provided,
+    width: state.selectProps.width,
+    borderBottom: '1px solid grey',
+    color: state.selectProps.menuColor,
+    width: '50%',
+  }),
+  option: (provided, state) => ({
+    ...provided,
+    padding: 20,
+  }),
+  control: (control) => ({
+    ...control,
+    padding: 4
+  }),
+  singleValue: (provided, state) => {
+    const opacity = state.isDisabled ? 0.5 : 1;
+    const transition = 'opacity 300ms';
+    return { ...provided, opacity, transition };
+  },
+  multiValue: (styles, { data }) => {
+    return {
+      ...styles,
+      backgroundColor: '#ffae42',
+      color: 'whitesmoke',
+    };
+  },
+  multiValueLabel: (styles, { data }) => ({
+    ...styles,
+    color: data.color,
+  }),
+  multiValueRemove: (styles, { data }) => ({
+    ...styles,
+    color: data.color,
+    ':hover': {
+      backgroundColor: data.color,
+      color: 'white',
+    },
+  }),
+}
 
 export const Filters = (props) => {
+
+  const formData = props.formData;
   const payerType = constants.Paytype;
   const patientCohort = constants.Patient_Cohort;
-  const states = constants.States.map(data=>{
-    return {value:data, label:data}
+
+  const defaultStates = formData.states;
+  const defaultTreatmentsOR = formData.treatmentsOR;
+  const defaultTreatmentsAND = formData.treatmentsAND;
+  const defaultMedicalConditionsOR = formData.medicalConditionsOR;
+  const defaultMedicalConditionsAND = formData.medicalConditionsAND;
+
+  const states = constants.States.map(data => {
+    return { value: data, label: data }
   });
 
-  const animatedComponents = makeAnimated();
-  const cohort = props.cohort;
-  const payType = props.payType;
-  const treatment = props.treatment;
-  const medicalCondition = props.medicalCondition;
+  const treatment = props.treatment.map(data => {
+    return { value: data.label_val, label: data.name }
+  });
 
-  const filterStates = props.filterStates;
-  const filterTreatmentAND = props.filterTreatmentAND;
-  const filterMedicalConditionAND = props.filterMedicalConditionAND;
-  const filterTreatmentOR = props.filterTreatmentOR;
-  const filterMedicalConditionOR = props.filterMedicalConditionOR;
+  const medicalCondition = props.medicalCondition.map(data => {
+    return { value: data.label_val, label: data.name }
+  });
+
+  const onChangeGroup = (groupType) => {
+    formData.groupBy = (groupType === constants.groupType.Cohort) ? constants.groupType.Cohort : constants.groupType.PayerType;
+  }
+
+  const onChangeGroupBy = (event, filterType) => {
+    switch (filterType) {
+      case constants.groupType.Cohort:
+        formData.cohorts = {
+          ...formData.cohorts,
+          [event.target.name]: event.target.checked,
+        }
+        break;
+
+      case constants.groupType.PayerType:
+        formData.payerType = {
+          ...formData.payerType,
+          [event.target.name]: event.target.checked,
+        };
+        break;
+    }
+  }
+
+  const onChangeStates = (event) => {
+    
+    let statesData = event.map((data) => data.value);
+
+    formData.states = states.filter(data=> statesData.includes(data.value)) 
+  }
+
+  const onChangeTreatment = (event, logic) =>{
+    let treatments = event.map(data=> data.value);
+    if (logic === constants.Logic.AND) {
+        formData.treatmentsAND =  treatment.filter(data=> treatments.includes(data.value));
+
+    }
+    else if (logic === constants.Logic.OR) {
+        formData.treatmentsOR = treatment.filter(data=> treatments.includes(data.value)) ;;
+    }
+  }
+
+  const onChangeMedicalCondition = (event, logic) =>{
+    let medicalConditions = event.map(data=> data.value);
+    if (logic === constants.Logic.AND) {
+        formData.medicalConditionsAND = medicalCondition.filter(data=> medicalConditions.includes(data.value));
+    }
+    else if (logic === constants.Logic.OR) {
+        formData.medicalConditionsOR = medicalCondition.filter(data=> medicalConditions.includes(data.value));
+    }
+  }
+
+  const validateFormData = (formData) =>{
+    if(formData.groupBy && formData.treatmentsAND.length!=0 && formData.treatmentsOR.length!=0 && formData.medicalConditionsAND.length!=0 && formData.medicalConditionsOR.length!=0){
+      return true;
+    }
+    return false;
+  }
+
+  useEffect(() => {
+    if(validateFormData(formData)){
+      props.onChangeFormData(formData);
+    }
+  }, [formData])
 
   const GroupData = () => {
-    if (props.groupBy == constants.groupType.Cohort) {
+    if (formData.groupBy == constants.groupType.Cohort) {
       return (
-        <div className="groupType">
-          <h3>Patient Cohort</h3>
-          <FormGroup>
-            {
-              patientCohort.map((data,i) => {
-                return <FormControlLabel key={`cohort-formgrp-${i}`}
-                  control={
-                    <Checkbox 
-                      checked={cohort[data]} 
-                      onChange={(e) => props.onChange(e, constants.groupType.Cohort)} 
-                      name={data} />
-                  }
-                  label={data.toUpperCase()}
-                />
-              })
-            }
-          </FormGroup>
-        </div>
+        <FormGroup className="form-group">
+          <FormLabel component="legend">Cohort Type</FormLabel>
+          <div row>
+            {patientCohort.map((data, i) => {
+              return <FormControlLabel key={`cohort-formgrp-${i}`}
+                control={
+                  <Checkbox
+                    checked={formData.cohorts[data]}
+                    onChange={(e) => onChangeGroupBy(e, constants.groupType.Cohort)}
+                    name={data} />
+                }
+                label={data.toUpperCase()}
+              />
+            })}
+          </div>
+        </FormGroup>
       )
     }
-    else if (props.groupBy == constants.groupType.PayerType) {
+    else if (formData.groupBy == constants.groupType.PayerType) {
       return (
-        <div className="groupType">
-          <h3>Payer Type</h3>
-          <FormGroup>
-            {
-              payerType.map((data,i) => {
-                return <FormControlLabel key={`paytyp-formgrp-${i}`}
-                  control={
-                    <Checkbox checked={payType[data]}
-                      onChange={(e) => props.onChange(e, constants.groupType.PayerType)}
-                      name={data} />
-                  }
-                  label={data}
-                />
-              })
-            }
-          </FormGroup>
-        </div>
+        <FormGroup className="form-group" >
+          <FormLabel component="legend">Payer Type</FormLabel>
+          <div row>
+            {payerType.map((data, i) => {
+              return <FormControlLabel key={`paytyp-formgrp-${i}`}
+                control={
+                  <Checkbox checked={formData.payType[data]}
+                    onChange={(e) => onChangeGroupBy(e, constants.groupType.PayerType)}
+                    name={data} />
+                }
+                label={data} />
+            })}
+          </div>
+        </FormGroup>
       )
     }
   }
-
-  const handleDelete = (e, val) => {
-    e.preventDefault();
-    let event = {
-      target: {
-        checked: false,
-        name: val
-      }
-    }
-    props.onChangeStates(event)
-  }
-
-  const handleStateChange = (e)=>{
-    console.log(e);
-  }
-
-
-  const takeScreenshot = (e)=>{
-      html2canvas(document.getElementById("medical-chart"), {
-        onclone: document => {
-          document.getElementById("image-render-medical").style.visibility = "hidden";
-        }
-      }).then(canvas => {
-        
-        const imgData = canvas.toDataURL("image/png");
-        const pdf = new jsPdf("l", "mm", "a4");
-        const width = pdf.internal.pageSize.getWidth();
-        const height = pdf.internal.pageSize.getHeight();
-        pdf.addImage(imgData, "JPEG", 0, 0, width, height);
-        pdf.save(`medical-chart_${new Date().toISOString()}.pdf`);
-      });
-
-      html2canvas(document.getElementById("treatment-chart"), {
-        onclone: document => {
-          document.getElementById("image-render-treatment").style.visibility = "hidden";
-        }
-      }).then(canvas => {
-        
-        const imgData = canvas.toDataURL("image/png");
-        const pdf = new jsPdf("l", "mm", "a4");
-        const width = pdf.internal.pageSize.getWidth();
-        const height = pdf.internal.pageSize.getHeight();
-        pdf.addImage(imgData, "JPEG", 0, 0, width, height);
-        pdf.save(`treatment-chart_${new Date().toISOString()}.pdf`);
-      });
-  };
-
-  
 
   return (
     <div className="filters">
-      <div className="groupBy">
-        <h3> Group By </h3>
-        <RadioGroup
-          aria-label="gender"
-          defaultValue="cohort"
-          name="radio-buttons-group"
-          color="primary"
-          onClick={(e) => props.onChangeGroup(e.target.value)}
-        >
-          <FormControlLabel value="cohort" control={<Radio />} label="Cohort" />
-          <FormControlLabel value="paytype" control={<Radio />} label="Payer Type " />
+      <FormGroup classsName="form-group">
+        <FormLabel component="legend">Group By</FormLabel>
+        <RadioGroup row
+          defaultValue={formData.groupBy}
+          onClick={(e) => onChangeGroup(e.target.value)}
+          name="radio-buttons-group">
+          <FormControlLabel value={constants.groupType.Cohort} control={<Radio />} label="Cohort" />
+          <FormControlLabel value={constants.groupType.PayerType} control={<Radio />} label="Payer" />
         </RadioGroup>
-      </div>
+      </FormGroup>
 
       <GroupData />
 
-      <div className="">
-        <h3> States </h3>
+      <FormGroup classsName="form-group">
+        <FormLabel component="legend">States</FormLabel>
         <Select
-          defaultValue={states}
+          defaultValue={defaultStates}
           isMulti
-          name="colors"
+          name="states"
+          styles={customStyles}
           options={states}
-          onChange={(e) => props.onChangeStates(e)}
+          onChange={(e) => onChangeStates(e)}
+          classNamePrefix="select" />
+      </FormGroup>
+      <br />
+      <FormGroup classsName="form-group">
+        <FormLabel component="legend">Treatment with AND</FormLabel>
+        <Select
+          isMulti
+          name="treatmentAND"
+          defaultValue={defaultTreatmentsAND}
+          styles={customStyles}
+          options={treatment}
+          onChange={(e) => onChangeTreatment(e, constants.Logic.AND)}
           classNamePrefix="select"
         />
-      </div>
-
-      <div className="treatment">
-        <div>
-          <h3>Treatments with AND</h3>
-          <FormGroup>
-            {
-              treatment.map((data) => {
-                return <FormControlLabel
-                  control={
-                    <Checkbox
-                      onChange={(e) => props.onChangeTreatment(e, constants.Logic.AND)}
-                      checked={!!filterTreatmentAND.find(val => data.label_val == val)}
-                      name={data.name}
-                      value={data.label_val} />
-                  }
-                  label={data.name}
-                />
-
-              })
-            }
-          </FormGroup>
-        </div>
-        <div>
-          <h3>Treatments with OR</h3>
-          <FormGroup>
-            {
-              treatment.map((data) => {
-                return <FormControlLabel
-                  control={
-                    <Checkbox
-                      onChange={(e) => props.onChangeTreatment(e, constants.Logic.OR)}
-                      checked={!!filterTreatmentOR.find(val => data.label_val == val)}
-                      name={data.name}
-                      value={data.label_val} />
-                  }
-                  label={data.name}
-                />
-              })
-            }
-          </FormGroup>
-        </div>
-      </div>
-
-      <div className="medical-conditions">
-        <div>
-          <h3>Medical Conditions with AND</h3>
-          <FormGroup>
-            {
-              medicalCondition.map((data) => {
-                return <FormControlLabel
-                  control={
-                    <Checkbox
-                      onChange={(e) => props.onChangeMedicalCondition(e, constants.Logic.AND)}
-                      checked={!!filterMedicalConditionAND.find(val => data.label_val == val)}
-                      name={data.name}
-                      value={data.label_val} />
-                  }
-                  label={data.name}
-                />
-
-              })
-            }
-          </FormGroup>
-        </div>
-
-        <div>
-          <h3>Medical Conditions with OR</h3>
-          <FormGroup>
-            {
-              medicalCondition.map((data) => {
-                return <FormControlLabel
-                  control={
-                    <Checkbox
-                      onChange={(e) => props.onChangeMedicalCondition(e, constants.Logic.OR)}
-                      checked={!!filterMedicalConditionOR.find(val => data.label_val == val)}
-                      name={data.name}
-                      value={data.label_val} />
-                  }
-                  label={data.name}
-                />
-              })
-            }
-          </FormGroup>
-        </div>
-      </div>
-      <div className="update-button">
-        <span><Button color="primary" variant="contained" type="submit" onClick={props.onClick}> Update chart </Button></span>
-
-        {/* Please view this button when the the graph data is available*/}
-        <span style={{paddingLeft:"15px"}}><Button color="primary" variant="outlined"  onClick={(e)=>{takeScreenshot(e)}}>Take Screenshot</Button></span>
-      </div>
-      <div id="image-render-medical"></div>
-      <div id="image-render-treatment"></div>
+      </FormGroup>
+      <br />
+      <FormGroup classsName="form-group">
+        <FormLabel component="legend">Treatment with OR</FormLabel>
+        <Select
+          isMulti
+          name="treatmentOR"
+          defaultValue={defaultTreatmentsOR}
+          styles={customStyles}
+          options={treatment}
+          onChange={(e) => onChangeTreatment(e, constants.Logic.OR)}
+          classNamePrefix="select"
+        />
+      </FormGroup>
+      <br />
+      <FormGroup classsName="form-group">
+        <FormLabel component="legend">Medical Conditions with AND</FormLabel>
+        <Select
+          isMulti
+          name="colors"
+          defaultValue={defaultMedicalConditionsOR}
+          styles={customStyles}
+          options={medicalCondition}
+          onChange={(e) => onChangeMedicalCondition(e, constants.Logic.AND)}
+          classNamePrefix="select"
+        />
+      </FormGroup>
+      <br />
+      <FormGroup classsName="form-group">
+        <FormLabel component="legend">Medical Condtions with OR</FormLabel>
+        <Select
+          isMulti
+          name="colors"
+          defaultValue={defaultMedicalConditionsAND}
+          styles={customStyles}
+          options={medicalCondition}
+          onChange={(e) => onChangeMedicalCondition(e, constants.Logic.OR)}
+          classNamePrefix="select"
+        />
+      </FormGroup>
     </div>
   )
 }

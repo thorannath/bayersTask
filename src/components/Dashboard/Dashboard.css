@@ -40,3 +40,7 @@
 .states>div, .treatment>div, .medical-conditions>div{
     overflow-y:scroll
 }
+
+.btn-stack{
+    margin-left: auto;
+}

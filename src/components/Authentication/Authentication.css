@@ -1,12 +1,23 @@
 .container-fluid{
     height: 100vh;
+    background-image: url('./backgroud_image.png');
+    background-size: cover;
     display: flex;
+    justify-content: right;
+    align-items: center;
+    overflow-y: hidden;
+}
+
+/* .image_bg{
+    object-position: center;
+    object-fit:cover contain ;
+    max-width:100%;
+    max-height:100%;
 }
 
 .image{
     width: 55%;
-    background-color: royalblue;
-    background-size: cover;
+    background-color: cornsilk;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -16,17 +27,21 @@
     font-style: italic;
     color: seashell;
     font-size: 45px;
-}
+} */
 
 .logo{
     font-size: larger;
 }
 
 .card{
-    width: 45%;
+    width: 450px;
+    margin-right: 5em;
+    border-radius: 10px;
     background-color: whitesmoke;
-    padding: 5em;
+    
+    padding: 2em;
     text-align: center; 
+    box-shadow: 0px 2px 5px #888;
 }
 
 .card h2{
