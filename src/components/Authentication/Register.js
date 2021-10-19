@@ -25,16 +25,16 @@ export const Register = () => {
 
 
     const handleFormSubmit = async (e) => {
-        if (username, password, fullName, email) {
+        if (username && password && fullName && email) {
             const response = await axios.post('http://localhost:3000/users/register', {userid: username, password, fullName, email})
             if (response && response.data.success) {
                 setMessage(response.data.message);
                 setSeverity('success');
 
-                Cookies.set('userid', username, {expires: 1, path:'/'}); 
-                Cookies.set('password', password, {expires: 1, path:'/'});
-                Cookies.set('authToken', response.data.userData.authToken, {expires: 1, path:'/'});
-                history.push("/app/patient-finder");
+                // Cookies.set('userid', username, {expires: 1, path:'/'}); 
+                // Cookies.set('password', password, {expires: 1, path:'/'});
+                // Cookies.set('authToken', response.data.userData.authToken, {expires: 1, path:'/'});
+                // history.push("/app/patient-finder");
             }
             else {
                 setSeverity('error');

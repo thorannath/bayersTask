@@ -47,11 +47,7 @@ const Login = () => {
         }
         setOpen(false);
     };
-
-    const inputStyles = {
-        backgroundColor:'red'
-    }
-
+    
     return (
         <div className="login-cls">
             <Form.Group className="form-group" controlId="username">

@@ -7,12 +7,11 @@ import Checkbox from '@mui/material/Checkbox';
 import Radio from '@mui/material/Radio';
 import RadioGroup from '@mui/material/RadioGroup';
 import Select from 'react-select';
-import { useEffect } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 
 const customStyles = {
   menu: (provided, state) => ({
     ...provided,
-    width: state.selectProps.width,
     borderBottom: '1px solid grey',
     color: state.selectProps.menuColor,
     width: '50%',
@@ -53,15 +52,21 @@ const customStyles = {
 
 export const Filters = (props) => {
 
-  const formData = props.formData;
+  const [formData, setFormData] = useState(props.formData);
+
+  console.log(formData);
+  const [treatmentsAND, setTreatmentsAND] = useState(formData.treatmentsAND);
+  const [treatmentsOR, setTreatmentsOR] = useState(formData.treatmentsOR);
+  const [medicalConditionsAND, setMedicalConditionsAND] = useState(formData.medicalConditionsAND);
+  const [medicalConditionsOR, setMedicalConditionsOR] = useState(formData.medicalConditionsOR);
+
+
+  useEffect(() => {
+    setFormData(props.formData)
+  }, [props.formData]);
+
   const payerType = constants.Paytype;
   const patientCohort = constants.Patient_Cohort;
-
-  const defaultStates = formData.states;
-  const defaultTreatmentsOR = formData.treatmentsOR;
-  const defaultTreatmentsAND = formData.treatmentsAND;
-  const defaultMedicalConditionsOR = formData.medicalConditionsOR;
-  const defaultMedicalConditionsAND = formData.medicalConditionsAND;
 
   const states = constants.States.map(data => {
     return { value: data, label: data }
@@ -76,53 +81,68 @@ export const Filters = (props) => {
   });
 
   const onChangeGroup = (groupType) => {
-    formData.groupBy = (groupType === constants.groupType.Cohort) ? constants.groupType.Cohort : constants.groupType.PayerType;
+    let formVal = {...formData};
+    formVal.groupBy = (groupType === constants.groupType.Cohort) ? constants.groupType.Cohort : constants.groupType.PayerType;
+    validateAndSend(formVal);
+
   }
 
   const onChangeGroupBy = (event, filterType) => {
+    let formVal = {...formData};
     switch (filterType) {
       case constants.groupType.Cohort:
-        formData.cohorts = {
-          ...formData.cohorts,
+        formVal.cohorts = {
+          ...formVal.cohorts,
           [event.target.name]: event.target.checked,
         }
         break;
 
       case constants.groupType.PayerType:
-        formData.payerType = {
-          ...formData.payerType,
+        formVal.payerType = {
+          ...formVal.payerType,
           [event.target.name]: event.target.checked,
         };
         break;
     }
+    validateAndSend(formVal);
   }
 
   const onChangeStates = (event) => {
-    
+    let formVal = {...formData};
     let statesData = event.map((data) => data.value);
-
-    formData.states = states.filter(data=> statesData.includes(data.value)) 
+    formVal.states = states.filter(data=> statesData.includes(data.value)) 
+    validateAndSend(formVal);
   }
 
   const onChangeTreatment = (event, logic) =>{
     let treatments = event.map(data=> data.value);
+    let formVal = {...formData};
     if (logic === constants.Logic.AND) {
-        formData.treatmentsAND =  treatment.filter(data=> treatments.includes(data.value));
+      formVal.treatmentsAND =  treatment.filter(data=> treatments.includes(data.value));
+      setTreatmentsAND(formVal.treatmentsAND);
 
     }
     else if (logic === constants.Logic.OR) {
-        formData.treatmentsOR = treatment.filter(data=> treatments.includes(data.value)) ;;
+      formVal.treatmentsOR = treatment.filter(data=> treatments.includes(data.value)) ;
+      setTreatmentsOR(formVal.treatmentsOR);
+
     }
+    validateAndSend(formVal);
+
   }
 
   const onChangeMedicalCondition = (event, logic) =>{
     let medicalConditions = event.map(data=> data.value);
+    let formVal = {...formData};
     if (logic === constants.Logic.AND) {
-        formData.medicalConditionsAND = medicalCondition.filter(data=> medicalConditions.includes(data.value));
+      formVal.medicalConditionsAND = medicalCondition.filter(data=> medicalConditions.includes(data.value));
+      setMedicalConditionsAND(formVal.medicalConditionsAND);
     }
     else if (logic === constants.Logic.OR) {
-        formData.medicalConditionsOR = medicalCondition.filter(data=> medicalConditions.includes(data.value));
+      formVal.medicalConditionsOR = medicalCondition.filter(data=> medicalConditions.includes(data.value));
+      setMedicalConditionsOR(formVal.medicalConditionsOR);
     }
+    validateAndSend(formVal);
   }
 
   const validateFormData = (formData) =>{
@@ -130,25 +150,26 @@ export const Filters = (props) => {
       return true;
     }
     return false;
-  }
+  };
 
-  useEffect(() => {
+  const validateAndSend = (formData) => {
+    setFormData({...formData});
     if(validateFormData(formData)){
       props.onChangeFormData(formData);
     }
-  }, [formData])
+  };
 
   const GroupData = () => {
-    if (formData.groupBy == constants.groupType.Cohort) {
+    if (props.formData.groupBy == constants.groupType.Cohort) {
       return (
-        <FormGroup className="form-group">
+        <FormGroup className="">
           <FormLabel component="legend">Cohort Type</FormLabel>
           <div row>
             {patientCohort.map((data, i) => {
               return <FormControlLabel key={`cohort-formgrp-${i}`}
                 control={
                   <Checkbox
-                    checked={formData.cohorts[data]}
+                    checked={props.formData.cohorts[data]}
                     onChange={(e) => onChangeGroupBy(e, constants.groupType.Cohort)}
                     name={data} />
                 }
@@ -161,7 +182,7 @@ export const Filters = (props) => {
     }
     else if (formData.groupBy == constants.groupType.PayerType) {
       return (
-        <FormGroup className="form-group" >
+        <FormGroup className="" >
           <FormLabel component="legend">Payer Type</FormLabel>
           <div row>
             {payerType.map((data, i) => {
@@ -177,11 +198,14 @@ export const Filters = (props) => {
         </FormGroup>
       )
     }
+    else{
+      return null
+    }
   }
 
   return (
     <div className="filters">
-      <FormGroup classsName="form-group">
+      <FormGroup className="">
         <FormLabel component="legend">Group By</FormLabel>
         <RadioGroup row
           defaultValue={formData.groupBy}
@@ -194,24 +218,26 @@ export const Filters = (props) => {
 
       <GroupData />
 
-      <FormGroup classsName="form-group">
+      <FormGroup className="">
         <FormLabel component="legend">States</FormLabel>
         <Select
-          defaultValue={defaultStates}
+          defaultValue={formData.states}
           isMulti
           name="states"
           styles={customStyles}
           options={states}
+          key="value"
+          label="label"
           onChange={(e) => onChangeStates(e)}
           classNamePrefix="select" />
       </FormGroup>
       <br />
-      <FormGroup classsName="form-group">
+      <FormGroup className="">
         <FormLabel component="legend">Treatment with AND</FormLabel>
         <Select
           isMulti
           name="treatmentAND"
-          defaultValue={defaultTreatmentsAND}
+          value={treatmentsAND}
           styles={customStyles}
           options={treatment}
           onChange={(e) => onChangeTreatment(e, constants.Logic.AND)}
@@ -219,12 +245,12 @@ export const Filters = (props) => {
         />
       </FormGroup>
       <br />
-      <FormGroup classsName="form-group">
+      <FormGroup className="">
         <FormLabel component="legend">Treatment with OR</FormLabel>
         <Select
           isMulti
           name="treatmentOR"
-          defaultValue={defaultTreatmentsOR}
+          value={treatmentsOR}
           styles={customStyles}
           options={treatment}
           onChange={(e) => onChangeTreatment(e, constants.Logic.OR)}
@@ -232,12 +258,12 @@ export const Filters = (props) => {
         />
       </FormGroup>
       <br />
-      <FormGroup classsName="form-group">
+      <FormGroup className="">
         <FormLabel component="legend">Medical Conditions with AND</FormLabel>
         <Select
           isMulti
           name="colors"
-          defaultValue={defaultMedicalConditionsOR}
+          value={medicalConditionsAND}
           styles={customStyles}
           options={medicalCondition}
           onChange={(e) => onChangeMedicalCondition(e, constants.Logic.AND)}
@@ -245,12 +271,12 @@ export const Filters = (props) => {
         />
       </FormGroup>
       <br />
-      <FormGroup classsName="form-group">
+      <FormGroup className="">
         <FormLabel component="legend">Medical Condtions with OR</FormLabel>
         <Select
           isMulti
           name="colors"
-          defaultValue={defaultMedicalConditionsAND}
+          value={medicalConditionsOR}
           styles={customStyles}
           options={medicalCondition}
           onChange={(e) => onChangeMedicalCondition(e, constants.Logic.OR)}
