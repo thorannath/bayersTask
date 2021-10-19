@@ -6,13 +6,11 @@ import ButtonGroup from '@mui/material/ButtonGroup';
 import Button from '@mui/material/Button';
 import Cookies from 'js-cookie';
 import { Redirect } from 'react-router-dom';
-import Snackbar from '../Snackbar/Snackbar';
 
 
 const Authentication = () => {
 
     const [authType, setAuthType] = useState('login');
-    // const [snackbarObj, setSnackbarObj] = useState({isOpen:false, severity:'error', message:''});
 
 
     const Auth = (type) => {
@@ -49,7 +47,6 @@ const Authentication = () => {
                         <Auth />
                     </div>
                 </div>
-                {/* <Snackbar isOpen={snackbarObj.isOpen} severity={snackbarObj.severity} message={snackbarObj.message}></Snackbar> */}
             </div>
         );
     } else {

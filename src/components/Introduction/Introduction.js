@@ -67,7 +67,7 @@ const Introduction = () => {
                 <p>Study design: Cross-sectional analysis</p>
                 <p>Study period: 1 January 2019 – 31 December 2019</p>
 
-                <img src={studyDesign} style={{margin:30}}/>
+                <img alt="background" src={studyDesign} style={{margin:30}}/>
                 <p>All analyses are descriptive in nature and displayed using tables and figures. Descriptive analyses of the data were performed using summary statistics. Measures including clinical events, comorbidities, provider types, and medication use are reported as the number and percentage of patients in a cohort who had a particular demographic or clinical characteristic, or had visited a provider specialty of interest.</p>
                 <p className="back"> Back to <a href="#content">Content</a></p>
             </div>
