@@ -171,6 +171,7 @@ const Dashboard = () => {
         const treatmentsChart = createChartData(res.treatments);
         setTreatmentsChartData({ ...treatmentsChart });
 
+        console.log(treatmentsChart)
         const medicalResponse = await axios.post('http://localhost:3000/patientfinder/medicals', request);
         const res2 = medicalResponse.data;
         res2.medical_conditions.labels.shift();
