@@ -164,7 +164,7 @@ const Dashboard = () => {
                 group_by: request.group_condition.group_by,
                 selection: JSON.stringify(request.group_condition.selection)
             },
-            states: JSON.stringify(request.states),
+            states: JSON.stringify(request.states.map((e)=>e['value'])),
             treatments: {
                 labels: JSON.stringify(request.treatments.labels), //selectedTreatmentLabels,
                 OR: JSON.stringify(request.treatments.OR),
