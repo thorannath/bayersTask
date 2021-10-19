@@ -23,7 +23,7 @@ export const Register = () => {
 
 
     const handleFormSubmit = async (e) => {
-        if (username, password, fullName, email) {
+        if (username && password && fullName && email) {
             const response = await axios.post('http://localhost:3000/users/register', {userid: username, password, fullName, email})
             if (response && response.data.success) {
                 setMessage('Successfully registered. Please login!');

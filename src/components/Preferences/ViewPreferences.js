@@ -46,6 +46,26 @@ const deleteModalstyle = {
 
 
 const ViewPreferences = (props) => {
+
+    useEffect(() => {
+        const getPreferences = async () => {
+            const userid = Cookies.get('userid');
+            const authToken = Cookies.get('authToken');
+            const response = await axios.post('http://localhost:3000/users/preferences', { userid, authToken });
+            if (response.data.success) {
+                const preferencesData = response.data.preferenceData;
+    
+                let prefData = preferencesData?.map(data => {
+                    return createData(data.id, data.saveName, data.createdAt);
+                });
+    
+                setRowData([...prefData]);
+                setPreferences([...preferencesData]);
+            }
+        }
+        getPreferences();
+    }, [])
+
     const [rowData, setRowData] = useState([]);
     const [preferences, setPreferences]=  useState([]);
     const [openDeleteModal, setOpenDeleteModal] = useState(false);
@@ -71,9 +91,7 @@ const ViewPreferences = (props) => {
         handleOpenDeleteModal();
     }
 
-    useEffect(() => {
-        getPreferences();
-    }, [])
+
 
     const getPreferences = async () => {
         const userid = Cookies.get('userid');
@@ -85,8 +103,7 @@ const ViewPreferences = (props) => {
             let prefData = preferencesData? preferences.map(data => {
                 return createData(data.id, data.saveName, data.createdAt);
             }):null;
-            
-            console.log(prefData);
+
             setRowData([...prefData]);
             setPreferences([...preferencesData]);
         }
@@ -96,8 +113,9 @@ const ViewPreferences = (props) => {
         let preference = deletePreference;
         let userid = Cookies.get('userid', { path: '/' });
         let authToken = Cookies.get('authToken', { path: '/' });
-        const response = await axios.delete('http://localhost:3000/users/preferences', { userid, authToken, preferenceId: preference.id });
-        if (response.success) {
+        let params = {userid, authToken, preferenceId: preference.id};
+        const response = await axios.delete('http://localhost:3000/users/preferences', {params});
+        if (response.data.success) {
             getPreferences();
         }
         else {
@@ -105,6 +123,7 @@ const ViewPreferences = (props) => {
         }
         handleCloseDeleteModal();
     }
+
 
     return (
         <Box sx={style}>
@@ -121,7 +140,7 @@ const ViewPreferences = (props) => {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {rowData
+                        {rowData.length>0 && rowData
                             .map((row) => (
                                 <TableRow
                                     key={row.saveName}
@@ -138,7 +157,11 @@ const ViewPreferences = (props) => {
                                         <Tooltip title="Delete"><Button color="warning" onClick={() => deleteSettings(row)}><DeleteIcon /></Button></Tooltip>
                                     </TableCell>
                                 </TableRow>
-                            ))}
+                            ))
+                            }
+                            {
+                                rowData==0 && <p style={{display:'block', textAlign:'right', fontWeight:'bold', padding:5}}> No Preferences Available </p>
+                            }
                     </TableBody>
                 </Table>
             </TableContainer>
