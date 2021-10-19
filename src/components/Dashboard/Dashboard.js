@@ -176,7 +176,7 @@ const Dashboard = () => {
         const groupKeys = (formData.groupBy == constants.groupType.Cohort) ? formData.cohorts : formData.payType;
         const treatmentLabels = treatment.map((e, i) => { return e["label"] })
         const medicalConditionLabels = medicalCondition.map((e, i) => { return e["label"] })
-
+        console.log(treatmentLabels)
         const request = {
             jsonData: {
                 group_condition: {
