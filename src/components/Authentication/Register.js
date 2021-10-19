@@ -5,6 +5,8 @@ import axios from 'axios';
 import { useState, forwardRef} from 'react';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
+import Cookies from 'js-cookie';
+import { useHistory } from "react-router-dom";
 
 const Alert = forwardRef(function Alert(props, ref) {
     return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
@@ -12,7 +14,7 @@ const Alert = forwardRef(function Alert(props, ref) {
   
 
 export const Register = () => {
-
+    const history = useHistory();
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
     const [fullName, setFullName] = useState('');
@@ -26,8 +28,13 @@ export const Register = () => {
         if (username, password, fullName, email) {
             const response = await axios.post('http://localhost:3000/users/register', {userid: username, password, fullName, email})
             if (response && response.data.success) {
-                setMessage('Successfully registered. Please login!');
+                setMessage(response.data.message);
                 setSeverity('success');
+
+                Cookies.set('userid', username, {expires: 1, path:'/'}); 
+                Cookies.set('password', password, {expires: 1, path:'/'});
+                Cookies.set('authToken', response.data.userData.authToken, {expires: 1, path:'/'});
+                history.push("/app/patient-finder");
             }
             else {
                 setSeverity('error');

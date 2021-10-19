@@ -123,7 +123,7 @@ const CreatePreferences = (props) => {
     }
     
     const handleFormSubmit = async () => {
-        const req = requestObject(); 
+        /*const req = requestObject(); 
         if(initialData.saveName){
             req.preferenceId = initialData.id;
             let response = await axios.put('http://localhost:3000/users/preferences', req);
@@ -142,7 +142,7 @@ const CreatePreferences = (props) => {
             else{
                 props.closeModal({type:'create', action:'add', success:false, message:'Unable to add preference' });
             }
-        }
+        }*/
     }
 
     const handleCancel = ()=>{

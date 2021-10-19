@@ -28,7 +28,6 @@ const Login = () => {
             if (response && response.data.success) {
                 setMessage(response.data.message);
                 setSeverity('success');
-                /* --- FIXME => Later: change this to user_id & auth-token --- */
                 Cookies.set('userid', username, {expires: 1, path:'/'}); 
                 Cookies.set('password', password, {expires: 1, path:'/'});
                 Cookies.set('authToken', response.data.userData.authToken, {expires: 1, path:'/'});

@@ -35,6 +35,7 @@ const Header = () => {
     };
 
     const logout = () => {
+        /* TODO: (Rahul-Part) call Axios for updating logout in database record belonging to user */
         Cookies.remove("userid");
         Cookies.remove("password");
         history.push("/");

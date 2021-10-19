@@ -18,6 +18,7 @@ import jsPdf from "jspdf";
 import FormGroup from '@mui/material/FormGroup';
 import FormLabel from '@mui/material/FormLabel';
 import { FormControlLabel } from '@mui/material';
+import { RequestQuote } from '@mui/icons-material';
 const customStyles = {
     menu: (provided, state) => ({
       ...provided,
@@ -155,12 +156,37 @@ const Dashboard = () => {
         return data;
     }
 
+    const processRequest = (request)=> {
+        return {
+            userid: request.userid,
+            authToken: request.authToken,
+            group_condition: {
+                group_by: request.group_condition.group_by,
+                selection: JSON.stringify(request.group_condition.selection)
+            },
+            states: JSON.stringify(request.states),
+            treatments: {
+                labels: JSON.stringify(request.treatments.labels), //selectedTreatmentLabels,
+                OR: JSON.stringify(request.treatments.OR),
+                AND: JSON.stringify(request.treatments.AND)
+            },
+            medical_conditions: {
+                labels: JSON.stringify(request.medical_conditions.labels), //selectedMedicalConditionLabels,
+                OR: JSON.stringify(request.medical_conditions.OR),
+                AND: JSON.stringify(request.medical_conditions.AND)
+            }
+        }
+    }
     const fetchGraphData = async () => {
-        const request = requestObject();
+        const request = processRequest(requestObject());
         /* Later: Introduce  Authentication and Posting mechanism*/
         request.userid = Cookies.get("userid", { path: '/' });
         request.authToken = Cookies.get('authToken', { path: '/' });
-        const treatmentResponse = await axios.post('http://localhost:3000/patientfinder/treatments', request);
+        const treatmentResponse = await axios.request({
+            method: 'GET',
+            url: 'http://localhost:3000/patientfinder/treatments', 
+            params: request
+        });
         const res = treatmentResponse.data;
         res.treatments.labels.shift();
         res.treatments.data = res.treatments.data.map((e, i) => {
@@ -171,7 +197,11 @@ const Dashboard = () => {
         const treatmentsChart = createChartData(res.treatments);
         setTreatmentsChartData({ ...treatmentsChart });
 
-        const medicalResponse = await axios.post('http://localhost:3000/patientfinder/medicals', request);
+        const medicalResponse = await axios.request({
+            method: 'GET',
+            url: 'http://localhost:3000/patientfinder/medicals', 
+            params: request
+        });
         const res2 = medicalResponse.data;
         res2.medical_conditions.labels.shift();
         res2.medical_conditions.data = res2.medical_conditions.data.map((e, i) => {
@@ -182,6 +212,7 @@ const Dashboard = () => {
 
         const medicalChart = createChartData(res2.medical_conditions)
         setMedicalChartData({ ...medicalChart });
+        
     }
 
     const fetchLabels = async () => {
@@ -189,7 +220,11 @@ const Dashboard = () => {
             userid: Cookies.get("userid", { path: '/' }),
             authToken: Cookies.get('authToken', { path: '/' }),
         }
-        const labelsResponse = await axios.post('http://localhost:3000/patientfinder/labels', {...params});
+        const labelsResponse = await axios.request({
+                method: 'GET',
+                url: 'http://localhost:3000/patientfinder/labels', 
+                params: params /* Note: This is Query Parameters */
+        });
 
         if (labelsResponse.status == 200) {
             const labelData = labelsResponse.data.labelData;
@@ -260,7 +295,12 @@ const Dashboard = () => {
     const getPreferences = async () => {
         const userid = Cookies.get('userid');
         const authToken = Cookies.get('authToken');
-        const response = await axios.post('http://localhost:3000/users/preferences', { userid, authToken });
+        const response = await axios.request({
+            method: 'GET',
+            url: 'http://localhost:3000/users/preferences', 
+            params: { userid: userid, authToken: authToken }
+        });
+        
         if (response.data.success) {
             const preferencesData = response.data.preferenceData;
             let data = preferencesData.map(data=> { return {value:data.id, label:data.saveName}});
@@ -271,7 +311,6 @@ const Dashboard = () => {
                 let preference = preferencesData.find(data=> data.id == response.defaultPreferenceId);
                 if(preference) setDefaultPreference({value:preference.id, label:preference.saveName});
             }
-            handlePreferenceChange(preferencesData[0].id);
         }
     }
 
