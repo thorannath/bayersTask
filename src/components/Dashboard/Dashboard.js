@@ -184,7 +184,7 @@ const Dashboard = () => {
                     group_by: formData.groupBy,
                     selection: Object.keys(groupKeys).filter((e, i) => { return groupKeys[e] })
                 },
-                states: formData.states,
+                states: formData.states.map(data=> data.value),
                 treatments: {
                     labels: treatmentLabels, //selectedTreatmentLabels,
                     OR: formData.treatmentsOR ? formData.treatmentsOR.map(data => data.value) : null,
