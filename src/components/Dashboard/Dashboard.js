@@ -111,37 +111,13 @@ const Dashboard = () => {
         return data;
     },[medicalCondition, preferences, treatment]);
 
-    const processRequest = (request)=> {
-        return {
-            userid: request.userid,
-            authToken: request.authToken,
-            group_condition: {
-                group_by: request.group_condition.group_by,
-                selection: JSON.stringify(request.group_condition.selection)
-            },
-            states: JSON.stringify(request.states.map((e)=>e['value'])),
-            treatments: {
-                labels: JSON.stringify(request.treatments.labels), //selectedTreatmentLabels,
-                OR: JSON.stringify(request.treatments.OR),
-                AND: JSON.stringify(request.treatments.AND)
-            },
-            medical_conditions: {
-                labels: JSON.stringify(request.medical_conditions.labels), //selectedMedicalConditionLabels,
-                OR: JSON.stringify(request.medical_conditions.OR),
-                AND: JSON.stringify(request.medical_conditions.AND)
-            }
-        }
-    }
     const fetchGraphData = async () => {
-        const request = processRequest(requestObject());
+        const request = requestObject();
         /* Later: Introduce  Authentication and Posting mechanism*/
+        // console.log(`request message ${JSON.stringify(request)}`);
         request.userid = Cookies.get("userid", { path: '/' });
         request.authToken = Cookies.get('authToken', { path: '/' });
-        const treatmentResponse = await axios.request({
-            method: 'GET',
-            url: 'http://localhost:3000/patientfinder/treatments', 
-            params: request
-        });
+        const treatmentResponse = await axios.post('http://localhost:3000/patientfinder/treatments', request);
         const res = treatmentResponse.data;
         res.treatments.labels.shift();
         res.treatments.data = res.treatments.data.map((e, i) => {
@@ -152,11 +128,7 @@ const Dashboard = () => {
         const treatmentsChart = createChartData(res.treatments);
         setTreatmentsChartData({ ...treatmentsChart });
 
-        const medicalResponse = await axios.request({
-            method: 'GET',
-            url: 'http://localhost:3000/patientfinder/medicals', 
-            params: request
-        });
+        const medicalResponse = await axios.post('http://localhost:3000/patientfinder/medicals', request);
         const res2 = medicalResponse.data;
         res2.medical_conditions.labels.shift();
         res2.medical_conditions.data = res2.medical_conditions.data.map((e, i) => {
@@ -217,7 +189,7 @@ const Dashboard = () => {
                     group_by: formData.groupBy,
                     selection: Object.keys(groupKeys).filter((e, i) => { return groupKeys[e] })
                 },
-                states: formData.states,
+                states: formData.states.map((e)=>e['value']),
                 treatments: {
                     labels: treatmentLabels, //selectedTreatmentLabels,
                     OR: formData.treatmentsOR ? formData.treatmentsOR.map(data => data.value) : null,
