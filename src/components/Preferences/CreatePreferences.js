@@ -74,7 +74,7 @@ const CreatePreferences = (props) => {
 
     const initialData = props.loadFormData;
 
-    const [name, setName] = useState(initialData.preferenceName);
+    const [name, setName] = useState(props.loadFormData.preferenceName);
     const [defaultVal, setDefaultVal] = useState(false);
     const [formData, setFormData] = useState({...initialData});
 
@@ -121,8 +121,18 @@ const CreatePreferences = (props) => {
 
         return request;
     }
+
+    const validateFormData = (formData) =>{
+        if(formData.groupBy && formData.treatmentsAND.length!=0 && formData.treatmentsOR.length!=0 && formData.medicalConditionsAND.length!=0 && formData.medicalConditionsOR.length!=0){
+          return true;
+        }
+        return false;
+      };
+    
     
     const handleFormSubmit = async () => {
+        if(!validateFormData(formData)) return;
+
         const req = requestObject(); 
         if(initialData.saveName){
             req.preferenceId = initialData.id;
@@ -150,10 +160,6 @@ const CreatePreferences = (props) => {
         props.closeModal({type:'create', action:'close'});
     }
 
-    const handleFormData = (data)=>{
-        setFormData({...data});
-    }
-
     return (
         <div>
             <Box sx={style}>
@@ -165,12 +171,13 @@ const CreatePreferences = (props) => {
                     <TextField 
                     id="standard-basic" 
                     label="Preference Name" 
+                    value={name}
                     onChange={handleName}
                     variant="standard" />
                 </FormGroup>
                 <Filters
                 formData={formData}
-                onChangeFormData= {handleFormData}
+                onChangeFormData= {setFormData}
                 treatment={treatment}
                 medicalCondition={medicalCondition}
                 />

@@ -7,9 +7,7 @@ const Alert = forwardRef(function Alert(props, ref) {
   });
   
 const Snackbar = (props) => {
-
-    console.log(props.isOpen)
-
+    
     const isOpen = props.isOpen;
     const message = props.message;
     const severity = props.severity

@@ -51,7 +51,7 @@ const ViewPreferences = (props) => {
         const getPreferences = async () => {
             const userid = Cookies.get('userid');
             const authToken = Cookies.get('authToken');
-            const response = await axios.post('http://localhost:3000/users/preferences', { userid, authToken });
+            const response = await axios.get('http://localhost:3000/users/preferences',{params:{ userid, authToken }});
             if (response.data.success) {
                 const preferencesData = response.data.preferenceData;
     

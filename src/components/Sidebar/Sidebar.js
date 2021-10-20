@@ -30,8 +30,6 @@ const Sidebar = (props) => {
         return 'menu-item';
     }
 
-    console.log(location.pathname);
-
     return (
         <div className="sidebar">
             <MenuList className="menu-list">

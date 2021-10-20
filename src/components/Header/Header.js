@@ -36,7 +36,7 @@ const Header = () => {
 
     return (
         <nav className="navbar">
-            <h1> CKD Navigator </h1>
+            <h1> CKD Population Navigator </h1>
             <div className="menu-icons">
                 <span style={{ display: 'flex', alignItems: 'center', fontWeight: 'bold', letterSpacing: 1.2 }}>Hello {Cookies.get("userid", { path: "/" })},</span>
                 <IconButton onClick={handleClick} size="small" sx={{ ml: 2 }}>

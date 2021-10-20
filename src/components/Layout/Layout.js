@@ -9,7 +9,6 @@ import './Layout.css';
 import Cookies from 'js-cookie';
 
 const Layout = (props) => {
-    console.log(props.location)
     if(Cookies.get('userid', {path: '/'})){ /* Later: use auth-token and perform authentication from backend*/
         return (
             <div>

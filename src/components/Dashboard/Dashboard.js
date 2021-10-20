@@ -19,6 +19,9 @@ import FormGroup from '@mui/material/FormGroup';
 import FormLabel from '@mui/material/FormLabel';
 import MenuItem from '@mui/material/MenuItem';
 
+import {getPreferences} from '../../store/utils/thunkCreators';
+import { connect } from "react-redux";
+
 const Dashboard = () => {
     const colors = constants.colors;
     const [treatmentsChartData, setTreatmentsChartData] = useState({});
@@ -65,7 +68,6 @@ const Dashboard = () => {
         else {
             if (res.action == 'edit') {
                 let data = loadPreferenceForm(res.data.id);
-                console.log(data);
                 setLoadFormData({ ...data })
                 setOpenCreateModal(true)
                 getPreferences();
@@ -114,7 +116,6 @@ const Dashboard = () => {
     const fetchGraphData = async () => {
         const request = requestObject();
         /* Later: Introduce  Authentication and Posting mechanism*/
-        // console.log(`request message ${JSON.stringify(request)}`);
         request.userid = Cookies.get("userid", { path: '/' });
         request.authToken = Cookies.get('authToken', { path: '/' });
         const treatmentResponse = await axios.post('http://localhost:3000/patientfinder/treatments', request);
@@ -182,7 +183,6 @@ const Dashboard = () => {
         const groupKeys = (formData.groupBy == constants.groupType.Cohort) ? formData.cohorts : formData.payType;
         const treatmentLabels = treatment.map((e, i) => { return e["label"] })
         const medicalConditionLabels = medicalCondition.map((e, i) => { return e["label"] })
-        console.log(treatmentLabels)
         const request = {
             jsonData: {
                 group_condition: {
@@ -214,6 +214,7 @@ const Dashboard = () => {
         setDefaultPreference(event);
         const data = loadPreferenceForm(event);
 
+        console.log(data);
         if (data) {
             setFormData({ ...data });
         }
@@ -366,4 +367,18 @@ const Dashboard = () => {
     )
 }
 
-export default Dashboard
+const mapStateToProps = (state) => {
+    return {
+      user: state.user,
+    };
+  };
+  
+  const mapDispatchToProps = (dispatch) => {
+    return {
+      getPreferences: () => {
+        dispatch(getPreferences());
+      },
+    };
+  };
+  
+  export default connect(mapStateToProps, mapDispatchToProps)(Dashboard);
