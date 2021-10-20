@@ -68,11 +68,11 @@ const customStyles = {
       }),
 }
 
-//get /preferences?username=value
-
 const CreatePreferences = (props) => {
 
     const initialData = props.loadFormData;
+
+    console.log(initialData);
 
     const [name, setName] = useState(props.loadFormData.preferenceName);
     const [defaultVal, setDefaultVal] = useState(false);
@@ -132,7 +132,6 @@ const CreatePreferences = (props) => {
     
     const handleFormSubmit = async () => {
         if(!validateFormData(formData)) return;
-
         const req = requestObject(); 
         if(initialData.saveName){
             req.preferenceId = initialData.id;

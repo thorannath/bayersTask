@@ -90,7 +90,7 @@ const Dashboard = () => {
             groupBy: jsonData.group_condition.group_by,
             states: jsonData.states.map(data=> { return {value:data, label:data}}),
             cohorts: { ckd: false, diab: false, both: false },
-            payType: { MCR: true, COM: true },
+            payType: { MCR: false, COM: false },
             treatmentsOR: treatment.map(data => { if (jsonData.treatments.OR.includes(data.label_val)){ return { value: data.label_val, label: data.name}} return null}).filter(data => data),
             treatmentsAND: treatment.map(data => { if (jsonData.treatments.AND.includes(data.label_val)){return { value: data.label_val, label: data.name}} return null}).filter(data => data),
             medicalConditionsAND: medicalCondition.map(data => { if (jsonData.medical_conditions.AND.includes(data.label_val)){return { value: data.label_val, label: data.name }} return null}).filter(data => data),
@@ -214,7 +214,6 @@ const Dashboard = () => {
         setDefaultPreference(event);
         const data = loadPreferenceForm(event);
 
-        console.log(data);
         if (data) {
             setFormData({ ...data });
         }
