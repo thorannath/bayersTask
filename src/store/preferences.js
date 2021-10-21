@@ -1,4 +1,4 @@
-import { addPreferenceToStore, editPreferenceToStore, deletePreferenceToStore } from "./utils/reducerFunctions"
+import { addPreferenceToStore, editPreferenceToStore, deletePreferenceToStore, loadPreferencesToStore } from "./utils/reducerFunctions"
 //ACTIONS
 
 const ADD_PREFERENCE = "ADD_PREFERENCE";
@@ -6,29 +6,29 @@ const EDIT_PREFERENCE = "EDIT_PREFERENCE";
 const DELETE_PREFERENCE = "DELTE_PREFERENCE";
 const GET_PREFERENCE = "GET_PREFERENCE";
  
-//Add a preference
-export const addPreference = (success, data = {}, message) => {
+//Action Creators
+export const addPreferenceAction = (data = {}, success=false) => {
     return {
       type: ADD_PREFERENCE,
       payload: data,
     };
 };
 
-export const editPreference = (success, data = {}, message) => {
+export const editPreferenceAction = (data = {}) => {
     return {
         type: EDIT_PREFERENCE,
         payload: data,
     };
 }
 
-export const deletePreference = (success, data = {}, message) => {
+export const deletePreferenceAction = (preferenceId='') => {
     return {
-        type: EDIT_PREFERENCE,
-        payload: data,
+        type: DELETE_PREFERENCE,
+        payload: preferenceId,
     };
 }
 
-export const getPreferences = (success, data = {}, message) =>{
+export const loadPreferences = (data = []) =>{
     return {
         type: GET_PREFERENCE,
         payload: data,
@@ -42,12 +42,10 @@ const reducer = (state =[], action) =>{
           return addPreferenceToStore(state, action.payload);
         case EDIT_PREFERENCE:
           return editPreferenceToStore(state, action.payload);
-        case DELETE_PREFERENCE: {
+        case DELETE_PREFERENCE:
           return deletePreferenceToStore(state, action.payload);
-        }
-        case GET_PREFERENCE: {
-            return getPreferences(state, action.payload);
-        }
+        case GET_PREFERENCE: 
+            return loadPreferencesToStore(state, action.payload);
         default:
           return state;
       }

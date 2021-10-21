@@ -9,6 +9,22 @@ export const editPreferenceToStore = (state, preference) =>{
 }
 
 export const deletePreferenceToStore = (state, preferenceId) =>{
-    let preferences = state.filter(data=> data.id == preferenceId);
+    let preferences = state.filter(data=> data.id != preferenceId);
     return [...preferences];
+}
+
+export const loadPreferencesToStore = (state, preferences) => {
+    return [...preferences];
+}
+
+export const loadLabelsToStore = (state, labels) =>{
+    return {...state, labels}
+}
+
+export const loadTreatmentsToStore = (state, treatments) =>{
+    return {...state, treatments};
+}
+
+export const loadMedicalConditionsToStore = (state, medicalConditions) =>{
+    return {...state, medicalConditions};
 }

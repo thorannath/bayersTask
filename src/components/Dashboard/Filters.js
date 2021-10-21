@@ -8,6 +8,7 @@ import Radio from '@mui/material/Radio';
 import RadioGroup from '@mui/material/RadioGroup';
 import Select from 'react-select';
 import { useEffect, useState, useCallback } from 'react';
+import {useSelector, useDispatch} from 'react-redux';
 
 const customStyles = {
   menu: (provided, state) => ({
@@ -50,14 +51,17 @@ const customStyles = {
   }),
 }
 
-
-
 export const Filters = (props) => {
+  const treatment = useSelector(state=> state.labels.treatments).map(data => {
+    return { value: data.label_val, label: data.name }
+  });;
+  const medicalCondition = useSelector(state=> state.labels.medicalConditions).map(data => {
+    return { value: data.label_val, label: data.name }
+  });;
   const [formData, setFormData] = useState(props.formData);
 
   useEffect(() => {
     setFormData(props.formData);
-
   }, [props.formData]);
 
   const payerType = constants.Paytype;
@@ -65,14 +69,6 @@ export const Filters = (props) => {
 
   const states = constants.States.map(data => {
     return { value: data, label: data }
-  });
-
-  const treatment = props.treatment.map(data => {
-    return { value: data.label_val, label: data.name }
-  });
-
-  const medicalCondition = props.medicalCondition.map(data => {
-    return { value: data.label_val, label: data.name }
   });
 
   const onChangeGroup = (event) => {

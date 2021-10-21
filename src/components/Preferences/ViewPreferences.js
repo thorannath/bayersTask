@@ -17,7 +17,8 @@ import Typography from '@mui/material/Typography';
 import Modal from '@mui/material/Modal';
 import axios from 'axios'
 import Cookies from 'js-cookie';
-
+import { deletePreference } from '../../store/utils/thunkCreators';
+import { useSelector, useDispatch } from 'react-redux';
 
 function createData(id, saveName, createdAt) {
     return { id, saveName, createdAt };
@@ -47,32 +48,23 @@ const deleteModalstyle = {
 
 const ViewPreferences = (props) => {
 
+    const dispatch = useDispatch();
+    const preferences = useSelector(state => state.preferences);
+
     useEffect(() => {
-        const getPreferences = async () => {
-            const userid = Cookies.get('userid');
-            const authToken = Cookies.get('authToken');
-            const response = await axios.get('http://localhost:3000/users/preferences',{params:{ userid, authToken }});
-            if (response.data.success) {
-                const preferencesData = response.data.preferenceData;
-    
-                let prefData = preferencesData?.map(data => {
-                    return createData(data.id, data.saveName, data.createdAt);
-                });
-    
-                setRowData([...prefData]);
-                setPreferences([...preferencesData]);
-            }
-        }
-        getPreferences();
-    }, [])
+        let prefData = preferences? preferences.map(data => {
+            return createData(data.id, data.saveName, data.createdAt);
+        }):null;
+
+        setRowData([...prefData]);
+    }, [preferences])
 
     const [rowData, setRowData] = useState([]);
-    const [preferences, setPreferences]=  useState([]);
     const [openDeleteModal, setOpenDeleteModal] = useState(false);
     const handleOpenDeleteModal = () => setOpenDeleteModal(true);
     const handleCloseDeleteModal = () => setOpenDeleteModal(false);
 
-    const [deletePreference, setDeletePreference] = useState({});
+    const [deletePreferenceData, setDeletePreferenceData] = useState({});
 
     const handleCancel = () => {
         props.closeModal({ type: 'view', action: 'close' });
@@ -87,44 +79,13 @@ const ViewPreferences = (props) => {
     }
 
     const deleteSettings = (row) => {
-        setDeletePreference({ ...row });
+        setDeletePreferenceData({ ...row });
         handleOpenDeleteModal();
     }
 
-
-
-    const getPreferences = async () => {
-        const userid = Cookies.get('userid');
-        const authToken = Cookies.get('authToken');
-        const response = await axios.request({
-            method: 'GET',
-            url: 'http://localhost:3000/users/preferences', 
-            params: { userid: userid, authToken: authToken }
-        });
-        if (response.data.success) {
-            const preferencesData = response.data.preferenceData;
-
-            let prefData = preferencesData? preferences.map(data => {
-                return createData(data.id, data.saveName, data.createdAt);
-            }):null;
-
-            setRowData([...prefData]);
-            setPreferences([...preferencesData]);
-        }
-    }
-
     const onConfirmDelete = async () => {
-        let preference = deletePreference;
-        let userid = Cookies.get('userid', { path: '/' });
-        let authToken = Cookies.get('authToken', { path: '/' });
-        let params = {userid, authToken, preferenceId: preference.id};
-        const response = await axios.delete('http://localhost:3000/users/preferences', {params});
-        if (response.data.success) {
-            getPreferences();
-        }
-        else {
-
-        }
+        let preference = deletePreferenceData;
+        dispatch(deletePreference(preference.id));
         handleCloseDeleteModal();
     }
 

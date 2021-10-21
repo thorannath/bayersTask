@@ -19,22 +19,33 @@ import FormGroup from '@mui/material/FormGroup';
 import FormLabel from '@mui/material/FormLabel';
 import MenuItem from '@mui/material/MenuItem';
 
-import {getPreferences} from '../../store/utils/thunkCreators';
-import { connect } from "react-redux";
+import {useSelector, useDispatch} from 'react-redux';
+import { fetchLabels, getPreferences } from '../../store/utils/thunkCreators';
 
 const Dashboard = () => {
+    const treatments = useSelector(state=> state.labels.treatments);
+    const medicalConditions = useSelector(state=> state.labels.medicalConditions);
+    const preferences = useSelector(state => state.preferences);
+
+    console.log(preferences)
+
     const colors = constants.colors;
     const [treatmentsChartData, setTreatmentsChartData] = useState({});
     const [medicalChartData, setMedicalChartData] = useState({});
-    const [treatment, setTreatment] = useState([]);
-    const [medicalCondition, setMedicalCondition] = useState([]);
+
     const [openViewModal, setOpenViewModal] = useState(false);
     const [openCreateModal, setOpenCreateModal] = useState(false);
-    const [preferences, setPreferences] = useState([]);
     const [defaultPreference, setDefaultPreference] = useState('');
 
+    const dispatch = useDispatch();
+
+    useEffect(() => {
+        dispatch(fetchLabels())
+        dispatch(getPreferences());
+    }, [dispatch])
+
     const initialData = {
-        preferenceName: null,
+        preferenceName: '',
         groupBy: constants.groupType.Cohort,
         states: constants.States.map(data => { return { value: data, label: data } }),
         cohorts: { ckd: true, diab: true, both: true },
@@ -91,10 +102,10 @@ const Dashboard = () => {
             states: jsonData.states.map(data=> { return {value:data, label:data}}),
             cohorts: { ckd: false, diab: false, both: false },
             payType: { MCR: false, COM: false },
-            treatmentsOR: treatment.map(data => { if (jsonData.treatments.OR.includes(data.label_val)){ return { value: data.label_val, label: data.name}} return null}).filter(data => data),
-            treatmentsAND: treatment.map(data => { if (jsonData.treatments.AND.includes(data.label_val)){return { value: data.label_val, label: data.name}} return null}).filter(data => data),
-            medicalConditionsAND: medicalCondition.map(data => { if (jsonData.medical_conditions.AND.includes(data.label_val)){return { value: data.label_val, label: data.name }} return null}).filter(data => data),
-            medicalConditionsOR: medicalCondition.map(data => { if (jsonData.medical_conditions.OR.includes(data.label_val)){return { value: data.label_val, label: data.name}} return null }).filter(data => data),
+            treatmentsOR: treatments.map(data => { if (jsonData.treatments.OR.includes(data.label_val)){ return { value: data.label_val, label: data.name}} return null}).filter(data => data),
+            treatmentsAND: treatments.map(data => { if (jsonData.treatments.AND.includes(data.label_val)){return { value: data.label_val, label: data.name}} return null}).filter(data => data),
+            medicalConditionsAND: medicalConditions.map(data => { if (jsonData.medical_conditions.AND.includes(data.label_val)){return { value: data.label_val, label: data.name }} return null}).filter(data => data),
+            medicalConditionsOR: medicalConditions.map(data => { if (jsonData.medical_conditions.OR.includes(data.label_val)){return { value: data.label_val, label: data.name}} return null }).filter(data => data),
         };
         if (jsonData.group_condition.group_by == 'cohort') {
             for (const [type, bool] of Object.entries(data.cohorts)) {
@@ -111,7 +122,7 @@ const Dashboard = () => {
             }
         }
         return data;
-    },[medicalCondition, preferences, treatment]);
+    },[medicalConditions, preferences, treatments]);
 
     const fetchGraphData = async () => {
         const request = requestObject();
@@ -143,25 +154,6 @@ const Dashboard = () => {
         
     }
 
-    const fetchLabels = async () => {
-        let params = {
-            userid: Cookies.get("userid", { path: '/' }),
-            authToken: Cookies.get('authToken', { path: '/' }),
-        }
-        const labelsResponse = await axios.request({
-                method: 'GET',
-                url: 'http://localhost:3000/patientfinder/labels', 
-                params: params /* Note: This is Query Parameters */
-        });
-
-        if (labelsResponse.status == 200) {
-            const labelData = labelsResponse.data.labelData;
-            let medicalConditions = labelData.filter(data => data.label_type == constants.labelTypes.MEDICAL_CONDITION);
-            let treatments = labelData.filter(data => data.label_type == constants.labelTypes.TREATMENT);
-            setMedicalCondition([...medicalConditions])
-            setTreatment([...treatments]);
-        }
-    }
 
     const createChartData = (obj) => {
         const chart = {
@@ -181,8 +173,8 @@ const Dashboard = () => {
 
     const requestObject = () => {
         const groupKeys = (formData.groupBy == constants.groupType.Cohort) ? formData.cohorts : formData.payType;
-        const treatmentLabels = treatment.map((e, i) => { return e["label"] })
-        const medicalConditionLabels = medicalCondition.map((e, i) => { return e["label"] })
+        const treatmentLabels = treatments.map((e, i) => { return e["label"] })
+        const medicalConditionLabels = medicalConditions.map((e, i) => { return e["label"] })
         const request = {
             jsonData: {
                 group_condition: {
@@ -219,32 +211,12 @@ const Dashboard = () => {
         }
     },[loadPreferenceForm]);
 
-    const getPreferences = async () => {
-        const userid = Cookies.get('userid');
-        const authToken = Cookies.get('authToken');
-        const response = await axios.request({
-            method: 'GET',
-            url: 'http://localhost:3000/users/preferences', 
-            params: { userid: userid, authToken: authToken }
-        });
-        
-        if (response.data.success) {
-            const preferencesData = response.data.preferenceData;
-            let data = preferencesData.map(data => { return { value: data.id, label: data.saveName } });
-            setPreferences([...preferencesData]);
-            if (response.data.defaultPreferenceId) {
-                handlePreferenceChange(response.data.defaultPreferenceId);
-                let preference = preferencesData.find(data => data.id == response.defaultPreferenceId);
-                if (preference) setDefaultPreference({ value: preference.id, label: preference.saveName });
-            }
-        }
-    }
 
     useEffect(() => {
-        if (preferences.length >0 && treatment.length>0 && medicalCondition.length>0) {
+        if (preferences.length >0 && treatments.length>0 && medicalConditions.length>0) {
             handlePreferenceChange(preferences[0].id);
         }
-    }, [preferences, treatment, medicalCondition, handlePreferenceChange])
+    }, [preferences, treatments, medicalConditions, handlePreferenceChange])
 
 
     const takeScreenshot = (e) => {
@@ -309,7 +281,7 @@ const Dashboard = () => {
                         onChange={(e)=> handlePreferenceChange(e.target.value)}
                     >
                         <MenuItem value="">Please Select</MenuItem>
-                        {preferences.map(data=>{
+                        {preferences.length>0 && preferences.map(data=>{
                             return (<MenuItem value={data.id}>{data.saveName}</MenuItem>)
                         })}
                     </Select>
@@ -323,8 +295,6 @@ const Dashboard = () => {
             <Filters
                 formData={formData}
                 onChangeFormData={setFormData}
-                treatment={treatment}
-                medicalCondition={medicalCondition}
             />
             <div className="update-button">
                 <span><Button color="primary" variant="contained" type="submit" onClick={handleClick}> Update chart </Button></span>
@@ -345,8 +315,6 @@ const Dashboard = () => {
                 }}>
                 <CreatePreferences
                     loadFormData={loadFormData}
-                    treatment={treatment}
-                    medicalCondition={medicalCondition}
                     closeModal={(type) => handleCloseModal(type)} />
             </Modal>
             <Modal
@@ -366,18 +334,4 @@ const Dashboard = () => {
     )
 }
 
-const mapStateToProps = (state) => {
-    return {
-      user: state.user,
-    };
-  };
-  
-  const mapDispatchToProps = (dispatch) => {
-    return {
-      getPreferences: () => {
-        dispatch(getPreferences());
-      },
-    };
-  };
-  
-  export default connect(mapStateToProps, mapDispatchToProps)(Dashboard);
+  export default Dashboard;
