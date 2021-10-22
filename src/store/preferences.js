@@ -7,14 +7,14 @@ const DELETE_PREFERENCE = "DELTE_PREFERENCE";
 const GET_PREFERENCE = "GET_PREFERENCE";
  
 //Action Creators
-export const addPreferenceAction = (data = {}, success=false) => {
+export const addPreferenceAction = (data = {}) => {
     return {
       type: ADD_PREFERENCE,
       payload: data,
     };
 };
 
-export const editPreferenceAction = (data = {}) => {
+export const editPreferenceAction = (data ={}) => {
     return {
         type: EDIT_PREFERENCE,
         payload: data,
@@ -28,7 +28,7 @@ export const deletePreferenceAction = (preferenceId='') => {
     };
 }
 
-export const loadPreferences = (data = []) =>{
+export const loadPreferences = (data = {}) =>{
     return {
         type: GET_PREFERENCE,
         payload: data,
@@ -36,7 +36,7 @@ export const loadPreferences = (data = []) =>{
 }
   
 
-const reducer = (state =[], action) =>{
+const reducer = (state ={preferences:[], defaultPreferenceId:''}, action) =>{
     switch (action.type) {
         case ADD_PREFERENCE:
           return addPreferenceToStore(state, action.payload);

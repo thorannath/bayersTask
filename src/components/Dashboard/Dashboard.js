@@ -25,9 +25,19 @@ import { fetchLabels, getPreferences } from '../../store/utils/thunkCreators';
 const Dashboard = () => {
     const treatments = useSelector(state=> state.labels.treatments);
     const medicalConditions = useSelector(state=> state.labels.medicalConditions);
-    const preferences = useSelector(state => state.preferences);
+    const preferences = useSelector(state => state.preferences.preferences);
+    const defaultPreferenceId = useSelector(state => state.preferences.defaultPreferenceId);
 
-    console.log(preferences)
+    const [defaultPreference, setDefaultPreference] = useState('');
+    useEffect(() => {
+        if(defaultPreference !== defaultPreferenceId){
+            handlePreferenceChange(defaultPreferenceId);
+        }
+        else{
+            console.log(preferences);
+        }
+
+    }, [defaultPreferenceId, preferences]);
 
     const colors = constants.colors;
     const [treatmentsChartData, setTreatmentsChartData] = useState({});
@@ -35,7 +45,6 @@ const Dashboard = () => {
 
     const [openViewModal, setOpenViewModal] = useState(false);
     const [openCreateModal, setOpenCreateModal] = useState(false);
-    const [defaultPreference, setDefaultPreference] = useState('');
 
     const dispatch = useDispatch();
 
@@ -45,6 +54,7 @@ const Dashboard = () => {
     }, [dispatch])
 
     const initialData = {
+        preferenceId:'',
         preferenceName: '',
         groupBy: constants.groupType.Cohort,
         states: constants.States.map(data => { return { value: data, label: data } }),
@@ -60,7 +70,7 @@ const Dashboard = () => {
     const [formData, setFormData] = useState({ ...initialData });
 
     const handleOpenModal = (res) => {
-        if (res.type == 'create') {
+        if (res.type === 'create') {
             setLoadFormData({...initialData});
             setOpenCreateModal(true)
         }
@@ -70,20 +80,16 @@ const Dashboard = () => {
     };
 
     const handleCloseModal = (res) => {
-        if (res.type == 'create') {
-            if (res.success) {
-                getPreferences();
-            }
+        if (res.type === 'create') {
             setOpenCreateModal(false)
         }
         else {
-            if (res.action == 'edit') {
+            if (res.action === 'edit') {
                 let data = loadPreferenceForm(res.data.id);
                 setLoadFormData({ ...data })
                 setOpenCreateModal(true)
-                getPreferences();
             }
-            else if (res.action == 'view') {
+            else if (res.action === 'view') {
                 let data = loadPreferenceForm(res.data.id);
                 setFormData({ ...data });
             }
@@ -92,11 +98,12 @@ const Dashboard = () => {
     };
 
     const loadPreferenceForm = useCallback((id) => {
-        let preference = preferences.find(data => data.id == id);
+        let preference = preferences.find(data => data.id === id);
         if (!preference) return null;
 
         let jsonData = preference.jsonData;
         const data = {
+            preferenceId:preference.id,
             preferenceName: preference.saveName,
             groupBy: jsonData.group_condition.group_by,
             states: jsonData.states.map(data=> { return {value:data, label:data}}),
@@ -107,15 +114,15 @@ const Dashboard = () => {
             medicalConditionsAND: medicalConditions.map(data => { if (jsonData.medical_conditions.AND.includes(data.label_val)){return { value: data.label_val, label: data.name }} return null}).filter(data => data),
             medicalConditionsOR: medicalConditions.map(data => { if (jsonData.medical_conditions.OR.includes(data.label_val)){return { value: data.label_val, label: data.name}} return null }).filter(data => data),
         };
-        if (jsonData.group_condition.group_by == 'cohort') {
-            for (const [type, bool] of Object.entries(data.cohorts)) {
+        if (jsonData.group_condition.group_by === 'cohort') {
+            for (const [type] of Object.entries(data.cohorts)) {
                 if (jsonData.group_condition.selection.includes(type)) {
                     data.cohorts[type] = true;
                 }
             }
         }
         else {
-            for (const [type, bool] of Object.entries(data.payType)) {
+            for (const [type] of Object.entries(data.payType)) {
                 if (jsonData.group_condition.selection.includes(type)) {
                     data.payType[type] = true;
                 }
@@ -166,13 +173,14 @@ const Dashboard = () => {
                 label: val.type,
                 backgroundColor: colors[index],
                 data: val.data
-            })
+            });
+            return;
         })
         return chart;
     }
 
     const requestObject = () => {
-        const groupKeys = (formData.groupBy == constants.groupType.Cohort) ? formData.cohorts : formData.payType;
+        const groupKeys = (formData.groupBy === constants.groupType.Cohort) ? formData.cohorts : formData.payType;
         const treatmentLabels = treatments.map((e, i) => { return e["label"] })
         const medicalConditionLabels = medicalConditions.map((e, i) => { return e["label"] })
         const request = {
@@ -203,6 +211,7 @@ const Dashboard = () => {
     }
 
     const handlePreferenceChange = useCallback((event) => {
+        console.log(event);
         setDefaultPreference(event);
         const data = loadPreferenceForm(event);
 
@@ -210,13 +219,6 @@ const Dashboard = () => {
             setFormData({ ...data });
         }
     },[loadPreferenceForm]);
-
-
-    useEffect(() => {
-        if (preferences.length >0 && treatments.length>0 && medicalConditions.length>0) {
-            handlePreferenceChange(preferences[0].id);
-        }
-    }, [preferences, treatments, medicalConditions, handlePreferenceChange])
 
 
     const takeScreenshot = (e) => {
@@ -249,11 +251,6 @@ const Dashboard = () => {
         });
     };
 
-    useEffect(() => {
-        fetchLabels();
-        getPreferences();
-    }, [])
-
     const treatmentsChartComponent = (
         <div id="treatment-chart">
             <h3> Treatment Chart </h3>
@@ -280,9 +277,9 @@ const Dashboard = () => {
                         value={defaultPreference}
                         onChange={(e)=> handlePreferenceChange(e.target.value)}
                     >
-                        <MenuItem value="">Please Select</MenuItem>
+                        <MenuItem value="" disabled>Please Select</MenuItem>
                         {preferences.length>0 && preferences.map(data=>{
-                            return (<MenuItem value={data.id}>{data.saveName}</MenuItem>)
+                            return (<MenuItem key={data.id} value={data.id}>{data.saveName}</MenuItem>)
                         })}
                     </Select>
                 </FormGroup>

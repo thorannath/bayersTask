@@ -6,12 +6,12 @@ import { Button, TextField } from '@mui/material';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import './Preferences.css';
 import { useState } from 'react';
-import axios from 'axios'
 import CloseIcon from '@mui/icons-material/Close';
 import Filters from '../Dashboard/Filters';
 import * as constants from '../../Constant';
 import { useSelector, useDispatch } from 'react-redux';
 import { addPreference, updatePreference } from '../../store/utils/thunkCreators';
+import { useEffect } from 'react';
 
 
 const style = {
@@ -28,50 +28,6 @@ const style = {
     p: 3,
 };
 
-const customStyles = {
-    menu: (provided, state) => ({
-        ...provided,
-        width: state.selectProps.width,
-        borderBottom: '1px solid grey',
-        color: state.selectProps.menuColor,
-        width: '50%',
-    }),
-    option: (provided, state) => ({
-        ...provided,
-        padding: 20,
-    }),
-    control: (control) => ({
-        ...control,
-        padding: 4
-    }),
-    singleValue: (provided, state) => {
-        const opacity = state.isDisabled ? 0.5 : 1;
-        const transition = 'opacity 300ms';
-        return { ...provided, opacity, transition };
-    },
-    multiValue: (styles, { data }) => {
-        return {
-            ...styles,
-            backgroundColor: '#ffae42',
-            color: 'whitesmoke',
-        };
-    },
-    multiValueLabel: (styles, { data }) => ({
-        ...styles,
-        color: data.color,
-    }),
-    multiValueRemove: (styles, { data }) => ({
-        ...styles,
-        color: data.color,
-        ':hover': {
-            backgroundColor: data.color,
-            color: 'white',
-        },
-    }),
-}
-
-//get /preferences?username=value
-
 const CreatePreferences = (props) => {
     const dispatch = useDispatch();
 
@@ -83,14 +39,15 @@ const CreatePreferences = (props) => {
     const treatments = useSelector(state=> state.labels.treatments);
     const medicalConditions = useSelector(state=> state.labels.medicalConditions);
 
-    // const [treatments, medicalConditions] = useSelector(state => { return { treatments: state.labels.treatments, medicalConditions: state.labels.medicalConditions } });
-    const preference = useSelector(state => state.preferences);
+    const defaultPreferenceId = useSelector(state => state.preferences.defaultPreferenceId);
+ 
+    useEffect(() => {
+        let defaultVal = (defaultPreferenceId === initialData.id)?true:false;
+        setDefaultVal(defaultVal);
+    }, [defaultPreferenceId, initialData]);
+
+
     const loader = useSelector(state => state.loader);
-
-
-
-
-
 
     const handleName = (event) => {
         setName(event.target.value);
@@ -101,7 +58,7 @@ const CreatePreferences = (props) => {
     }
 
     const requestObject = () => {
-        const groupKeys = (formData.groupBy == constants.groupType.Cohort) ? formData.cohorts : formData.payType;
+        const groupKeys = (formData.groupBy === constants.groupType.Cohort) ? formData.cohorts : formData.payType;
         const treatmentLabels = treatments.map((e, i) => { return e["label"] })
         const medicalConditionLabels = medicalConditions.map((e, i) => { return e["label"] })
 
@@ -131,7 +88,7 @@ const CreatePreferences = (props) => {
     }
 
     const validateFormData = (formData) => {
-        if (formData.groupBy && formData.treatmentsAND.length != 0 && formData.treatmentsOR.length != 0 && formData.medicalConditionsAND.length != 0 && formData.medicalConditionsOR.length != 0) {
+        if (formData.groupBy && formData.treatmentsAND.length !== 0 && formData.treatmentsOR.length !== 0 && formData.medicalConditionsAND.length !== 0 && formData.medicalConditionsOR.length !== 0) {
             return true;
         }
         return false;
@@ -199,7 +156,7 @@ const CreatePreferences = (props) => {
                     onChangeFormData={setFormData}
                 />
                 <FormGroup className="form-group">
-                    <FormControlLabel control={<Checkbox checked={formData.default} onChange={handleDefault} />} label="Make this as default" />
+                    <FormControlLabel control={<Checkbox checked={defaultVal} onChange={handleDefault} />} label="Make this as default" />
                 </FormGroup>
                 <div align="right">
                     <Button type="submit" sx={{ width: '25%' }} variant="contained" onClick={handleFormSubmit}>Save</Button>
