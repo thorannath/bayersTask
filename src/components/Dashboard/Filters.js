@@ -7,8 +7,8 @@ import Checkbox from '@mui/material/Checkbox';
 import Radio from '@mui/material/Radio';
 import RadioGroup from '@mui/material/RadioGroup';
 import Select from 'react-select';
-import { useEffect, useState, useCallback } from 'react';
-import {useSelector, useDispatch} from 'react-redux';
+import { useEffect, useState } from 'react';
+import {useSelector} from 'react-redux';
 
 const customStyles = {
   menu: (provided, state) => ({
@@ -136,7 +136,7 @@ export const Filters = (props) => {
   };
 
   const GroupData = () => {
-    if (formData.groupBy == constants.groupType.Cohort) {
+    if (formData.groupBy === constants.groupType.Cohort) {
       return (
         <FormGroup className="">
           <FormLabel component="legend">Cohort Type</FormLabel>
@@ -156,7 +156,7 @@ export const Filters = (props) => {
         </FormGroup>
       )
     }
-    else if (formData.groupBy == constants.groupType.PayerType) {
+    else if (formData.groupBy === constants.groupType.PayerType) {
       return (
         <FormGroup className="" >
           <FormLabel component="legend">Payer Type</FormLabel>

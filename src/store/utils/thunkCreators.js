@@ -40,7 +40,8 @@ export const addPreference = (obj) => async (dispatch) => {
         const { data } = await axios.post(baseURL + "users/preferences", { ...obj, ...params });
 
         if (data.success) {
-            dispatch(addPreferenceAction(data.data));
+            let defaultPreferenceId= obj.makeDefault?data.data.id:'';
+            dispatch(addPreferenceAction({preference:data.data, defaultPreferenceId}));
         }
         dispatch(setLoadingStatus(false));
     } catch (error) {
@@ -58,7 +59,7 @@ export const updatePreference = (obj) => async (dispatch) => {
         const { data } = await axios.put(baseURL + "users/preferences", { ...obj, ...params });
 
         if (data.success) {
-            dispatch(editPreferenceAction(data.data));
+            dispatch(editPreferenceAction({preference:data.data, defaultPreferenceId:obj.makeDefault}));
         }
         dispatch(setLoadingStatus(false));
     } catch (error) {
@@ -91,8 +92,9 @@ export const getPreferences = () => async (dispatch) => {
         }
         const { data } = await axios.get(baseURL + "users/preferences", { params });
 
+        console.log(data);
         if (data.success) {
-            dispatch(loadPreferences(data.preferenceData));
+            dispatch(loadPreferences({preferences:data.preferenceData, defaultPreferenceId: data.defaultPreferenceId}));
         }
 
     } catch (error) {
@@ -109,8 +111,8 @@ export const fetchLabels = () => async (dispatch) => {
         const { data } = await axios.get(baseURL + "patientfinder/labels", { params });
 
         if (data.success) {
-            let medicalConditions = data.labelData.filter(data => data.label_type == constants.labelTypes.MEDICAL_CONDITION);
-            let treatments = data.labelData.filter(data => data.label_type == constants.labelTypes.TREATMENT);
+            let medicalConditions = data.labelData.filter(data => data.label_type === constants.labelTypes.MEDICAL_CONDITION);
+            let treatments = data.labelData.filter(data => data.label_type === constants.labelTypes.TREATMENT);
             dispatch(getTreatments(treatments));
             dispatch(getMedicalConditions(medicalConditions));
         }

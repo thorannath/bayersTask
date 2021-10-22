@@ -18,12 +18,6 @@ export const structure = [
 
 const Sidebar = (props) => {
 
-    /*const history = useHistory();
-    const handleRoute = (label) =>{
-        let route = structure.find(val=> val.label === label);
-        if(route) history.push(route.link);
-    }*/
-
     const location = useLocation();
     const isActive = (route) => {
         if (location.pathname === route) return 'menu-item btn-active';
@@ -35,7 +29,7 @@ const Sidebar = (props) => {
             <MenuList className="menu-list">
 
                 <Link className="list-link" to="/app/introduction">
-                    <MenuItem className="menu-item" className={isActive(constants.routes.Introduction)}>
+                    <MenuItem className={isActive(constants.routes.Introduction)}>
                         <ListItemText disableTypography className='list-item-text'>
                             Introduction
                         </ListItemText>
@@ -43,7 +37,7 @@ const Sidebar = (props) => {
                 </Link>
 
                 <Link className="list-link" to="/app/home">
-                    <MenuItem className="menu-item" className={isActive(constants.routes.Home)}>
+                    <MenuItem className={isActive(constants.routes.Home)}>
                         <ListItemText disableTypography className='list-item-text'>
                             Home
                         </ListItemText>

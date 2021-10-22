@@ -15,8 +15,6 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import Modal from '@mui/material/Modal';
-import axios from 'axios'
-import Cookies from 'js-cookie';
 import { deletePreference } from '../../store/utils/thunkCreators';
 import { useSelector, useDispatch } from 'react-redux';
 
@@ -49,7 +47,7 @@ const deleteModalstyle = {
 const ViewPreferences = (props) => {
 
     const dispatch = useDispatch();
-    const preferences = useSelector(state => state.preferences);
+    const preferences = useSelector(state => state.preferences.preferences);
 
     useEffect(() => {
         let prefData = preferences? preferences.map(data => {
@@ -57,7 +55,7 @@ const ViewPreferences = (props) => {
         }):null;
 
         setRowData([...prefData]);
-    }, [preferences])
+    }, [preferences]);
 
     const [rowData, setRowData] = useState([]);
     const [openDeleteModal, setOpenDeleteModal] = useState(false);
@@ -125,7 +123,7 @@ const ViewPreferences = (props) => {
                             ))
                             }
                             {
-                                rowData==0 && <p style={{display:'block', textAlign:'right', fontWeight:'bold', padding:5}}> No Preferences Available </p>
+                                rowData===0 && <p style={{display:'block', textAlign:'right', fontWeight:'bold', padding:5}}> {rowData===0} No Preferences Available </p>
                             }
                     </TableBody>
                 </Table>
