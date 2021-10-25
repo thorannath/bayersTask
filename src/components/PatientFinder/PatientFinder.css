@@ -1,6 +1,23 @@
 .container{
     display: flex;
-    flex-direction: column;
+    position: relative;
+}
+
+.sidebar{
+    width: 250px;
+    position: fixed;
+    overflow-y: scroll;
+    max-width: 100%;
+    background-color: white;
+    height: 100vh;
+    box-shadow: 5px 0 5px -2px #888;
+    padding-top: 25px;
+    padding:10px;
+}
+
+.main{
+    width: 80%;
+    margin-left: auto;
 }
 
 .box{
@@ -43,4 +60,8 @@
 
 .btn-stack{
     margin-left: auto;
+}
+
+.formGroup{
+   padding-top: 15px;
 }

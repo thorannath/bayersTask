@@ -7,7 +7,7 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 import './Preferences.css';
 import { useState } from 'react';
 import CloseIcon from '@mui/icons-material/Close';
-import Filters from '../Dashboard/Filters';
+import Filters from '../PatientFinder/Filters';
 import * as constants from '../../Constant';
 import { useSelector, useDispatch } from 'react-redux';
 import { addPreference, updatePreference } from '../../store/utils/thunkCreators';

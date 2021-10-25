@@ -1,5 +1,5 @@
 import React from 'react'
-import './Dashboard.css';
+import './PatientFinder.css';
 import Graph from './Graph';
 import Filters from './Filters';
 import axios from 'axios'
@@ -12,32 +12,68 @@ import Backdrop from '@mui/material/Backdrop';
 import Modal from '@mui/material/Modal';
 import ViewPreferences from '../Preferences/ViewPreferences';
 import CreatePreferences from '../Preferences/CreatePreferences';
-import Select from '@mui/material/Select';
 import html2canvas from "html2canvas";
 import jsPdf from "jspdf";
+import { useSelector, useDispatch } from 'react-redux';
+import { fetchLabels, getPreferences } from '../../store/utils/thunkCreators';
+import SidebarFilters from './SidebarFilters';
 import FormGroup from '@mui/material/FormGroup';
 import FormLabel from '@mui/material/FormLabel';
-import MenuItem from '@mui/material/MenuItem';
+import Select from 'react-select';
+import { FormControlLabel } from '@mui/material';
 
-import {useSelector, useDispatch} from 'react-redux';
-import { fetchLabels, getPreferences } from '../../store/utils/thunkCreators';
+const customStyles = {
+    menu: (provided, state) => ({
+        ...provided,
+        borderBottom: '1px solid grey',
+        color: state.selectProps.menuColor,
+        width: '50%',
+    }),
+    option: (provided, state) => ({
+        ...provided,
+        padding: 20,
+    }),
+    control: (control) => ({
+        ...control,
+        padding: 4
+    }),
+    singleValue: (provided, state) => {
+        const opacity = state.isDisabled ? 0.5 : 1;
+        const transition = 'opacity 300ms';
+        return { ...provided, opacity, transition };
+    },
+    multiValue: (styles, { data }) => {
+        return {
+            ...styles,
+            backgroundColor: '#ffae42',
+            color: 'whitesmoke',
+        };
+    },
+    multiValueLabel: (styles, { data }) => ({
+        ...styles,
+        color: data.color,
+    }),
+    multiValueRemove: (styles, { data }) => ({
+        ...styles,
+        color: data.color,
+        ':hover': {
+            backgroundColor: data.color,
+            color: 'white',
+        },
+    }),
+}
 
-const Dashboard = () => {
-    const treatments = useSelector(state=> state.labels.treatments);
-    const medicalConditions = useSelector(state=> state.labels.medicalConditions);
+const PatientFinder = () => {
+    const treatments = useSelector(state => state.labels.treatments);
+    const medicalConditions = useSelector(state => state.labels.medicalConditions);
     const preferences = useSelector(state => state.preferences.preferences);
-    const defaultPreferenceId = useSelector(state => state.preferences.defaultPreferenceId);
 
-    const [defaultPreference, setDefaultPreference] = useState('');
-    useEffect(() => {
-        if(defaultPreference !== defaultPreferenceId){
-            handlePreferenceChange(defaultPreferenceId);
-        }
-        else{
-            console.log(preferences);
-        }
-
-    }, [defaultPreferenceId, preferences]);
+    const treatment = useSelector(state => state.labels.treatments).map(data => {
+        return { value: data.label_val, label: data.name }
+    });
+    const medicalCondition = useSelector(state => state.labels.medicalConditions).map(data => {
+        return { value: data.label_val, label: data.name }
+    });
 
     const colors = constants.colors;
     const [treatmentsChartData, setTreatmentsChartData] = useState({});
@@ -54,10 +90,10 @@ const Dashboard = () => {
     }, [dispatch])
 
     const initialData = {
-        preferenceId:'',
+        preferenceId: '',
         preferenceName: '',
         groupBy: constants.groupType.Cohort,
-        states: constants.States.map(data => { return { value: data, label: data } }),
+        states: '',
         cohorts: { ckd: true, diab: true, both: true },
         payType: { MCR: true, COM: true },
         treatmentsOR: [],
@@ -71,7 +107,7 @@ const Dashboard = () => {
 
     const handleOpenModal = (res) => {
         if (res.type === 'create') {
-            setLoadFormData({...initialData});
+            setLoadFormData({ ...initialData });
             setOpenCreateModal(true)
         }
         else {
@@ -103,16 +139,16 @@ const Dashboard = () => {
 
         let jsonData = preference.jsonData;
         const data = {
-            preferenceId:preference.id,
+            preferenceId: preference.id,
             preferenceName: preference.saveName,
             groupBy: jsonData.group_condition.group_by,
-            states: jsonData.states.map(data=> { return {value:data, label:data}}),
+            states: jsonData.states.map(data => { return { value: data, label: data } }),
             cohorts: { ckd: false, diab: false, both: false },
             payType: { MCR: false, COM: false },
-            treatmentsOR: treatments.map(data => { if (jsonData.treatments.OR.includes(data.label_val)){ return { value: data.label_val, label: data.name}} return null}).filter(data => data),
-            treatmentsAND: treatments.map(data => { if (jsonData.treatments.AND.includes(data.label_val)){return { value: data.label_val, label: data.name}} return null}).filter(data => data),
-            medicalConditionsAND: medicalConditions.map(data => { if (jsonData.medical_conditions.AND.includes(data.label_val)){return { value: data.label_val, label: data.name }} return null}).filter(data => data),
-            medicalConditionsOR: medicalConditions.map(data => { if (jsonData.medical_conditions.OR.includes(data.label_val)){return { value: data.label_val, label: data.name}} return null }).filter(data => data),
+            treatmentsOR: treatments.map(data => { if (jsonData.treatments.OR.includes(data.label_val)) { return { value: data.label_val, label: data.name } } return null }).filter(data => data),
+            treatmentsAND: treatments.map(data => { if (jsonData.treatments.AND.includes(data.label_val)) { return { value: data.label_val, label: data.name } } return null }).filter(data => data),
+            medicalConditionsAND: medicalConditions.map(data => { if (jsonData.medical_conditions.AND.includes(data.label_val)) { return { value: data.label_val, label: data.name } } return null }).filter(data => data),
+            medicalConditionsOR: medicalConditions.map(data => { if (jsonData.medical_conditions.OR.includes(data.label_val)) { return { value: data.label_val, label: data.name } } return null }).filter(data => data),
         };
         if (jsonData.group_condition.group_by === 'cohort') {
             for (const [type] of Object.entries(data.cohorts)) {
@@ -129,7 +165,7 @@ const Dashboard = () => {
             }
         }
         return data;
-    },[medicalConditions, preferences, treatments]);
+    }, [medicalConditions, preferences, treatments]);
 
     const fetchGraphData = async () => {
         const request = requestObject();
@@ -158,7 +194,7 @@ const Dashboard = () => {
 
         const medicalChart = createChartData(res2.medical_conditions)
         setMedicalChartData({ ...medicalChart });
-        
+
     }
 
 
@@ -189,7 +225,7 @@ const Dashboard = () => {
                     group_by: formData.groupBy,
                     selection: Object.keys(groupKeys).filter((e, i) => { return groupKeys[e] })
                 },
-                states: formData.states.map((e)=>e['value']),
+                states: formData.states.map((e) => e['value']),
                 treatments: {
                     labels: treatmentLabels, //selectedTreatmentLabels,
                     OR: formData.treatmentsOR ? formData.treatmentsOR.map(data => data.value) : null,
@@ -211,14 +247,12 @@ const Dashboard = () => {
     }
 
     const handlePreferenceChange = useCallback((event) => {
-        console.log(event);
-        setDefaultPreference(event);
         const data = loadPreferenceForm(event);
 
         if (data) {
             setFormData({ ...data });
         }
-    },[loadPreferenceForm]);
+    }, [loadPreferenceForm]);
 
 
     const takeScreenshot = (e) => {
@@ -264,71 +298,143 @@ const Dashboard = () => {
             <Graph chartData={medicalChartData} />
         </div>
     );
+
+    const onChangeTreatment = (event, logic) => {
+        let treatments = event.map(data => data.value);
+        let formVal = { ...formData };
+        if (logic === constants.Logic.AND) {
+            formVal.treatmentsAND = treatment.filter(data => treatments.includes(data.value));
+
+        }
+        else if (logic === constants.Logic.OR) {
+            formVal.treatmentsOR = treatment.filter(data => treatments.includes(data.value));
+
+        }
+        setFormData({ ...formVal });
+    }
+
+    const onChangeMedicalCondition = (event, logic) => {
+        let medicalConditions = event.map(data => data.value);
+        let formVal = { ...formData };
+        if (logic === constants.Logic.AND) {
+            formVal.medicalConditionsAND = medicalCondition.filter(data => medicalConditions.includes(data.value));
+        }
+        else if (logic === constants.Logic.OR) {
+            formVal.medicalConditionsOR = medicalCondition.filter(data => medicalConditions.includes(data.value));
+        }
+        setFormData({ ...formVal });
+    }
+
     return (
         <div className="container">
-            <div className="page_header">
-                <h1> Patient Finder </h1>
-                <FormGroup className="form-group">
-                    <FormLabel name="preferences">Select Preference</FormLabel>
-                    <Select
-                        labelId="demo-simple-select-label"
-                        id="demo-simple-select"
-                        label="Preferences"
-                        value={defaultPreference}
-                        onChange={(e)=> handlePreferenceChange(e.target.value)}
-                    >
-                        <MenuItem value="" disabled>Please Select</MenuItem>
-                        {preferences.length>0 && preferences.map(data=>{
-                            return (<MenuItem key={data.id} value={data.id}>{data.saveName}</MenuItem>)
-                        })}
-                    </Select>
-                </FormGroup>
-                <Stack className="btn-stack" spacing={2} direction="row">
-                    <Button variant="contained" color="warning" onClick={() => { handleOpenModal({ type: 'create' }) }}> CREATE PREFRENCE </Button>
-                    <Button variant="contained" color="info" onClick={() => { handleOpenModal({ type: 'view' }) }}> VIEW PREFRENCES </Button>
-                </Stack>
-            </div>
-
-            <Filters
+            <SidebarFilters
                 formData={formData}
                 onChangeFormData={setFormData}
+                onChangePreference={(id) => handlePreferenceChange(id)}
             />
-            <div className="update-button">
-                <span><Button color="primary" variant="contained" type="submit" onClick={handleClick}> Update chart </Button></span>
-                <span style={{ paddingLeft: "15px" }}><Button color="primary" variant="outlined" onClick={(e) => takeScreenshot(e)}>Take Screenshot</Button></span>
+            <div className="main">
+                <div className="page_header">
+                    <h1> Patient Finder </h1>
+                    <Stack className="btn-stack" spacing={2} direction="row">
+                        <Button variant="contained" color="warning" onClick={() => { handleOpenModal({ type: 'create' }) }}> CREATE PREFRENCE </Button>
+                        <Button variant="contained" color="info" onClick={() => { handleOpenModal({ type: 'view' }) }}> VIEW PREFRENCES </Button>
+                    </Stack>
+                </div>
+
+
+                <div className="update-button">
+                    <span><Button color="primary" variant="contained" type="submit" onClick={handleClick}> Update chart </Button></span>
+                    <span style={{ paddingLeft: "15px" }}><Button color="primary" variant="outlined" onClick={(e) => takeScreenshot(e)}>Take Screenshot</Button></span>
+                </div>
+
+
+
+                {treatmentsChartComponent}
+
+                <FormGroup className="">
+                    <FormLabel component="legend">Treatment with AND</FormLabel>
+                    <Select
+                        isMulti
+                        name="treatmentAND"
+                        value={formData.treatmentsAND}
+                        styles={customStyles}
+                        options={treatment}
+                        onChange={(e) => onChangeTreatment(e, constants.Logic.AND)}
+                        classNamePrefix="select"
+                    />
+                </FormGroup>
+                <br />
+                <FormGroup className="">
+                    <FormLabel component="legend">Treatment with OR</FormLabel>
+                    <Select
+                        isMulti
+                        name="treatmentOR"
+                        value={formData.treatmentsOR}
+                        styles={customStyles}
+                        options={treatment}
+                        onChange={(e) => onChangeTreatment(e, constants.Logic.OR)}
+                        classNamePrefix="select"
+                    />
+                </FormGroup>
+                <hr />
+                {medicalChartComponent}
+
+                <FormGroup className="">
+                    <FormLabel component="legend">Medical Conditions with AND</FormLabel>
+                    <Select
+                        isMulti
+                        name="colors"
+                        value={formData.medicalConditionsAND}
+                        styles={customStyles}
+                        options={medicalCondition}
+                        onChange={(e) => onChangeMedicalCondition(e, constants.Logic.AND)}
+                        classNamePrefix="select"
+                    />
+                </FormGroup>
+                <br />
+                <FormGroup className="">
+                    <FormLabel component="legend">Medical Condtions with OR</FormLabel>
+                    <Select
+                        isMulti
+                        name="colors"
+                        value={formData.medicalConditionsOR}
+                        styles={customStyles}
+                        options={medicalCondition}
+                        onChange={(e) => onChangeMedicalCondition(e, constants.Logic.OR)}
+                        classNamePrefix="select"
+                    />
+                </FormGroup>
+
+                <Modal
+                    open={openCreateModal}
+                    onClose={() => handleCloseModal('create')}
+                    closeAfterTransition
+                    BackdropComponent={Backdrop}
+                    BackdropProps={{
+                        timeout: 500,
+                    }}>
+                    <CreatePreferences
+                        loadFormData={loadFormData}
+                        closeModal={(type) => handleCloseModal(type)} />
+                </Modal>
+                <Modal
+                    open={openViewModal}
+                    onClose={() => handleCloseModal('view')}
+                    closeAfterTransition
+                    BackdropComponent={Backdrop}
+                    BackdropProps={{
+                        timeout: 500,
+                    }}>
+                    <ViewPreferences
+                        openModal={openViewModal}
+                        closeModal={(type) => handleCloseModal(type)}
+                    />
+                </Modal>
+
             </div>
 
-            {treatmentsChartComponent}
-            <hr />
-            {medicalChartComponent}
-
-            <Modal
-                open={openCreateModal}
-                onClose={() => handleCloseModal('create')}
-                closeAfterTransition
-                BackdropComponent={Backdrop}
-                BackdropProps={{
-                    timeout: 500,
-                }}>
-                <CreatePreferences
-                    loadFormData={loadFormData}
-                    closeModal={(type) => handleCloseModal(type)} />
-            </Modal>
-            <Modal
-                open={openViewModal}
-                onClose={() => handleCloseModal('view')}
-                closeAfterTransition
-                BackdropComponent={Backdrop}
-                BackdropProps={{
-                    timeout: 500,
-                }}>
-                <ViewPreferences
-                    openModal={openViewModal}
-                    closeModal={(type) => handleCloseModal(type)}
-                />
-            </Modal>
         </div>
     )
 }
 
-  export default Dashboard;
+export default PatientFinder;

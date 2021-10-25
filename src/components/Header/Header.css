@@ -1,15 +1,55 @@
+.main-nav{
+    position: fixed;
+    width: 100%;
+    z-index: 10;
+    height:130px;
+}
 .navbar{
     background-color:royalblue;
     color: seashell;
-    box-shadow: 0px 2px 5px #888;
     padding: 20px;
     display: flex;
     height: 70px;
-    width: 100%;
     align-items: center;
-    position: fixed;
-    z-index: 10;
 }
+
+.title-link{
+    text-decoration: none;
+    color: whitesmoke !important;
+}
+
+.sub-header{
+    background-color: beige;
+    height: 60px;
+    box-shadow: 0px 2px 5px #888;
+}
+
+.list-item-text, .list-item-text a{
+    text-decoration: none;
+    padding:5px;
+    font-size: 16px;
+    font-weight: 500;
+    color: gray;
+}
+
+.list-link{
+    text-decoration: none;
+}
+
+.sub-header .menu-list{
+    display: flex;
+    flex-direction: row;
+    margin: 0;
+}
+
+.btn-active{
+    background-color: transparent !important;
+}
+
+.btn-active .list-item-text{
+    color: royalblue;
+}
+
 
 h1{
     font-family:'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif
