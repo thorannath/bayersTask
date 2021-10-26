@@ -66,7 +66,6 @@ const SidebarFilters = (props) => {
     const preferences = useSelector(state => state.preferences.preferences.map(data => { return { value: data.id, label: data.saveName } }));
     const defaultPreferenceId = useSelector(state => state.preferences.defaultPreferenceId);
 
-    console.log(defaultPreferenceId);
     const [defaultPreference, setDefaultPreference] = useState({value:'', label:''});
 
     useEffect(() => {

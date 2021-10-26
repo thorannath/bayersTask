@@ -75,21 +75,14 @@ const PatientFinder = () => {
         return { value: data.label_val, label: data.name }
     });
 
+    const [treatmentsSelected, setTreatmentsSelected] = useState(treatment);
+    const [medicalConditionsSelected, setMedicalConditionsSelected] = useState(medicalCondition);
+
     const colors = constants.colors;
     const [treatmentsChartData, setTreatmentsChartData] = useState({});
     const [medicalChartData, setMedicalChartData] = useState({});
 
-    const [openViewModal, setOpenViewModal] = useState(false);
-    const [openCreateModal, setOpenCreateModal] = useState(false);
-
-    const dispatch = useDispatch();
-
-    useEffect(() => {
-        dispatch(fetchLabels())
-        dispatch(getPreferences());
-    }, [dispatch])
-
-    const initialData = {
+    var initialData = {
         preferenceId: '',
         preferenceName: '',
         groupBy: constants.groupType.Cohort,
@@ -101,6 +94,19 @@ const PatientFinder = () => {
         medicalConditionsAND: [],
         medicalConditionsOR: []
     }
+
+    const [openViewModal, setOpenViewModal] = useState(false);
+    const [openCreateModal, setOpenCreateModal] = useState(false);
+
+    const dispatch = useDispatch();
+
+    useEffect(() => {
+        dispatch(fetchLabels())
+        dispatch(getPreferences());
+        setTreatmentsSelected(treatment);
+        setMedicalConditionsSelected(medicalCondition);
+    }, [dispatch])
+
 
     const [loadFormData, setLoadFormData] = useState({ ...initialData });
     const [formData, setFormData] = useState({ ...initialData });
@@ -217,8 +223,8 @@ const PatientFinder = () => {
 
     const requestObject = () => {
         const groupKeys = (formData.groupBy === constants.groupType.Cohort) ? formData.cohorts : formData.payType;
-        const treatmentLabels = treatments.map((e, i) => { return e["label"] })
-        const medicalConditionLabels = medicalConditions.map((e, i) => { return e["label"] })
+        const treatmentLabels = treatment.map((e) => { return e["label"] })
+        const medicalConditionLabels = medicalCondition.map((e) => { return e["label"] })
         const request = {
             jsonData: {
                 group_condition: {
@@ -238,7 +244,6 @@ const PatientFinder = () => {
                 }
             }
         }
-
         return request;
     }
 
@@ -376,6 +381,19 @@ const PatientFinder = () => {
                         classNamePrefix="select"
                     />
                 </FormGroup>
+                <br/>
+                <FormGroup className="">
+                    <FormLabel component="legend">Select Focus Labels</FormLabel>
+                    <Select
+                        isMulti
+                        name="selectLabels"
+                        value={treatmentsSelected}
+                        styles={customStyles}
+                        options={treatment}
+                        onChange={setTreatmentsSelected}
+                        classNamePrefix="select"
+                    />
+                </FormGroup>
                 <hr />
                 {medicalChartComponent}
 
@@ -401,6 +419,19 @@ const PatientFinder = () => {
                         styles={customStyles}
                         options={medicalCondition}
                         onChange={(e) => onChangeMedicalCondition(e, constants.Logic.OR)}
+                        classNamePrefix="select"
+                    />
+                </FormGroup>
+                <br/>
+                <FormGroup className="">
+                    <FormLabel component="legend">Select Focus Labels</FormLabel>
+                    <Select
+                        isMulti
+                        name="selectLabels"
+                        value={medicalConditionsSelected}
+                        styles={customStyles}
+                        options={treatment}
+                        onChange={setMedicalConditionsSelected}
                         classNamePrefix="select"
                     />
                 </FormGroup>
