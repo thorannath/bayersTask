@@ -179,6 +179,10 @@ export const Filters = (props) => {
     }
   }
 
+  {/* TODO: Create Form Validation for  complete form. Try to make a single function to handle form validations. Use examples of react form validations.*/}
+
+  {/**TODO: https://adostes.medium.com/validating-a-form-in-react-cc29d47e140f */}
+
   return (
     <div className="filters">
       <FormGroup className="">

@@ -143,6 +143,7 @@ const CreatePreferences = (props) => {
                     <Button type="submit" onClick={handleCancel}><CloseIcon /></Button>
                 </div>
                 <h2> Create a Preference </h2>
+                {/* TODO: Create Form Validation for Preference name. More validations inside Filters component */}
                 <FormGroup className="form-group">
                     <TextField
                         id="standard-basic"
