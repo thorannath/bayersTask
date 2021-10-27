@@ -4,7 +4,7 @@
 }
 
 .sidebar{
-    width: 250px;
+    width: 20%;
     position: fixed;
     overflow-y: scroll;
     max-width: 100%;
@@ -18,6 +18,7 @@
 .main{
     width: 80%;
     margin-left: auto;
+    padding: 40px;
 }
 
 .box{
@@ -34,6 +35,8 @@
 
 .graph{
     overflow-x: scroll;
+    height: auto;
+    width: auto;
 }
 
 .groupBy, .groupType, .states{

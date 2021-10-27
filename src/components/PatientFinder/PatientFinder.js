@@ -20,7 +20,6 @@ import SidebarFilters from './SidebarFilters';
 import FormGroup from '@mui/material/FormGroup';
 import FormLabel from '@mui/material/FormLabel';
 import Select from 'react-select';
-import { FormControlLabel } from '@mui/material';
 
 const customStyles = {
     menu: (provided, state) => ({
@@ -89,6 +88,8 @@ const PatientFinder = () => {
         states: '',
         cohorts: { ckd: true, diab: true, both: true },
         payType: { MCR: true, COM: true },
+        treatmentSelected:treatment,
+        medicalConditionsSelected:medicalCondition,
         treatmentsOR: [],
         treatmentsAND: [],
         medicalConditionsAND: [],
@@ -103,8 +104,6 @@ const PatientFinder = () => {
     useEffect(() => {
         dispatch(fetchLabels())
         dispatch(getPreferences());
-        setTreatmentsSelected(treatment);
-        setMedicalConditionsSelected(medicalCondition);
     }, [dispatch])
 
 
@@ -223,8 +222,16 @@ const PatientFinder = () => {
 
     const requestObject = () => {
         const groupKeys = (formData.groupBy === constants.groupType.Cohort) ? formData.cohorts : formData.payType;
-        const treatmentLabels = treatment.map((e) => { return e["label"] })
-        const medicalConditionLabels = medicalCondition.map((e) => { return e["label"] })
+        const treatmentLabels = treatmentsSelected.map(data => {
+
+            let treatment = treatments.find(val => val.label_val == data.value);
+            if (treatment) return treatment.label;
+        });
+        const medicalConditionLabels = medicalConditionsSelected.map((data) => {
+
+            let medicalCondition = medicalConditions.find(val => val.label_val == data.value);
+            if (medicalCondition) return medicalCondition.label;
+        });
         const request = {
             jsonData: {
                 group_condition: {
@@ -244,11 +251,17 @@ const PatientFinder = () => {
                 }
             }
         }
+
+        console.log(request)
         return request;
     }
 
     const handleClick = () => {
         fetchGraphData();
+    }
+
+    const handleReset = () => {
+        setFormData({ ...initialData });
     }
 
     const handlePreferenceChange = useCallback((event) => {
@@ -260,7 +273,7 @@ const PatientFinder = () => {
     }, [loadPreferenceForm]);
 
 
-    const takeScreenshot = (e) => {
+    const takeScreenshot = () => {
         html2canvas(document.getElementById("medical-chart"), {
             onclone: document => {
                 document.getElementById("image-render-medical").style.visibility = "hidden";
@@ -330,58 +343,58 @@ const PatientFinder = () => {
         setFormData({ ...formVal });
     }
 
+    const onChangeTreatmentSelected = (event) => {
+        let res = event.map(data => data.value);
+        let treatments = treatment.filter(data => res.includes(data.value));
+        setTreatmentsSelected([...treatments]);
+    }
+
+    const onChangeMedicalConditionsSelected = (event) => {
+        let res = event.map(data => data.value);
+        let medicalConditions = medicalCondition.filter(data => res.includes(data.value));
+        setMedicalConditionsSelected([...medicalConditions]);
+    }
+
     return (
         <div className="container">
             <SidebarFilters
                 formData={formData}
                 onChangeFormData={setFormData}
+                onUpdateChart={handleClick}
+                onResetChart={handleReset}
+                onCreatePreference={() => { handleOpenModal({ type: 'create' }) }}
+                onViewPreference={() => { handleOpenModal({ type: 'view' }) }}
                 onChangePreference={(id) => handlePreferenceChange(id)}
-            />
+                onTakeScreenshot={takeScreenshot}/>
             <div className="main">
-                <div className="page_header">
-                    <h1> Patient Finder </h1>
-                    <Stack className="btn-stack" spacing={2} direction="row">
-                        <Button variant="contained" color="warning" onClick={() => { handleOpenModal({ type: 'create' }) }}> CREATE PREFRENCE </Button>
-                        <Button variant="contained" color="info" onClick={() => { handleOpenModal({ type: 'view' }) }}> VIEW PREFRENCES </Button>
-                    </Stack>
-                </div>
-
-
-                <div className="update-button">
-                    <span><Button color="primary" variant="contained" type="submit" onClick={handleClick}> Update chart </Button></span>
-                    <span style={{ paddingLeft: "15px" }}><Button color="primary" variant="outlined" onClick={(e) => takeScreenshot(e)}>Take Screenshot</Button></span>
-                </div>
-
-
-
                 {treatmentsChartComponent}
 
-                <FormGroup className="">
-                    <FormLabel component="legend">Treatment with AND</FormLabel>
-                    <Select
-                        isMulti
-                        name="treatmentAND"
-                        value={formData.treatmentsAND}
-                        styles={customStyles}
-                        options={treatment}
-                        onChange={(e) => onChangeTreatment(e, constants.Logic.AND)}
-                        classNamePrefix="select"
-                    />
-                </FormGroup>
-                <br />
-                <FormGroup className="">
-                    <FormLabel component="legend">Treatment with OR</FormLabel>
-                    <Select
-                        isMulti
-                        name="treatmentOR"
-                        value={formData.treatmentsOR}
-                        styles={customStyles}
-                        options={treatment}
-                        onChange={(e) => onChangeTreatment(e, constants.Logic.OR)}
-                        classNamePrefix="select"
-                    />
-                </FormGroup>
-                <br/>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', columnGap: '30px' }}>
+                    <FormGroup>
+                        <FormLabel component="legend">Treatment with AND</FormLabel>
+                        <Select
+                            isMulti
+                            name="treatmentAND"
+                            value={formData.treatmentsAND}
+                            styles={customStyles}
+                            options={treatment}
+                            onChange={(e) => onChangeTreatment(e, constants.Logic.AND)}
+                            classNamePrefix="select"
+                        />
+                    </FormGroup>
+                    <FormGroup>
+                        <FormLabel component="legend">Treatment with OR</FormLabel>
+                        <Select
+                            isMulti
+                            name="treatmentOR"
+                            value={formData.treatmentsOR}
+                            styles={customStyles}
+                            options={treatment}
+                            onChange={(e) => onChangeTreatment(e, constants.Logic.OR)}
+                            classNamePrefix="select"
+                        />
+                    </FormGroup>
+                </div>
                 <FormGroup className="">
                     <FormLabel component="legend">Select Focus Labels</FormLabel>
                     <Select
@@ -390,39 +403,40 @@ const PatientFinder = () => {
                         value={treatmentsSelected}
                         styles={customStyles}
                         options={treatment}
-                        onChange={setTreatmentsSelected}
+                        onChange={onChangeTreatmentSelected}
                         classNamePrefix="select"
                     />
                 </FormGroup>
                 <hr />
                 {medicalChartComponent}
 
-                <FormGroup className="">
-                    <FormLabel component="legend">Medical Conditions with AND</FormLabel>
-                    <Select
-                        isMulti
-                        name="colors"
-                        value={formData.medicalConditionsAND}
-                        styles={customStyles}
-                        options={medicalCondition}
-                        onChange={(e) => onChangeMedicalCondition(e, constants.Logic.AND)}
-                        classNamePrefix="select"
-                    />
-                </FormGroup>
-                <br />
-                <FormGroup className="">
-                    <FormLabel component="legend">Medical Condtions with OR</FormLabel>
-                    <Select
-                        isMulti
-                        name="colors"
-                        value={formData.medicalConditionsOR}
-                        styles={customStyles}
-                        options={medicalCondition}
-                        onChange={(e) => onChangeMedicalCondition(e, constants.Logic.OR)}
-                        classNamePrefix="select"
-                    />
-                </FormGroup>
-                <br/>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', columnGap: '30px' }}>
+                    <FormGroup className="">
+                        <FormLabel component="legend">Medical Conditions with AND</FormLabel>
+                        <Select
+                            isMulti
+                            name="colors"
+                            value={formData.medicalConditionsAND}
+                            styles={customStyles}
+                            options={medicalCondition}
+                            onChange={(e) => onChangeMedicalCondition(e, constants.Logic.AND)}
+                            classNamePrefix="select"
+                        />
+                    </FormGroup>
+                    <FormGroup className="">
+                        <FormLabel component="legend">Medical Condtions with OR</FormLabel>
+                        <Select
+                            isMulti
+                            name="colors"
+                            value={formData.medicalConditionsOR}
+                            styles={customStyles}
+                            options={medicalCondition}
+                            onChange={(e) => onChangeMedicalCondition(e, constants.Logic.OR)}
+                            classNamePrefix="select"
+                        />
+                    </FormGroup>
+                </div>
+
                 <FormGroup className="">
                     <FormLabel component="legend">Select Focus Labels</FormLabel>
                     <Select
@@ -431,7 +445,7 @@ const PatientFinder = () => {
                         value={medicalConditionsSelected}
                         styles={customStyles}
                         options={treatment}
-                        onChange={setMedicalConditionsSelected}
+                        onChange={onChangeMedicalConditionsSelected}
                         classNamePrefix="select"
                     />
                 </FormGroup>

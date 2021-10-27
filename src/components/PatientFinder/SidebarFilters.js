@@ -5,12 +5,13 @@ import FormLabel from '@mui/material/FormLabel';
 import Select from 'react-select';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import { FormControlLabel } from '@mui/material';
-import { useSelector, useDispatch } from 'react-redux';
-import { useState, useEffect, useCallback } from 'react';
-import MenuItem from '@mui/material/MenuItem';
+import { useSelector } from 'react-redux';
+import { useState, useEffect } from 'react';
 import Radio from '@mui/material/Radio';
 import RadioGroup from '@mui/material/RadioGroup';
 import Checkbox from '@mui/material/Checkbox';
+import Button from '@mui/material/Button';
+
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import BookmarksIcon from '@mui/icons-material/Bookmarks';
 
@@ -66,11 +67,11 @@ const SidebarFilters = (props) => {
     const preferences = useSelector(state => state.preferences.preferences.map(data => { return { value: data.id, label: data.saveName } }));
     const defaultPreferenceId = useSelector(state => state.preferences.defaultPreferenceId);
 
-    const [defaultPreference, setDefaultPreference] = useState({value:'', label:''});
+    const [defaultPreference, setDefaultPreference] = useState({ value: '', label: '' });
 
     useEffect(() => {
         if (defaultPreference.value !== defaultPreferenceId) {
-            let preference = preferences.find(data=> data.value == defaultPreferenceId);
+            let preference = preferences.find(data => data.value == defaultPreferenceId);
             onChangePreference(preference);
         }
         else {
@@ -188,7 +189,10 @@ const SidebarFilters = (props) => {
                     onChange={(e) => onChangePreference(e)}
                     classNamePrefix="select" />
             </FormGroup>
-
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', columnGap: '40px', marginTop: '20px' }}>
+                <Button color="warning" variant="contained" onClick={props.onCreatePreference}><AddCircleIcon fontSize="small"/> Create </Button>
+                <Button color="info" variant="contained" onClick={props.onViewPreference}><BookmarksIcon fontSize="small"/> View </Button>
+            </div>
 
             <FormGroup className="formGroup">
                 <FormLabel>Group By <InfoOutlinedIcon fontSize="small" color="primary" /></FormLabel>
@@ -217,7 +221,11 @@ const SidebarFilters = (props) => {
                     classNamePrefix="select" />
             </FormGroup>
 
-
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', columnGap: '30px', marginTop: '20px', marginBottom:'20px' }}>
+                <Button color="primary" variant="contained" type="submit" onClick={props.onUpdateChart}> Update </Button>
+                <Button color="warning" variant="outlined" onClick={props.onResetChart}> Reset </Button>
+            </div>
+            <Button color="info" fullWidth variant="contained" onClick={props.onTakeScreenshot}> Take Screenshot </Button>
         </div>
     )
 }
