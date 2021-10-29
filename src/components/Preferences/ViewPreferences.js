@@ -19,6 +19,7 @@ import { deletePreference } from '../../store/utils/thunkCreators';
 import { useSelector, useDispatch } from 'react-redux';
 import { closeModal, showModal } from '../../store/modals';
 import * as constants from '../../Constant';
+import moment from 'moment';
 
 function createData(id, saveName, createdAt) {
     return { id, saveName, createdAt };
@@ -31,6 +32,7 @@ const style = {
     transform: 'translate(-50%, -50%)',
     width: '50%',
     bgcolor: 'background.paper',
+    borderRadius: 3,
     boxShadow: 24,
 };
 
@@ -52,9 +54,9 @@ const ViewPreferences = (props) => {
     const preferences = useSelector(state => state.preferences.preferences);
 
     useEffect(() => {
-        let prefData = preferences? preferences.map(data => {
+        let prefData = preferences ? preferences.map(data => {
             return createData(data.id, data.saveName, data.createdAt);
-        }):null;
+        }) : null;
         setRowData([...prefData]);
     }, [preferences]);
 
@@ -66,16 +68,16 @@ const ViewPreferences = (props) => {
     const [deletePreferenceData, setDeletePreferenceData] = useState({});
 
     const handleCancel = () => {
-        dispatch(showModal({messageType:constants.MESSAGE_TYPES.VIEW_PREFERECNE, action:'close'}))
+        dispatch(showModal({ messageType: constants.MESSAGE_TYPES.VIEW_PREFERECNE, action: 'close' }))
     }
 
     const openSettings = (row) => {
-        dispatch(showModal({messageType:constants.MESSAGE_TYPES.VIEW_PREFERECNE, action:'close', data:{id:row.id}}))
+        dispatch(showModal({ messageType: constants.MESSAGE_TYPES.VIEW_PREFERECNE, action: 'close', data: { id: row.id } }))
     }
 
     const editSettings = (row) => {
-        dispatch(showModal({messageType:constants.MESSAGE_TYPES.VIEW_PREFERECNE, action:'close'}))
-        dispatch(showModal({messageType:constants.MESSAGE_TYPES.EDIT_PREFERENCE, action:'open', data:{id:row.id}}))
+        dispatch(showModal({ messageType: constants.MESSAGE_TYPES.VIEW_PREFERECNE, action: 'close' }))
+        dispatch(showModal({ messageType: constants.MESSAGE_TYPES.EDIT_PREFERENCE, action: 'open', data: { id: row.id } }))
     }
 
     const deleteSettings = (row) => {
@@ -92,20 +94,23 @@ const ViewPreferences = (props) => {
 
     return (
         <Box sx={style}>
-            <div align="right">
-                <Button type="submit" onClick={handleCancel}><CloseIcon /></Button>
+            <div class="modal-header">
+                <Typography align="left" variant="h6"> Preferences </Typography>
+                <div align="right">
+                    <Button type="submit" onClick={handleCancel}><CloseIcon /></Button>
+                </div>
             </div>
             <TableContainer sx={{ padding: 2 }}>
                 <Table stickyHeader sx={{ minWidth: 650 }} size="small" aria-label="a dense table">
                     <TableHead>
                         <TableRow>
                             <TableCell>Preference Name</TableCell>
-                            <TableCell>Created at</TableCell>
+                            <TableCell align="center">Created at</TableCell>
                             <TableCell align="center">Actions</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {rowData.length>0 && rowData
+                        {rowData.length > 0 && rowData
                             .map((row) => (
                                 <TableRow
                                     key={row.saveName}
@@ -113,8 +118,8 @@ const ViewPreferences = (props) => {
                                     <TableCell component="th" scope="row">
                                         {row.saveName}
                                     </TableCell>
-                                    <TableCell component="th" scope="row">
-                                        <p>{row.createdAt}</p>
+                                    <TableCell component="th" align="center" scope="row">
+                                        <p>{moment(row.createdAt).format('MM/DD/YYYY, h:mm:ss A')}</p>
                                     </TableCell>
                                     <TableCell align="center">
                                         <Tooltip title="Apply"><Button color="primary" onClick={() => openSettings(row)}> <VisibilityIcon /></Button></Tooltip>
@@ -123,10 +128,10 @@ const ViewPreferences = (props) => {
                                     </TableCell>
                                 </TableRow>
                             ))
-                            }
-                            {
-                                rowData===0 && <p style={{display:'block', textAlign:'right', fontWeight:'bold', padding:5}}> {rowData===0} No Preferences Available </p>
-                            }
+                        }
+                        {
+                            rowData === 0 && <p style={{ display: 'block', textAlign: 'right', fontWeight: 'bold', padding: 5 }}> {rowData === 0} No Preferences Available </p>
+                        }
                     </TableBody>
                 </Table>
             </TableContainer>
@@ -150,10 +155,10 @@ const ViewPreferences = (props) => {
 
 export default ViewPreferences
 
-/* TODO: 
-    1. Saved Preferences are not updated without reloading page. 
-    One solution is auto reloading the page. 
-    Will fix on work on it using a better approach by next update. 
+/* TODO:
+    1. Saved Preferences are not updated without reloading page.
+    One solution is auto reloading the page.
+    Will fix on work on it using a better approach by next update.
     (NOTE: This can become problematic if user A logs out and another user B log in to user A's preferences)
 
     2. Make Default is not connected to the API yet. Will fix by next iteration.

@@ -30,11 +30,13 @@ const customStyles = {
     }),
     option: (provided, state) => ({
         ...provided,
-        padding: 20,
+        padding: 8,
+        fontSize:'small',
     }),
     control: (control) => ({
         ...control,
         padding: 4,
+        fontSize:'small'
     }),
     singleValue: (provided, state) => {
         const opacity = state.isDisabled ? 0.5 : 1;
@@ -199,6 +201,9 @@ const PatientFinder = () => {
 
     const fetchGraphData = async () => {
         const request = requestObject();
+
+        if(!request) return;
+        
         request.userid = Cookies.get("userid", { path: '/' });
         request.authToken = Cookies.get('authToken', { path: '/' });
         const treatmentResponse = await axios.post('http://localhost:3000/patientfinder/treatments', request);

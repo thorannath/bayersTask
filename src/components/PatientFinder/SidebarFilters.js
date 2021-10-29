@@ -11,6 +11,7 @@ import Radio from '@mui/material/Radio';
 import RadioGroup from '@mui/material/RadioGroup';
 import Checkbox from '@mui/material/Checkbox';
 import Button from '@mui/material/Button';
+import Typography from '@mui/material/Typography';
 
 const customStyles = {
     menu: (provided, state) => ({
@@ -21,11 +22,12 @@ const customStyles = {
     }),
     option: (provided, state) => ({
         ...provided,
-        padding: 20,
+        padding: 8,
+        fontSize:'small',
     }),
     control: (control) => ({
         ...control,
-        padding: 4,
+        fontSize:'small'
     }),
     singleValue: (provided, state) => {
         const opacity = state.isDisabled ? 0.5 : 1;
@@ -142,18 +144,18 @@ const SidebarFilters = (props) => {
         if (formData.groupBy === constants.groupType.Cohort) {
             return (
                 <FormGroup className="formGroup">
-                    <FormLabel class="formLabel" >Cohort Type</FormLabel>
+                    <FormLabel class="formLabel">Cohort Type</FormLabel>
                     <div row>
                         {patientCohort.map((data, i) => {
                             return <FormControlLabel key={`cohort-formgrp-${i}`}
                                 control={
                                     <Checkbox
                                         checked={formData.cohorts[data]}
+                                        sx={{ '& .MuiSvgIcon-root': { fontSize: 20 } }}
                                         onChange={(e) => onChangeGroupBy(e, constants.groupType.Cohort)}
                                         name={data} />
                                 }
-                                label={data.toUpperCase()}
-                            />
+                                label={<Typography variant="body2" color="textSecondary">{data.toUpperCase()}</Typography>}/>
                         })}
                     </div>
                 </FormGroup>
@@ -171,7 +173,7 @@ const SidebarFilters = (props) => {
                                         onChange={(e) => onChangeGroupBy(e, constants.groupType.PayerType)}
                                         name={data} />
                                 }
-                                label={data} />
+                                label={<Typography variant="body2" color="textSecondary">{data.toUpperCase()}</Typography>}/>
                         })}
                     </div>
                 </FormGroup>
@@ -233,8 +235,10 @@ const SidebarFilters = (props) => {
                     value={formData.groupBy}
                     onClick={onChangeGroup}
                     name="radio-buttons-group">
-                    <FormControlLabel value={constants.groupType.Cohort} control={<Radio />} label="Cohort" />
-                    <FormControlLabel value={constants.groupType.PayerType} control={<Radio />} label="Payer" />
+                    <FormControlLabel value={constants.groupType.Cohort} control={<Radio />} 
+                        label={<Typography variant="body2" color="textSecondary">Cohort</Typography>}/>
+                    <FormControlLabel value={constants.groupType.PayerType} control={<Radio />}
+                      label={<Typography variant="body2" color="textSecondary">Payer</Typography>}/>
                 </RadioGroup>
             </FormGroup>
 

@@ -63,11 +63,11 @@ const Header = () => {
 
         <div className="main-nav">
             <nav className="navbar">
-                <h1 ><Link className="title-link" to={constants.routes.Introduction}>
+                <Link className="title-link" to={constants.routes.Introduction}>
                     CKD Population Navigator
-                </Link></h1>
+                </Link>
                 <div className="menu-icons">
-                    <span style={{ display: 'flex', alignItems: 'center', fontWeight: 'bold', letterSpacing: 1.2 }}>Hello {Cookies.get("userid", { path: "/" })},</span>
+                    <span style={{ display: 'flex', alignItems: 'center', fontSize:14, fontWeight: 'bold', letterSpacing: 1.2 }}>Hello {Cookies.get("userid", { path: "/" })},</span>
                     <IconButton onClick={handleClick} size="small" sx={{ ml: 2 }}>
                         <Avatar sx={{ width: 32, height: 32 }}>M</Avatar>
                     </IconButton>

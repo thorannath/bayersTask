@@ -2,3 +2,15 @@
     visibility: hidden;
     color: red;
 }
+
+.modal-header{
+    padding-left: 30px;
+    padding-top: 5px;
+    border-bottom: 1px solid gray;
+    display: grid;
+    grid-template-columns: 4fr 1fr;
+}
+
+.form{
+    padding: 0 20px 10px 20px;
+}

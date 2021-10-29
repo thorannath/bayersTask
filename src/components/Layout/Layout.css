@@ -8,5 +8,6 @@
     float: right;
     height: 100%;
     width: 100%;
-    margin-top: 130px;
+    position:absolute;
+    top:80px
 }
