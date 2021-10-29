@@ -179,10 +179,6 @@ export const Filters = (props) => {
     }
   }
 
-  {/* TODO: Create Form Validation for  complete form. Try to make a single function to handle form validations. Use examples of react form validations.*/}
-
-  {/**TODO: https://adostes.medium.com/validating-a-form-in-react-cc29d47e140f */}
-
   return (
     <div className="filters">
       <FormGroup className="">
@@ -212,57 +208,61 @@ export const Filters = (props) => {
           classNamePrefix="select" />
       </FormGroup>
       <br />
-      <FormGroup className="">
-        <FormLabel component="legend">Treatment with AND</FormLabel>
-        <Select
-          isMulti
-          name="treatmentAND"
-          value={formData.treatmentsAND}
-          styles={customStyles}
-          options={treatment}
-          onChange={(e) => onChangeTreatment(e, constants.Logic.AND)}
-          classNamePrefix="select"
-        />
-      </FormGroup>
-      <br />
-      <FormGroup className="">
-        <FormLabel component="legend">Treatment with OR</FormLabel>
-        <Select
-          isMulti
-          name="treatmentOR"
-          value={formData.treatmentsOR}
-          styles={customStyles}
-          options={treatment}
-          onChange={(e) => onChangeTreatment(e, constants.Logic.OR)}
-          classNamePrefix="select"
-        />
-      </FormGroup>
-      <br />
-      <FormGroup className="">
-        <FormLabel component="legend">Medical Conditions with AND</FormLabel>
-        <Select
-          isMulti
-          name="colors"
-          value={formData.medicalConditionsAND}
-          styles={customStyles}
-          options={medicalCondition}
-          onChange={(e) => onChangeMedicalCondition(e, constants.Logic.AND)}
-          classNamePrefix="select"
-        />
-      </FormGroup>
-      <br />
-      <FormGroup className="">
-        <FormLabel component="legend">Medical Condtions with OR</FormLabel>
-        <Select
-          isMulti
-          name="colors"
-          value={formData.medicalConditionsOR}
-          styles={customStyles}
-          options={medicalCondition}
-          onChange={(e) => onChangeMedicalCondition(e, constants.Logic.OR)}
-          classNamePrefix="select"
-        />
-      </FormGroup>
+      {
+        /*
+        <FormGroup className="">
+          <FormLabel component="legend">Treatment with AND</FormLabel>
+          <Select
+            isMulti
+            name="treatmentAND"
+            value={formData.treatmentsAND}
+            styles={customStyles}
+            options={treatment}
+            onChange={(e) => onChangeTreatment(e, constants.Logic.AND)}
+            classNamePrefix="select"
+          />
+        </FormGroup>
+        <br />
+        <FormGroup className="">
+          <FormLabel component="legend">Treatment with OR</FormLabel>
+          <Select
+            isMulti
+            name="treatmentOR"
+            value={formData.treatmentsOR}
+            styles={customStyles}
+            options={treatment}
+            onChange={(e) => onChangeTreatment(e, constants.Logic.OR)}
+            classNamePrefix="select"
+          />
+        </FormGroup>
+        <br />
+        <FormGroup className="">
+          <FormLabel component="legend">Medical Conditions with AND</FormLabel>
+          <Select
+            isMulti
+            name="colors"
+            value={formData.medicalConditionsAND}
+            styles={customStyles}
+            options={medicalCondition}
+            onChange={(e) => onChangeMedicalCondition(e, constants.Logic.AND)}
+            classNamePrefix="select"
+          />
+        </FormGroup>
+        <br />
+        <FormGroup className="">
+          <FormLabel component="legend">Medical Condtions with OR</FormLabel>
+          <Select
+            isMulti
+            name="colors"
+            value={formData.medicalConditionsOR}
+            styles={customStyles}
+            options={medicalCondition}
+            onChange={(e) => onChangeMedicalCondition(e, constants.Logic.OR)}
+            classNamePrefix="select"
+          />
+        </FormGroup>
+        */
+      }
     </div>
   )
 }

@@ -176,6 +176,9 @@ const SidebarFilters = (props) => {
 
     return (
         <div className="sidebar">
+            <div id="sidebar-message" style={{visibility: "hidden"}}>
+                <p>Message</p>
+            </div>
             <h3> Patient Finder Definition</h3>
             <FormGroup className="formGroup">
                 <FormLabel>Preferences <InfoOutlinedIcon fontSize="small" color="primary" /></FormLabel>

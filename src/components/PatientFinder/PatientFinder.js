@@ -174,7 +174,6 @@ const PatientFinder = () => {
 
     const fetchGraphData = async () => {
         const request = requestObject();
-        /* Later: Introduce  Authentication and Posting mechanism*/
         request.userid = Cookies.get("userid", { path: '/' });
         request.authToken = Cookies.get('authToken', { path: '/' });
         const treatmentResponse = await axios.post('http://localhost:3000/patientfinder/treatments', request);
