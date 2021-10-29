@@ -150,3 +150,13 @@ const ViewPreferences = (props) => {
 }
 
 export default ViewPreferences
+
+/* TODO: 
+    Saved Preferences are not updated without reloading page. 
+    One solution is auto reloading the page. 
+    Will fix on work on it using a better approach by next update. 
+
+    Make Default is not connected to the API yet. Will fix by next iteration.
+
+
+*/

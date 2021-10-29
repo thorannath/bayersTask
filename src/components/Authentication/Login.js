@@ -24,18 +24,23 @@ const Login = () => {
 
     const handleFormSubmit = async () => {
         if (username && password) {
-            const response = await axios.put('http://localhost:3000/users', { userid: username, password: password})
-            if (response && response.data.success) {
-                setMessage(response.data.message);
-                setSeverity('success');
-                Cookies.set('userid', username, {expires: 1, path:'/'}); 
-                Cookies.set('password', password, {expires: 1, path:'/'});
-                Cookies.set('authToken', response.data.userData.authToken, {expires: 1, path:'/'});
-                history.push("/app/patient-finder");
-            }
-            else {
+            try{
+                const response = await axios.put('http://localhost:3000/users', { userid: username, password: password})
+                if (response && response.data.success) {
+                    setMessage(response.data.message);
+                    setSeverity('success');
+                    Cookies.set('userid', username, {expires: 1, path:'/'}); 
+                    Cookies.set('password', password, {expires: 1, path:'/'});
+                    Cookies.set('authToken', response.data.userData.authToken, {expires: 1, path:'/'});
+                    history.push("/app/patient-finder");
+                }
+                else {
+                    setSeverity('error');
+                    setMessage(response.data.message);
+                }
+            } catch(err){
                 setSeverity('error');
-                setMessage(response.data.message);
+                setMessage(err.response.data.message);
             }
             setOpen(true);
         }

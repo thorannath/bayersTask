@@ -49,7 +49,7 @@ export const Register = () => {
                 }
             }catch(err){
                 setSeverity('error');
-                setMessage(err.response.data);
+                setMessage(err.response.data.message);
             }
         }
         else{

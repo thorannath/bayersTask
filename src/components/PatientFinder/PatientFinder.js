@@ -296,31 +296,33 @@ const PatientFinder = () => {
 
 
     const takeScreenshot = () => {
-        html2canvas(document.getElementById("medical-chart"), {
+        html2canvas(document.getElementById("medical-chart")/*, {
             onclone: document => {
                 document.getElementById("image-render-medical").style.visibility = "hidden";
             }
-        }).then(canvas => {
+        }*/).then(canvas => {
 
             const imgData = canvas.toDataURL("image/png");
             const pdf = new jsPdf("l", "mm", "a4");
             const width = pdf.internal.pageSize.getWidth();
             const height = pdf.internal.pageSize.getHeight();
-            pdf.addImage(imgData, "JPEG", 0, 0, width, height);
+            pdf.addImage(imgData, "JPEG", 10, 20, width-10, height-20);
             pdf.save(`medical-chart_${new Date().toISOString()}.pdf`);
-        });
+        })/*.catch(err=>{
+            console.log(err);
+        });*/
 
-        html2canvas(document.getElementById("treatment-chart"), {
+        html2canvas(document.getElementById("treatment-chart")/*, {
             onclone: document => {
                 document.getElementById("image-render-treatment").style.visibility = "hidden";
             }
-        }).then(canvas => {
+        }*/).then(canvas => {
 
             const imgData = canvas.toDataURL("image/png");
             const pdf = new jsPdf("l", "mm", "a4");
             const width = pdf.internal.pageSize.getWidth();
             const height = pdf.internal.pageSize.getHeight();
-            pdf.addImage(imgData, "JPEG", 0, 0, width, height);
+            pdf.addImage(imgData, "JPEG", 10, 20, width-10, height-20);
             pdf.save(`treatment-chart_${new Date().toISOString()}.pdf`);
         });
     };
