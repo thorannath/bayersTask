@@ -6,8 +6,9 @@ import users from './users';
 import preferences from './preferences';
 import labels from './labels';
 import loader from './loader';
+import modals from './modals';
 
-const appReducer = combineReducers({users, labels, preferences, loader});
+const appReducer = combineReducers({users, labels, preferences, modals, loader});
 
 const rootReducer = (state, action) => {
     return appReducer(state, action);

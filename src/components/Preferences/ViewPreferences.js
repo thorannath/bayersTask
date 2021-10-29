@@ -17,6 +17,8 @@ import Typography from '@mui/material/Typography';
 import Modal from '@mui/material/Modal';
 import { deletePreference } from '../../store/utils/thunkCreators';
 import { useSelector, useDispatch } from 'react-redux';
+import { closeModal, showModal } from '../../store/modals';
+import * as constants from '../../Constant';
 
 function createData(id, saveName, createdAt) {
     return { id, saveName, createdAt };
@@ -65,15 +67,16 @@ const ViewPreferences = (props) => {
     const [deletePreferenceData, setDeletePreferenceData] = useState({});
 
     const handleCancel = () => {
-        props.closeModal({ type: 'view', action: 'close' });
+        dispatch(showModal({messageType:constants.MESSAGE_TYPES.VIEW_PREFERECNE, action:'close'}))
     }
 
     const openSettings = (row) => {
-        props.closeModal({ type: 'view', action: 'view', data: row });
+        dispatch(showModal({messageType:constants.MESSAGE_TYPES.VIEW_PREFERECNE, action:'close', data:{id:row.id}}))
     }
 
     const editSettings = (row) => {
-        props.closeModal({ type: 'view', action: 'edit', data: row });
+        dispatch(showModal({messageType:constants.MESSAGE_TYPES.VIEW_PREFERECNE, action:'close'}))
+        dispatch(showModal({messageType:constants.MESSAGE_TYPES.EDIT_PREFERENCE, action:'open', data:{id:row.id}}))
     }
 
     const deleteSettings = (row) => {

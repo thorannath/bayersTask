@@ -1,6 +1,30 @@
 .container{
     display: flex;
-    flex-direction: column;
+    position: relative;
+}
+
+.sidebar{
+    width: 20%;
+    position: fixed;
+    overflow-y: scroll;
+    max-width: 100%;
+    background-color: white;
+    height: 100vh;
+    box-shadow: 5px 0 5px -2px #888;
+    padding-top: 25px;
+    padding:10px;
+}
+
+.sidebar-content{
+    height: 80%;
+    width: auto;
+    overflow-y: scroll;
+}
+
+.main{
+    width: 80%;
+    margin-left: auto;
+    padding: 40px;
 }
 
 .box{
@@ -17,6 +41,8 @@
 
 .graph{
     overflow-x: scroll;
+    height: auto;
+    width: auto;
 }
 
 .groupBy, .groupType, .states{
@@ -43,4 +69,9 @@
 
 .btn-stack{
     margin-left: auto;
+}
+
+.formGroup{
+   padding-top: 15px;
+   width: 100%;
 }

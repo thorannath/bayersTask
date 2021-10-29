@@ -16,12 +16,14 @@ export const addPreferenceToStore = (state, payload) =>{
 }
 
 export const editPreferenceToStore = (state, payload) =>{
-    payload.preference = state.preference.find(data=> data.id === payload.preference.id);
+    let preference = state.preferences.find(data=> data.id === payload.preference.id);
+
+    preference = payload.preference;
     if(payload.defaultPreferenceId){
         let defaultPreferenceId =payload.defaultPreferenceId;
         return {...state, defaultPreferenceId};
     }
-    return {...state};
+    return {...state, preferences:state.preferences};
 }
 
 export const deletePreferenceToStore = (state, preferenceId) =>{
@@ -66,4 +68,12 @@ export const loadTreatmentsToStore = (state, treatments) =>{
 
 export const loadMedicalConditionsToStore = (state, medicalConditions) =>{
     return {...state, medicalConditions};
+}
+
+export const onShowModals = (state, payload) =>{
+    return {...state, messageType:payload.messageType, action:payload.action, data:payload.data}
+}
+
+export const onCloseModals = (state, payload) =>{
+    return {...state, messageType:payload.messageType, action:payload.action, data:payload.data}
 }

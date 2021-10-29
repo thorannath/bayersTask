@@ -1,3 +1,9 @@
+/* TODO: 
+   1. Convert all constants to dynamic fetched values, based on the API calls for route /value. 
+      Refer to API Documentation.
+   2. Store the bakend api link within a constant and replace it with the magic constants used around the applications
+   3. 
+*/
 export const Paytype = [ "MCR", "COM" ];
 
 
@@ -13,6 +19,11 @@ export const groupBy = {
     PAY_TYPE:'paytyp'
 }
 
+export const MESSAGE_TYPES = {
+    CREATE_PREFERENCE:'CREATE_PREFERENCE',
+    VIEW_PREFERECNE:'VIEW_PREFERECNE',
+    EDIT_PREFERENCE:'EDIT_PREFERENCE'
+}
 
 export const Logic = {
     AND:'AND',
@@ -31,11 +42,6 @@ export const routes = {
     Dashboard: '/app/dashboard',
     Patient_Finder: '/app/patient-finder',
     Home:'/app/home',
-}
-
-export const messageTypes = {
-    SUCCESS:'success',
-    ERROR:'error'
 }
 
 export const States = [

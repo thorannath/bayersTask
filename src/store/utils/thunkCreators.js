@@ -59,6 +59,7 @@ export const updatePreference = (obj) => async (dispatch) => {
         const { data } = await axios.put(baseURL + "users/preferences", { ...obj, ...params });
 
         if (data.success) {
+            console.log(data);
             dispatch(editPreferenceAction({preference:data.data, defaultPreferenceId:obj.makeDefault}));
         }
         dispatch(setLoadingStatus(false));
