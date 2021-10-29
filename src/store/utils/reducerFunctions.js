@@ -1,5 +1,3 @@
-import { States } from "../../Constant";
-
 export const addPreferenceToStore = (state, payload) =>{
     let preferences = [...state.preferences];
     preferences.push(payload.preference);
@@ -16,21 +14,20 @@ export const addPreferenceToStore = (state, payload) =>{
 }
 
 export const editPreferenceToStore = (state, payload) =>{
-    let preference = state.preferences.find(data=> data.id === payload.preference.id);
-
-    preference = payload.preference;
+    let preferences = state.preferences;
+    let index = preferences.findIndex(data=> data.id === payload.preference.id);
+    if(!index) return {...state};
+    preferences[index] = payload.preference;
     if(payload.defaultPreferenceId){
         let defaultPreferenceId =payload.defaultPreferenceId;
-        return {...state, defaultPreferenceId};
+        return {...state, preferences, defaultPreferenceId};
     }
-    return {...state, preferences:state.preferences};
+    return {...state, preferences};
 }
 
 export const deletePreferenceToStore = (state, preferenceId) =>{
-
     let preferences = state.preferences.filter(data=> data.id !== preferenceId);
     let defaultPreferenceId = '';
-
     if(preferences.length === 0){
         return {...state, preferences, defaultPreferenceId}
     }
@@ -39,8 +36,6 @@ export const deletePreferenceToStore = (state, preferenceId) =>{
         defaultPreferenceId =preferences[0].id;
         return {...state, preferences, defaultPreferenceId};
     }
-
-
     return {...state, preferences};
 }
 
@@ -54,7 +49,6 @@ export const loadPreferencesToStore = (state, payload) => {
             return {preferences: payload.preferences, defaultPreferenceId: payload.preferences[0].id};
         }
     }
-
     return state;
 }
 

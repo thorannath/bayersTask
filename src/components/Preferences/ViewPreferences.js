@@ -55,7 +55,6 @@ const ViewPreferences = (props) => {
         let prefData = preferences? preferences.map(data => {
             return createData(data.id, data.saveName, data.createdAt);
         }):null;
-
         setRowData([...prefData]);
     }, [preferences]);
 

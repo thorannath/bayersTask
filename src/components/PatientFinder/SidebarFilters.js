@@ -12,9 +12,6 @@ import RadioGroup from '@mui/material/RadioGroup';
 import Checkbox from '@mui/material/Checkbox';
 import Button from '@mui/material/Button';
 
-import AddCircleIcon from '@mui/icons-material/AddCircle';
-import BookmarksIcon from '@mui/icons-material/Bookmarks';
-
 const customStyles = {
     menu: (provided, state) => ({
         ...provided,
@@ -28,7 +25,7 @@ const customStyles = {
     }),
     control: (control) => ({
         ...control,
-        padding: 4
+        padding: 4,
     }),
     singleValue: (provided, state) => {
         const opacity = state.isDisabled ? 0.5 : 1;
@@ -61,7 +58,6 @@ const SidebarFilters = (props) => {
 
     useEffect(() => {
         if(props.formData.preferenceId){
-           console.log(props.formData) 
            setDefaultPreference({value:props.formData.preferenceId, label:props.formData.preferenceName});
         }
         setFormData(props.formData);
@@ -105,7 +101,6 @@ const SidebarFilters = (props) => {
     const onChangeStates = (event) => {
         let formVal = { ...formData };
         let statesData = event.map((data) => data.value);
-        console.log(statesData);
         formVal.states = states.filter(data => statesData.includes(data.value))
         validateAndSend(formVal);
     }
@@ -147,7 +142,7 @@ const SidebarFilters = (props) => {
         if (formData.groupBy === constants.groupType.Cohort) {
             return (
                 <FormGroup className="formGroup">
-                    <FormLabel component="legend">Cohort Type</FormLabel>
+                    <FormLabel class="formLabel" >Cohort Type</FormLabel>
                     <div row>
                         {patientCohort.map((data, i) => {
                             return <FormControlLabel key={`cohort-formgrp-${i}`}
@@ -167,7 +162,7 @@ const SidebarFilters = (props) => {
         else if (formData.groupBy === constants.groupType.PayerType) {
             return (
                 <FormGroup className="formGroup" >
-                    <FormLabel component="legend">Payer Type</FormLabel>
+                    <FormLabel class="formLabel">Payer Type</FormLabel>
                     <div row>
                         {payerType.map((data, i) => {
                             return <FormControlLabel key={`paytyp-formgrp-${i}`}
@@ -221,7 +216,7 @@ const SidebarFilters = (props) => {
             </div>
             <h3> Patient Finder Definition</h3>
             <FormGroup className="formGroup">
-                <FormLabel>Preferences <InfoOutlinedIcon fontSize="small" color="primary" /></FormLabel>
+                <FormLabel class="formLabel">Preferences <InfoOutlinedIcon fontSize="small" color="primary" /></FormLabel>
                 <Select
                     name="preferences"
                     value={defaultPreference}
@@ -233,7 +228,7 @@ const SidebarFilters = (props) => {
                     classNamePrefix="select" />
             </FormGroup>
             <FormGroup className="formGroup">
-                <FormLabel>Group By <InfoOutlinedIcon fontSize="small" color="primary" /></FormLabel>
+                <FormLabel class="formLabel">Group By <InfoOutlinedIcon fontSize="small" color="primary" /></FormLabel>
                 <RadioGroup row
                     value={formData.groupBy}
                     onClick={onChangeGroup}
@@ -246,7 +241,7 @@ const SidebarFilters = (props) => {
             <GroupData />
 
             <FormGroup className="formGroup">
-                <FormLabel>States <InfoOutlinedIcon fontSize="small" color="primary" /></FormLabel>
+                <FormLabel class="formLabel">States <InfoOutlinedIcon fontSize="small" color="primary" /></FormLabel>
                 <Select
                     isMulti
                     name="states"
@@ -259,8 +254,8 @@ const SidebarFilters = (props) => {
                     classNamePrefix="select" />
             </FormGroup>
 
-            <FormGroup>
-                <FormLabel component="legend">Treatment with AND</FormLabel>
+            <FormGroup className="formGroup">
+                <FormLabel class="formLabel">Treatment with AND</FormLabel>
                 <Select
                     isMulti
                     name="treatmentAND"
@@ -271,8 +266,8 @@ const SidebarFilters = (props) => {
                     classNamePrefix="select"
                 />
             </FormGroup>
-            <FormGroup>
-                <FormLabel component="legend">Treatment with OR</FormLabel>
+            <FormGroup className="formGroup">
+                <FormLabel class="formLabel">Treatment with OR</FormLabel>
                 <Select
                     isMulti
                     name="treatmentOR"
@@ -284,8 +279,8 @@ const SidebarFilters = (props) => {
                 />
             </FormGroup>
 
-            <FormGroup className="">
-                <FormLabel component="legend">Medical Conditions with AND</FormLabel>
+            <FormGroup className="formGroup">
+                <FormLabel class="formLabel">Medical Conditions with AND</FormLabel>
                 <Select
                     isMulti
                     name="colors"
@@ -296,8 +291,8 @@ const SidebarFilters = (props) => {
                     classNamePrefix="select"
                 />
             </FormGroup>
-            <FormGroup className="">
-                <FormLabel component="legend">Medical Condtions with OR</FormLabel>
+            <FormGroup className="formGroup">
+                <FormLabel class="formLabel">Medical Condtions with OR</FormLabel>
                 <Select
                     isMulti
                     name="colors"

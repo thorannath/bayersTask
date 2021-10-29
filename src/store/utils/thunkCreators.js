@@ -59,7 +59,6 @@ export const updatePreference = (obj) => async (dispatch) => {
         const { data } = await axios.put(baseURL + "users/preferences", { ...obj, ...params });
 
         if (data.success) {
-            console.log(data);
             dispatch(editPreferenceAction({preference:data.data, defaultPreferenceId:obj.makeDefault}));
         }
         dispatch(setLoadingStatus(false));
@@ -92,8 +91,6 @@ export const getPreferences = () => async (dispatch) => {
             authToken: Cookies.get('authToken', { path: '/' }),
         }
         const { data } = await axios.get(baseURL + "users/preferences", { params });
-
-        console.log(data);
         if (data.success) {
             dispatch(loadPreferences({preferences:data.preferenceData, defaultPreferenceId: data.defaultPreferenceId}));
         }

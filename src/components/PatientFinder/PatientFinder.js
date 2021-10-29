@@ -34,7 +34,7 @@ const customStyles = {
     }),
     control: (control) => ({
         ...control,
-        padding: 4
+        padding: 4,
     }),
     singleValue: (provided, state) => {
         const opacity = state.isDisabled ? 0.5 : 1;
@@ -245,6 +245,8 @@ const PatientFinder = () => {
     }
 
     const requestObject = () => {
+
+        if(formData.states.length == 0) return;
         const groupKeys = (formData.groupBy === constants.groupType.Cohort) ? formData.cohorts : formData.payType;
         const treatmentLabels = treatmentsSelected.map(data => {
             let treatment = treatments.find(val => val.label_val == data.value);
@@ -273,8 +275,6 @@ const PatientFinder = () => {
                 }
             }
         }
-
-        console.log(request)
         return request;
     }
 
@@ -365,7 +365,7 @@ const PatientFinder = () => {
             <div className="main">
                 {treatmentsChartComponent}
                 <FormGroup className="">
-                    <FormLabel component="legend">Select Focus Labels</FormLabel>
+                    <FormLabel >Select Focus Labels</FormLabel>
                     <Select
                         isMulti
                         name="selectLabels"
@@ -378,7 +378,7 @@ const PatientFinder = () => {
                 </FormGroup>
                 {medicalChartComponent}
                 <FormGroup className="">
-                    <FormLabel component="legend">Select Focus Labels</FormLabel>
+                    <FormLabel >Select Focus Labels</FormLabel>
                     <Select
                         isMulti
                         name="selectLabels"
@@ -415,9 +415,7 @@ const PatientFinder = () => {
                         closeModal={(type) => handleCloseModal(type)}
                     />
                 </Modal>
-
             </div>
-
         </div>
     )
 }

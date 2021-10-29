@@ -118,7 +118,6 @@ const CreatePreferences = (props) => {
     }
 
     const validateFormData = (formData) => {
-        console.log(formData)
         if(!formData) return false;
 
         if(
@@ -147,10 +146,7 @@ const CreatePreferences = (props) => {
     const handleFormSubmit = async () => {
         if (!validateFormData(formData)) return;
         const req = requestObject();
-        console.log(initialData)
-
         if (initialData.saveName || initialData.preferenceName ) {
-            console.log(initialData)
             if(initialData.id){
                 req.preferenceId = initialData.id;
             }
