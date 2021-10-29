@@ -37,7 +37,7 @@ const CreatePreferences = (props) => {
     const [name, setName] = useState(props.loadFormData.preferenceName);
     const [defaultVal, setDefaultVal] = useState(false);
     const [formData, setFormData] = useState({ ...initialData });
-    const [errorStatus, setErrorStatus] = useState({error: true, message: "Please fill up the form!"});
+    const [errorStatus, setErrorStatus] = useState((initialData.saveName || initialData.preferenceName )?{error: false, message: ""}:{error: true, message: "Please fill up the form!"});
 
     const treatments = useSelector(state=> state.labels.treatments);
     const medicalConditions = useSelector(state=> state.labels.medicalConditions);
@@ -123,11 +123,11 @@ const CreatePreferences = (props) => {
 
         if(
             formData.groupBy 
-            // && (
-            //     formData.groupBy ==='cohort'? 
-            //     (formData.cohorts && Object.keys(formData.cohorts).map(e=> Number(formData.cohorts[e])).reduce((p,c)=> p+c) > 0): 
-            //     (formData.payType && Object.keys(formData.payerType).map(e=> Number(formData.payerType[e])).reduce((p,c)=> p+c) > 0)
-            // ) 
+             && (
+                 formData.groupBy ==='cohort'? 
+                 (formData.cohorts && Object.keys(formData.cohorts).map(e=> Number(formData.cohorts[e])).reduce((p,c)=> p+c) > 0): 
+                 (formData.payType && Object.keys(formData.payType).map(e=> Number(formData.payType[e])).reduce((p,c)=> p+c) > 0)
+             ) 
             &&
             /*formData.treatmentsAND.length !== 0 && formData.treatmentsOR.length !== 0 && 
             formData.medicalConditionsAND.length !== 0 && formData.medicalConditionsOR.length !== 0 &&*/

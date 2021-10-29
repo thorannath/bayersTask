@@ -101,7 +101,7 @@ const ViewPreferences = (props) => {
                     <TableHead>
                         <TableRow>
                             <TableCell>Preference Name</TableCell>
-                            <TableCell>Default</TableCell>
+                            <TableCell>Created at</TableCell>
                             <TableCell align="center">Actions</TableCell>
                         </TableRow>
                     </TableHead>

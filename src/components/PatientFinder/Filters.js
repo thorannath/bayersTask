@@ -67,8 +67,8 @@ export const Filters = (props) => {
   const payerType = constants.Paytype;
   const patientCohort = constants.Patient_Cohort;
 
-  const states = constants.States.map(data => {
-    return { value: data, label: data }
+  const states = Object.keys(constants.States).map(key => {
+    return { value: constants.States[key], label: key}
   });
 
   const onChangeGroup = (event) => {
@@ -101,6 +101,7 @@ export const Filters = (props) => {
   const onChangeStates = (event) => {
     let formVal = {...formData};
     let statesData = event.map((data) => data.value);
+    console.log(statesData);
     formVal.states = states.filter(data=> statesData.includes(data.value)) 
     validateAndSend(formVal);
   }
