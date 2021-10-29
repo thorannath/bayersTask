@@ -15,8 +15,15 @@ import ListItemText from '@mui/material/ListItemText';
 import { useLocation } from 'react-router-dom';
 import * as constants from '../../Constant';
 import { Link } from 'react-router-dom';
+import AddCircleIcon from '@mui/icons-material/AddCircle';
+import BookmarksIcon from '@mui/icons-material/Bookmarks';
+import { showModal } from '../../store/modals';
+import { useDispatch } from 'react-redux';
+
 
 const Header = () => {
+    const dispatch = useDispatch();
+
     const history = useHistory();
     const [anchorEl, setAnchorEl] = useState(null);
     const open = Boolean(anchorEl);
@@ -42,6 +49,15 @@ const Header = () => {
         if (location.pathname === route) return 'menu-item btn-active';
         return 'menu-item';
     }
+
+    const showCreatePreference = () =>{
+        dispatch(showModal({messageType:constants.MESSAGE_TYPES.CREATE_PREFERENCE, action:'open'}));
+    }
+
+    const showViewPreference = () =>{
+        dispatch(showModal({messageType:constants.MESSAGE_TYPES.VIEW_PREFERECNE, action:'open'}));
+    }
+    
 
     return (
 
@@ -92,9 +108,22 @@ const Header = () => {
                     anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
                 >
                     <MenuItem>
-                        <Avatar /> Profile
+                        <Avatar/> Profile
                     </MenuItem>
-                    <Divider />
+                    <Divider/>
+                    <MenuItem onClick={showCreatePreference}>
+                        <ListItemIcon>
+                            <AddCircleIcon fontSize="small"/>
+                        </ListItemIcon>
+                        Create Preference
+                    </MenuItem>
+                    <MenuItem onClick={showViewPreference}>
+                        <ListItemIcon>
+                            <BookmarksIcon fontSize="small"/>
+                        </ListItemIcon>
+                         View Preferences
+                    </MenuItem>
+                    <Divider/>
                     <MenuItem>
                         <ListItemIcon>
                             <Settings fontSize="small" />

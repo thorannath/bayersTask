@@ -67,6 +67,13 @@ const SidebarFilters = (props) => {
     const preferences = useSelector(state => state.preferences.preferences.map(data => { return { value: data.id, label: data.saveName } }));
     const defaultPreferenceId = useSelector(state => state.preferences.defaultPreferenceId);
 
+    const treatment = useSelector(state => state.labels.treatments).map(data => {
+        return { value: data.label_val, label: data.name }
+    });
+    const medicalCondition = useSelector(state => state.labels.medicalConditions).map(data => {
+        return { value: data.label_val, label: data.name }
+    });
+
     const [defaultPreference, setDefaultPreference] = useState({ value: '', label: '' });
 
     useEffect(() => {
@@ -174,6 +181,32 @@ const SidebarFilters = (props) => {
         }
     }
 
+    const onChangeTreatment = (event, logic) => {
+        let treatments = event.map(data => data.value);
+        let formVal = { ...formData };
+        if (logic === constants.Logic.AND) {
+            formVal.treatmentsAND = treatment.filter(data => treatments.includes(data.value));
+
+        }
+        else if (logic === constants.Logic.OR) {
+            formVal.treatmentsOR = treatment.filter(data => treatments.includes(data.value));
+
+        }
+        setFormData({ ...formVal });
+    }
+
+    const onChangeMedicalCondition = (event, logic) => {
+        let medicalConditions = event.map(data => data.value);
+        let formVal = { ...formData };
+        if (logic === constants.Logic.AND) {
+            formVal.medicalConditionsAND = medicalCondition.filter(data => medicalConditions.includes(data.value));
+        }
+        else if (logic === constants.Logic.OR) {
+            formVal.medicalConditionsOR = medicalCondition.filter(data => medicalConditions.includes(data.value));
+        }
+        setFormData({ ...formVal });
+    }
+
     return (
         <div className="sidebar">
             <h3> Patient Finder Definition</h3>
@@ -189,14 +222,9 @@ const SidebarFilters = (props) => {
                     onChange={(e) => onChangePreference(e)}
                     classNamePrefix="select" />
             </FormGroup>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', columnGap: '40px', marginTop: '20px' }}>
-                <Button color="warning" variant="contained" onClick={props.onCreatePreference}><AddCircleIcon fontSize="small"/> Create </Button>
-                <Button color="info" variant="contained" onClick={props.onViewPreference}><BookmarksIcon fontSize="small"/> View </Button>
-            </div>
-
             <FormGroup className="formGroup">
                 <FormLabel>Group By <InfoOutlinedIcon fontSize="small" color="primary" /></FormLabel>
-                <RadioGroup
+                <RadioGroup row
                     value={formData.groupBy}
                     onClick={onChangeGroup}
                     name="radio-buttons-group">
@@ -221,7 +249,57 @@ const SidebarFilters = (props) => {
                     classNamePrefix="select" />
             </FormGroup>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', columnGap: '30px', marginTop: '20px', marginBottom:'20px' }}>
+            <FormGroup>
+                <FormLabel component="legend">Treatment with AND</FormLabel>
+                <Select
+                    isMulti
+                    name="treatmentAND"
+                    value={formData.treatmentsAND}
+                    styles={customStyles}
+                    options={treatment}
+                    onChange={(e) => onChangeTreatment(e, constants.Logic.AND)}
+                    classNamePrefix="select"
+                />
+            </FormGroup>
+            <FormGroup>
+                <FormLabel component="legend">Treatment with OR</FormLabel>
+                <Select
+                    isMulti
+                    name="treatmentOR"
+                    value={formData.treatmentsOR}
+                    styles={customStyles}
+                    options={treatment}
+                    onChange={(e) => onChangeTreatment(e, constants.Logic.OR)}
+                    classNamePrefix="select"
+                />
+            </FormGroup>
+
+            <FormGroup className="">
+                <FormLabel component="legend">Medical Conditions with AND</FormLabel>
+                <Select
+                    isMulti
+                    name="colors"
+                    value={formData.medicalConditionsAND}
+                    styles={customStyles}
+                    options={medicalCondition}
+                    onChange={(e) => onChangeMedicalCondition(e, constants.Logic.AND)}
+                    classNamePrefix="select"
+                />
+            </FormGroup>
+            <FormGroup className="">
+                <FormLabel component="legend">Medical Condtions with OR</FormLabel>
+                <Select
+                    isMulti
+                    name="colors"
+                    value={formData.medicalConditionsOR}
+                    styles={customStyles}
+                    options={medicalCondition}
+                    onChange={(e) => onChangeMedicalCondition(e, constants.Logic.OR)}
+                    classNamePrefix="select"
+                />
+            </FormGroup>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', columnGap: '30px', marginTop: '20px', marginBottom: '20px' }}>
                 <Button color="primary" variant="contained" type="submit" onClick={props.onUpdateChart}> Update </Button>
                 <Button color="warning" variant="outlined" onClick={props.onResetChart}> Reset </Button>
             </div>

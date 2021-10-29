@@ -38,6 +38,8 @@ const CreatePreferences = (props) => {
 
     const treatments = useSelector(state=> state.labels.treatments);
     const medicalConditions = useSelector(state=> state.labels.medicalConditions);
+    const modalStatus = useSelector(state=> state.modals);
+
 
     const defaultPreferenceId = useSelector(state => state.preferences.defaultPreferenceId);
  

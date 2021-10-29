@@ -67,6 +67,40 @@ const PatientFinder = () => {
     const medicalConditions = useSelector(state => state.labels.medicalConditions);
     const preferences = useSelector(state => state.preferences.preferences);
 
+    const modalStatus = useSelector(state=> state.modals);
+    
+    useEffect(() => {
+        switch(modalStatus.messageType){
+            case constants.MESSAGE_TYPES.CREATE_PREFERENCE:
+                if(modalStatus.action === 'open'){
+                    setLoadFormData({ ...initialData });
+                    setOpenCreateModal(true)
+                }
+                else{
+                    setOpenCreateModal(false)
+                }
+                break;
+            case constants.MESSAGE_TYPES.VIEW_PREFERECNE: 
+                if(modalStatus.action === 'open'){
+                    setOpenViewModal(true)
+                }
+                else{
+                    setOpenViewModal(false)
+                }
+                break;
+            case constants.MESSAGE_TYPES.EDIT_PREFERENCE:
+                if(modalStatus.action === 'open'){
+                    let data = loadPreferenceForm(modalStatus.data.id);
+                    setLoadFormData({ ...data })
+                    setOpenCreateModal(true)
+                }
+                else{
+                    setOpenViewModal(false)
+                }
+                break
+            }
+    }, [modalStatus])
+
     const treatment = useSelector(state => state.labels.treatments).map(data => {
         return { value: data.label_val, label: data.name }
     });
@@ -111,20 +145,10 @@ const PatientFinder = () => {
     const [formData, setFormData] = useState({ ...initialData });
 
     const handleOpenModal = (res) => {
-        if (res.type === 'create') {
-            setLoadFormData({ ...initialData });
-            setOpenCreateModal(true)
-        }
-        else {
             setOpenViewModal(true)
-        }
     };
 
     const handleCloseModal = (res) => {
-        if (res.type === 'create') {
-            setOpenCreateModal(false)
-        }
-        else {
             if (res.action === 'edit') {
                 let data = loadPreferenceForm(res.data.id);
                 setLoadFormData({ ...data })
@@ -135,7 +159,6 @@ const PatientFinder = () => {
                 setFormData({ ...data });
             }
             setOpenViewModal(false)
-        }
     };
 
     const loadPreferenceForm = useCallback((id) => {
@@ -223,12 +246,10 @@ const PatientFinder = () => {
     const requestObject = () => {
         const groupKeys = (formData.groupBy === constants.groupType.Cohort) ? formData.cohorts : formData.payType;
         const treatmentLabels = treatmentsSelected.map(data => {
-
             let treatment = treatments.find(val => val.label_val == data.value);
             if (treatment) return treatment.label;
         });
         const medicalConditionLabels = medicalConditionsSelected.map((data) => {
-
             let medicalCondition = medicalConditions.find(val => val.label_val == data.value);
             if (medicalCondition) return medicalCondition.label;
         });
@@ -317,32 +338,6 @@ const PatientFinder = () => {
         </div>
     );
 
-    const onChangeTreatment = (event, logic) => {
-        let treatments = event.map(data => data.value);
-        let formVal = { ...formData };
-        if (logic === constants.Logic.AND) {
-            formVal.treatmentsAND = treatment.filter(data => treatments.includes(data.value));
-
-        }
-        else if (logic === constants.Logic.OR) {
-            formVal.treatmentsOR = treatment.filter(data => treatments.includes(data.value));
-
-        }
-        setFormData({ ...formVal });
-    }
-
-    const onChangeMedicalCondition = (event, logic) => {
-        let medicalConditions = event.map(data => data.value);
-        let formVal = { ...formData };
-        if (logic === constants.Logic.AND) {
-            formVal.medicalConditionsAND = medicalCondition.filter(data => medicalConditions.includes(data.value));
-        }
-        else if (logic === constants.Logic.OR) {
-            formVal.medicalConditionsOR = medicalCondition.filter(data => medicalConditions.includes(data.value));
-        }
-        setFormData({ ...formVal });
-    }
-
     const onChangeTreatmentSelected = (event) => {
         let res = event.map(data => data.value);
         let treatments = treatment.filter(data => res.includes(data.value));
@@ -362,39 +357,10 @@ const PatientFinder = () => {
                 onChangeFormData={setFormData}
                 onUpdateChart={handleClick}
                 onResetChart={handleReset}
-                onCreatePreference={() => { handleOpenModal({ type: 'create' }) }}
-                onViewPreference={() => { handleOpenModal({ type: 'view' }) }}
                 onChangePreference={(id) => handlePreferenceChange(id)}
                 onTakeScreenshot={takeScreenshot}/>
             <div className="main">
                 {treatmentsChartComponent}
-
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', columnGap: '30px' }}>
-                    <FormGroup>
-                        <FormLabel component="legend">Treatment with AND</FormLabel>
-                        <Select
-                            isMulti
-                            name="treatmentAND"
-                            value={formData.treatmentsAND}
-                            styles={customStyles}
-                            options={treatment}
-                            onChange={(e) => onChangeTreatment(e, constants.Logic.AND)}
-                            classNamePrefix="select"
-                        />
-                    </FormGroup>
-                    <FormGroup>
-                        <FormLabel component="legend">Treatment with OR</FormLabel>
-                        <Select
-                            isMulti
-                            name="treatmentOR"
-                            value={formData.treatmentsOR}
-                            styles={customStyles}
-                            options={treatment}
-                            onChange={(e) => onChangeTreatment(e, constants.Logic.OR)}
-                            classNamePrefix="select"
-                        />
-                    </FormGroup>
-                </div>
                 <FormGroup className="">
                     <FormLabel component="legend">Select Focus Labels</FormLabel>
                     <Select
@@ -407,36 +373,7 @@ const PatientFinder = () => {
                         classNamePrefix="select"
                     />
                 </FormGroup>
-                <hr />
                 {medicalChartComponent}
-
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', columnGap: '30px' }}>
-                    <FormGroup className="">
-                        <FormLabel component="legend">Medical Conditions with AND</FormLabel>
-                        <Select
-                            isMulti
-                            name="colors"
-                            value={formData.medicalConditionsAND}
-                            styles={customStyles}
-                            options={medicalCondition}
-                            onChange={(e) => onChangeMedicalCondition(e, constants.Logic.AND)}
-                            classNamePrefix="select"
-                        />
-                    </FormGroup>
-                    <FormGroup className="">
-                        <FormLabel component="legend">Medical Condtions with OR</FormLabel>
-                        <Select
-                            isMulti
-                            name="colors"
-                            value={formData.medicalConditionsOR}
-                            styles={customStyles}
-                            options={medicalCondition}
-                            onChange={(e) => onChangeMedicalCondition(e, constants.Logic.OR)}
-                            classNamePrefix="select"
-                        />
-                    </FormGroup>
-                </div>
-
                 <FormGroup className="">
                     <FormLabel component="legend">Select Focus Labels</FormLabel>
                     <Select

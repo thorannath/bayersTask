@@ -67,3 +67,11 @@ export const loadTreatmentsToStore = (state, treatments) =>{
 export const loadMedicalConditionsToStore = (state, medicalConditions) =>{
     return {...state, medicalConditions};
 }
+
+export const onShowModals = (state, payload) =>{
+    return {...state, messageType:payload.messageType, action:payload.action, data:payload.data}
+}
+
+export const onCloseModals = (state, payload) =>{
+    return {...state, messageType:payload.messageType, action:payload.action, data:payload.data}
+}

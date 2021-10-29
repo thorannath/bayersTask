@@ -13,6 +13,11 @@ export const groupBy = {
     PAY_TYPE:'paytyp'
 }
 
+export const MESSAGE_TYPES = {
+    CREATE_PREFERENCE:'CREATE_PREFERENCE',
+    VIEW_PREFERECNE:'VIEW_PREFERECNE',
+    EDIT_PREFERENCE:'EDIT_PREFERENCE'
+}
 
 export const Logic = {
     AND:'AND',
@@ -31,11 +36,6 @@ export const routes = {
     Dashboard: '/app/dashboard',
     Patient_Finder: '/app/patient-finder',
     Home:'/app/home',
-}
-
-export const messageTypes = {
-    SUCCESS:'success',
-    ERROR:'error'
 }
 
 export const States = [
