@@ -20,7 +20,7 @@ const reducer = (state = { messageType:'', action:'', data:''}, action) => {
     switch (action.type) {
       case SHOW_MODAL:
         return onCloseModals(state, action.payload);
-    case SHOW_MODAL:
+    case CLOSE_MODAL:
         return onShowModals(state, action.payload);
     default:
         return state;

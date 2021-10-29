@@ -15,6 +15,12 @@
     padding:10px;
 }
 
+.sidebar-content{
+    height: 80%;
+    width: auto;
+    overflow-y: scroll;
+}
+
 .main{
     width: 80%;
     margin-left: auto;
@@ -67,4 +73,5 @@
 
 .formGroup{
    padding-top: 15px;
+   width: 100%;
 }

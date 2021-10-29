@@ -71,10 +71,11 @@ const ViewPreferences = (props) => {
     }
 
     const openSettings = (row) => {
-        dispatch(showModal({messageType:constants.MESSAGE_TYPES.EDIT_PREFERENCE, action:'open', data:{id:row.id}}))
+        dispatch(showModal({messageType:constants.MESSAGE_TYPES.VIEW_PREFERECNE, action:'close', data:{id:row.id}}))
     }
 
     const editSettings = (row) => {
+        dispatch(showModal({messageType:constants.MESSAGE_TYPES.VIEW_PREFERECNE, action:'close'}))
         dispatch(showModal({messageType:constants.MESSAGE_TYPES.EDIT_PREFERENCE, action:'open', data:{id:row.id}}))
     }
 

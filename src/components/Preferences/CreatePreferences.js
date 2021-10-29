@@ -13,6 +13,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { addPreference, updatePreference } from '../../store/utils/thunkCreators';
 import { useEffect } from 'react';
 import { validateName } from '../common/validation';
+import { closeModal, showModal } from '../../store/modals';
 
 
 const style = {
@@ -21,12 +22,12 @@ const style = {
     left: '50%',
     transform: 'translate(-50%, -50%)',
     overflowY: 'scroll',
-    width: '50%',
-    height: '90%',
+    width: '40%',
+    height: '75%',
     borderRadius: 2,
     bgcolor: 'background.paper',
     boxShadow: 24,
-    p: 3,
+    p: 2,
 };
 
 const CreatePreferences = (props) => {
@@ -41,8 +42,22 @@ const CreatePreferences = (props) => {
     const treatments = useSelector(state=> state.labels.treatments);
     const medicalConditions = useSelector(state=> state.labels.medicalConditions);
     const modalStatus = useSelector(state=> state.modals);
+    const preferences = useSelector(state=> state.preferences.preferences);
 
 
+    useEffect(() => {
+        switch(modalStatus.messageType){
+            case constants.MESSAGE_TYPES.EDIT_PREFERENCE:
+                if(modalStatus.action === 'open'){
+                    let preference = preferences.find(val=> val.id === modalStatus.data.id);
+                    initialData.id = preference.id;
+                    initialData.saveName = preference.preferenceName;
+                }
+                break;
+            default:
+                break;
+        }
+    }, [modalStatus])
     const defaultPreferenceId = useSelector(state => state.preferences.defaultPreferenceId);
     const messageBoxId = 'create-preference-message';
  
@@ -65,7 +80,6 @@ const CreatePreferences = (props) => {
         }else{
             document.getElementById(messageBoxId).style.visibility = "hidden";
         }
-
         setName(event.target.value);
     }
 
@@ -104,12 +118,17 @@ const CreatePreferences = (props) => {
     }
 
     const validateFormData = (formData) => {
+        console.log(formData)
+        if(!formData) return false;
+
         if(
-            formData.groupBy && (
-                formData.groupBy==='cohort'? 
-                (formData.cohorts && Object.keys(formData.cohorts).map(e=> Number(formData.cohorts[e])).reduce((p,c)=> p+c) > 0): 
-                (formData.payType && Object.keys(formData.payerType).map(e=> Number(formData.payerType[e])).reduce((p,c)=> p+c) > 0)
-            ) &&
+            formData.groupBy 
+            // && (
+            //     formData.groupBy ==='cohort'? 
+            //     (formData.cohorts && Object.keys(formData.cohorts).map(e=> Number(formData.cohorts[e])).reduce((p,c)=> p+c) > 0): 
+            //     (formData.payType && Object.keys(formData.payerType).map(e=> Number(formData.payerType[e])).reduce((p,c)=> p+c) > 0)
+            // ) 
+            &&
             /*formData.treatmentsAND.length !== 0 && formData.treatmentsOR.length !== 0 && 
             formData.medicalConditionsAND.length !== 0 && formData.medicalConditionsOR.length !== 0 &&*/
             !errorStatus.error
@@ -120,14 +139,24 @@ const CreatePreferences = (props) => {
         document.getElementById(messageBoxId).firstElementChild.textContent = (errorStatus.message!=="")?errorStatus.message:"Please fill up all required.";
         document.getElementById(messageBoxId).style.visibility = "visible";
         return false;
+
+        return false;
     };
 
 
     const handleFormSubmit = async () => {
         if (!validateFormData(formData)) return;
         const req = requestObject();
-        if (initialData.saveName) {
-            req.preferenceId = initialData.id;
+        console.log(initialData)
+
+        if (initialData.saveName || initialData.preferenceName ) {
+            console.log(initialData)
+            if(initialData.id){
+                req.preferenceId = initialData.id;
+            }
+            if(initialData.preferenceId){
+                req.preferenceId = initialData.preferenceId; 
+            }
             // if(response.success){
             //     props.closeModal({type:'create', action:'add', success:true, message:'Preference Edited sucessfully' });
             // }
@@ -136,8 +165,7 @@ const CreatePreferences = (props) => {
             // }
             dispatch(updatePreference(req));
             if (!loader.isLoading) {
-                props.closeModal({ type: 'create', action: 'add', success: true, message: 'Preference Edited sucessfully' });
-
+                dispatch(closeModal({messageType:constants.MESSAGE_TYPES.CREATE_PREFERENCE, action:'close'}))
                 // if (response.success) {
                 // }
                 // else {
@@ -148,8 +176,7 @@ const CreatePreferences = (props) => {
         else {
             dispatch(addPreference(req));
             if (!loader.isLoading) {
-                props.closeModal({type:'create', action:'add', success:true, message:'Preference Added sucessfully' });
-
+                dispatch(closeModal({messageType:constants.MESSAGE_TYPES.CREATE_PREFERENCE, action:'close'}))
                 // if(response.success){
                 // }
                 // else{
@@ -161,7 +188,7 @@ const CreatePreferences = (props) => {
     }
 
     const handleCancel = () => {
-        props.closeModal({ type: 'create', action: 'close' });
+        dispatch(closeModal({messageType:constants.MESSAGE_TYPES.CREATE_PREFERENCE, action:'close'}));
     }
 
     return (

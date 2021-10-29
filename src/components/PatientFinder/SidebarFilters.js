@@ -60,6 +60,10 @@ const customStyles = {
 const SidebarFilters = (props) => {
 
     useEffect(() => {
+        if(props.formData.preferenceId){
+           console.log(props.formData) 
+           setDefaultPreference({value:props.formData.preferenceId, label:props.formData.preferenceName});
+        }
         setFormData(props.formData);
     }, [props.formData]);
 
@@ -106,6 +110,7 @@ const SidebarFilters = (props) => {
     }
 
     const onChangePreference = (event) => {
+        if(!event) return;
         setDefaultPreference(event);
         props.onChangePreference(event.value);
     };
@@ -209,6 +214,7 @@ const SidebarFilters = (props) => {
 
     return (
         <div className="sidebar">
+            <div className="sidebar-content">
             <div id="sidebar-message" style={{visibility: "hidden"}}>
                 <p>Message</p>
             </div>
@@ -307,6 +313,8 @@ const SidebarFilters = (props) => {
                 <Button color="warning" variant="outlined" onClick={props.onResetChart}> Reset </Button>
             </div>
             <Button color="info" fullWidth variant="contained" onClick={props.onTakeScreenshot}> Take Screenshot </Button>
+
+            </div>
         </div>
     )
 }

@@ -85,11 +85,16 @@ const PatientFinder = () => {
                     setOpenViewModal(true)
                 }
                 else{
+                    if(modalStatus.data?.id){
+                        let data = loadPreferenceForm(modalStatus.data.id);
+                        setFormData({ ...data });
+                    }
                     setOpenViewModal(false)
                 }
                 break;
             case constants.MESSAGE_TYPES.EDIT_PREFERENCE:
                 if(modalStatus.action === 'open'){
+                    setOpenViewModal(false);
                     let data = loadPreferenceForm(modalStatus.data.id);
                     setLoadFormData({ ...data })
                     setOpenCreateModal(true)
@@ -144,9 +149,6 @@ const PatientFinder = () => {
     const [loadFormData, setLoadFormData] = useState({ ...initialData });
     const [formData, setFormData] = useState({ ...initialData });
 
-    const handleOpenModal = (res) => {
-            setOpenViewModal(true)
-    };
 
     const handleCloseModal = (res) => {
             if (res.action === 'edit') {
@@ -380,7 +382,7 @@ const PatientFinder = () => {
                         name="selectLabels"
                         value={medicalConditionsSelected}
                         styles={customStyles}
-                        options={treatment}
+                        options={medicalCondition}
                         onChange={onChangeMedicalConditionsSelected}
                         classNamePrefix="select"
                     />

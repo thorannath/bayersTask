@@ -16,12 +16,14 @@ export const addPreferenceToStore = (state, payload) =>{
 }
 
 export const editPreferenceToStore = (state, payload) =>{
-    payload.preference = state.preference.find(data=> data.id === payload.preference.id);
+    let preference = state.preferences.find(data=> data.id === payload.preference.id);
+
+    preference = payload.preference;
     if(payload.defaultPreferenceId){
         let defaultPreferenceId =payload.defaultPreferenceId;
         return {...state, defaultPreferenceId};
     }
-    return {...state};
+    return {...state, preferences:state.preferences};
 }
 
 export const deletePreferenceToStore = (state, preferenceId) =>{
