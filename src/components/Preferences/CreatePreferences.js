@@ -12,6 +12,7 @@ import * as constants from '../../Constant';
 import { useSelector, useDispatch } from 'react-redux';
 import { addPreference, updatePreference } from '../../store/utils/thunkCreators';
 import { useEffect } from 'react';
+import { validateName } from '../common/validation';
 
 
 const style = {
@@ -35,6 +36,7 @@ const CreatePreferences = (props) => {
     const [name, setName] = useState(props.loadFormData.preferenceName);
     const [defaultVal, setDefaultVal] = useState(false);
     const [formData, setFormData] = useState({ ...initialData });
+    const [errorStatus, setErrorStatus] = useState({error: true, message: "Please fill up the form!"});
 
     const treatments = useSelector(state=> state.labels.treatments);
     const medicalConditions = useSelector(state=> state.labels.medicalConditions);
@@ -42,6 +44,7 @@ const CreatePreferences = (props) => {
 
 
     const defaultPreferenceId = useSelector(state => state.preferences.defaultPreferenceId);
+    const messageBoxId = 'create-preference-message';
  
     useEffect(() => {
         let defaultVal = (defaultPreferenceId === initialData.id)?true:false;
@@ -52,6 +55,17 @@ const CreatePreferences = (props) => {
     const loader = useSelector(state => state.loader);
 
     const handleName = (event) => {
+        
+        /* Name Validation Checking */
+        const errorStat = validateName(event.target.value);
+        setErrorStatus(errorStat);
+        if(errorStat.error){
+            document.getElementById(messageBoxId).firstElementChild.textContent = errorStat.message;
+            document.getElementById(messageBoxId).style.visibility = "visible";
+        }else{
+            document.getElementById(messageBoxId).style.visibility = "hidden";
+        }
+
         setName(event.target.value);
     }
 
@@ -90,9 +104,21 @@ const CreatePreferences = (props) => {
     }
 
     const validateFormData = (formData) => {
-        if (formData.groupBy && formData.treatmentsAND.length !== 0 && formData.treatmentsOR.length !== 0 && formData.medicalConditionsAND.length !== 0 && formData.medicalConditionsOR.length !== 0) {
+        if(
+            formData.groupBy && (
+                formData.groupBy==='cohort'? 
+                (formData.cohorts && Object.keys(formData.cohorts).map(e=> Number(formData.cohorts[e])).reduce((p,c)=> p+c) > 0): 
+                (formData.payType && Object.keys(formData.payerType).map(e=> Number(formData.payerType[e])).reduce((p,c)=> p+c) > 0)
+            ) &&
+            /*formData.treatmentsAND.length !== 0 && formData.treatmentsOR.length !== 0 && 
+            formData.medicalConditionsAND.length !== 0 && formData.medicalConditionsOR.length !== 0 &&*/
+            !errorStatus.error
+        ) {
+            setName(name.trim());
             return true;
         }
+        document.getElementById(messageBoxId).firstElementChild.textContent = (errorStatus.message!=="")?errorStatus.message:"Please fill up all required.";
+        document.getElementById(messageBoxId).style.visibility = "visible";
         return false;
     };
 
@@ -144,8 +170,10 @@ const CreatePreferences = (props) => {
                 <div align="right">
                     <Button type="submit" onClick={handleCancel}><CloseIcon /></Button>
                 </div>
+                <div id="create-preference-message">
+                    <p> Message </p>
+                </div>
                 <h2> Create a Preference </h2>
-                {/* TODO: Create Form Validation for Preference name. More validations inside Filters component */}
                 <FormGroup className="form-group">
                     <TextField
                         id="standard-basic"
