@@ -4,11 +4,25 @@
 }
 
 .modal-header{
-    padding-left: 30px;
-    padding-top: 5px;
-    border-bottom: 1px solid gray;
-    display: grid;
-    grid-template-columns: 4fr 1fr;
+    display: flex;
+    align-items: center;
+    padding: 10px 20px;
+    background-color: royalblue;
+    color: whitesmoke;
+    border-bottom: 1px solid rgb(169, 169, 169);
+}
+
+.modal-close{
+    margin-left: auto;
+}
+
+.modal-footer{
+    display: flex;
+    padding: 15px;
+    background-color: whitesmoke;
+    border-top: 1px solid rgb(169, 169, 169);
+    justify-content:flex-end;
+    align-items: center;
 }
 
 .form{

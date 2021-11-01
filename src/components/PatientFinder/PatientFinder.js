@@ -1,13 +1,9 @@
 import React from 'react'
 import './PatientFinder.css';
 import Graph from './Graph';
-import Filters from './Filters';
 import axios from 'axios'
 import { useState, useEffect, useCallback } from 'react';
 import * as constants from '../../Constant';
-import Cookies from 'js-cookie';
-import Button from '@mui/material/Button';
-import Stack from '@mui/material/Stack';
 import Backdrop from '@mui/material/Backdrop';
 import Modal from '@mui/material/Modal';
 import ViewPreferences from '../Preferences/ViewPreferences';
@@ -20,6 +16,7 @@ import SidebarFilters from './SidebarFilters';
 import FormGroup from '@mui/material/FormGroup';
 import FormLabel from '@mui/material/FormLabel';
 import Select from 'react-select';
+import { showModal } from '../../store/modals';
 
 const customStyles = {
     menu: (provided, state) => ({
@@ -31,12 +28,12 @@ const customStyles = {
     option: (provided, state) => ({
         ...provided,
         padding: 8,
-        fontSize:'small',
+        fontSize: 'small',
     }),
     control: (control) => ({
         ...control,
         padding: 4,
-        fontSize:'small'
+        fontSize: 'small'
     }),
     singleValue: (provided, state) => {
         const opacity = state.isDisabled ? 0.5 : 1;
@@ -68,26 +65,25 @@ const PatientFinder = () => {
     const treatments = useSelector(state => state.labels.treatments);
     const medicalConditions = useSelector(state => state.labels.medicalConditions);
     const preferences = useSelector(state => state.preferences.preferences);
+    const modalStatus = useSelector(state => state.modals);
 
-    const modalStatus = useSelector(state=> state.modals);
-    
     useEffect(() => {
-        switch(modalStatus.messageType){
+        switch (modalStatus.messageType) {
             case constants.MESSAGE_TYPES.CREATE_PREFERENCE:
-                if(modalStatus.action === 'open'){
+                if (modalStatus.action === 'open') {
                     setLoadFormData({ ...initialData });
                     setOpenCreateModal(true)
                 }
-                else{
+                else {
                     setOpenCreateModal(false)
                 }
                 break;
-            case constants.MESSAGE_TYPES.VIEW_PREFERECNE: 
-                if(modalStatus.action === 'open'){
+            case constants.MESSAGE_TYPES.VIEW_PREFERECNE:
+                if (modalStatus.action === 'open') {
                     setOpenViewModal(true)
                 }
-                else{
-                    if(modalStatus.data?.id){
+                else {
+                    if (modalStatus.data?.id) {
                         let data = loadPreferenceForm(modalStatus.data.id);
                         setFormData({ ...data });
                     }
@@ -95,17 +91,16 @@ const PatientFinder = () => {
                 }
                 break;
             case constants.MESSAGE_TYPES.EDIT_PREFERENCE:
-                if(modalStatus.action === 'open'){
-                    setOpenViewModal(false);
+                if (modalStatus.action === 'open') {
                     let data = loadPreferenceForm(modalStatus.data.id);
                     setLoadFormData({ ...data })
                     setOpenCreateModal(true)
                 }
-                else{
+                else {
                     setOpenViewModal(false)
                 }
                 break
-            }
+        }
     }, [modalStatus])
 
     const treatment = useSelector(state => state.labels.treatments).map(data => {
@@ -129,8 +124,8 @@ const PatientFinder = () => {
         states: '',
         cohorts: { ckd: true, diab: true, both: true },
         payType: { MCR: true, COM: true },
-        treatmentSelected:treatment,
-        medicalConditionsSelected:medicalCondition,
+        treatmentSelected: treatment,
+        medicalConditionsSelected: medicalCondition,
         treatmentsOR: [],
         treatmentsAND: [],
         medicalConditionsAND: [],
@@ -153,16 +148,13 @@ const PatientFinder = () => {
 
 
     const handleCloseModal = (res) => {
-            if (res.action === 'edit') {
-                let data = loadPreferenceForm(res.data.id);
-                setLoadFormData({ ...data })
-                setOpenCreateModal(true)
-            }
-            else if (res.action === 'view') {
-                let data = loadPreferenceForm(res.data.id);
-                setFormData({ ...data });
-            }
-            setOpenViewModal(false)
+        if (res.action === 'edit') {
+            return dispatch(showModal({ messageType: constants.MESSAGE_TYPES.EDIT_PREFERENCE, action: 'open', data: { id: res.data.id } }));
+        }
+        else if (res.action === 'view') {
+            return dispatch(closeModal({ messageType: constants.MESSAGE_TYPES.VIEW_PREFERECNE, action: 'close', data: { id: res.data.id } }))
+        }
+        return dispatch(closeModal({ messageType: constants.MESSAGE_TYPES.VIEW_PREFERECNE, action: 'close' }))
     };
 
     const loadPreferenceForm = useCallback((id) => {
@@ -202,8 +194,8 @@ const PatientFinder = () => {
     const fetchGraphData = async () => {
         const request = requestObject();
 
-        if(!request) return;
-        
+        if (!request) return;
+
         request.userid = Cookies.get("userid", { path: '/' });
         request.authToken = Cookies.get('authToken', { path: '/' });
         const treatmentResponse = await axios.post('http://localhost:3000/patientfinder/treatments', request);
@@ -251,7 +243,7 @@ const PatientFinder = () => {
 
     const requestObject = () => {
 
-        if(formData.states.length == 0) return;
+        if (formData.states.length == 0) return;
         const groupKeys = (formData.groupBy === constants.groupType.Cohort) ? formData.cohorts : formData.payType;
         const treatmentLabels = treatmentsSelected.map(data => {
             let treatment = treatments.find(val => val.label_val == data.value);
@@ -311,7 +303,7 @@ const PatientFinder = () => {
             const pdf = new jsPdf("l", "mm", "a4");
             const width = pdf.internal.pageSize.getWidth();
             const height = pdf.internal.pageSize.getHeight();
-            pdf.addImage(imgData, "JPEG", 10, 20, width-10, height-20);
+            pdf.addImage(imgData, "JPEG", 10, 20, width - 10, height - 20);
             pdf.save(`medical-chart_${new Date().toISOString()}.pdf`);
         })/*.catch(err=>{
             console.log(err);
@@ -327,7 +319,7 @@ const PatientFinder = () => {
             const pdf = new jsPdf("l", "mm", "a4");
             const width = pdf.internal.pageSize.getWidth();
             const height = pdf.internal.pageSize.getHeight();
-            pdf.addImage(imgData, "JPEG", 10, 20, width-10, height-20);
+            pdf.addImage(imgData, "JPEG", 10, 20, width - 10, height - 20);
             pdf.save(`treatment-chart_${new Date().toISOString()}.pdf`);
         });
     };
@@ -366,7 +358,7 @@ const PatientFinder = () => {
                 onUpdateChart={handleClick}
                 onResetChart={handleReset}
                 onChangePreference={(id) => handlePreferenceChange(id)}
-                onTakeScreenshot={takeScreenshot}/>
+                onTakeScreenshot={takeScreenshot} />
             <div className="main">
                 {treatmentsChartComponent}
                 <FormGroup className="">

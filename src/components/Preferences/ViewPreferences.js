@@ -30,9 +30,10 @@ const style = {
     top: '50%',
     left: '50%',
     transform: 'translate(-50%, -50%)',
+    overflowY: 'scroll',
     width: '50%',
-    bgcolor: 'background.paper',
     borderRadius: 3,
+    bgcolor: 'background.paper',
     boxShadow: 24,
 };
 
@@ -48,7 +49,7 @@ const deleteModalstyle = {
 };
 
 
-const ViewPreferences = (props) => {
+const ViewPreferences = () => {
 
     const dispatch = useDispatch();
     const preferences = useSelector(state => state.preferences.preferences);
@@ -68,7 +69,7 @@ const ViewPreferences = (props) => {
     const [deletePreferenceData, setDeletePreferenceData] = useState({});
 
     const handleCancel = () => {
-        dispatch(showModal({ messageType: constants.MESSAGE_TYPES.VIEW_PREFERECNE, action: 'close' }))
+        dispatch(closeModal({ messageType: constants.MESSAGE_TYPES.VIEW_PREFERECNE, action: 'close' }))
     }
 
     const openSettings = (row) => {
@@ -96,8 +97,8 @@ const ViewPreferences = (props) => {
         <Box sx={style}>
             <div class="modal-header">
                 <Typography align="left" variant="h6"> Preferences </Typography>
-                <div align="right">
-                    <Button type="submit" onClick={handleCancel}><CloseIcon /></Button>
+                <div className="modal-close">
+                    <Button color="inherit" type="submit" onClick={handleCancel}><CloseIcon /></Button>
                 </div>
             </div>
             <TableContainer sx={{ padding: 2 }}>

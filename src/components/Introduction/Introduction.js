@@ -39,7 +39,7 @@ const Introduction = () => {
                 <ul>
                     <li>Cohort: T2D without CKD
                         <ul>
-                            <li>Inclusion: At least 1 diagnosis code for T2D in 2019</li>
+                            <li> Inclusion: At least 1 diagnosis code for T2D in 2019</li>
                             <li>Exclusion: &lt;18 years of age; diagnosis of CKD in 2019</li>
                         </ul>
 

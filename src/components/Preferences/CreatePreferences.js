@@ -24,7 +24,6 @@ const style = {
     transform: 'translate(-50%, -50%)',
     overflowY: 'scroll',
     width: '40%',
-    height: '75%',
     borderRadius: 3,
     bgcolor: 'background.paper',
     boxShadow: 24,
@@ -70,7 +69,6 @@ const CreatePreferences = (props) => {
     const loader = useSelector(state => state.loader);
 
     const handleName = (event) => {
-
         /* Name Validation Checking */
         const errorStat = validateName(event.target.value);
         setErrorStatus(errorStat);
@@ -128,8 +126,6 @@ const CreatePreferences = (props) => {
                     (formData.payType && Object.keys(formData.payType).map(e => Number(formData.payType[e])).reduce((p, c) => p + c) > 0)
             )
             &&
-            /*formData.treatmentsAND.length !== 0 && formData.treatmentsOR.length !== 0 && 
-            formData.medicalConditionsAND.length !== 0 && formData.medicalConditionsOR.length !== 0 &&*/
             !errorStatus.error
         ) {
             setName(name.trim());
@@ -137,8 +133,6 @@ const CreatePreferences = (props) => {
         }
         document.getElementById(messageBoxId).firstElementChild.textContent = (errorStatus.message !== "") ? errorStatus.message : "Please fill up all required.";
         document.getElementById(messageBoxId).style.visibility = "visible";
-        return false;
-
         return false;
     };
 
@@ -153,33 +147,16 @@ const CreatePreferences = (props) => {
             if (initialData.preferenceId) {
                 req.preferenceId = initialData.preferenceId;
             }
-            // if(response.success){
-            //     props.closeModal({type:'create', action:'add', success:true, message:'Preference Edited sucessfully' });
-            // }
-            // else{
-            //     props.closeModal({type:'create', action:'add', success:false, message:'Unable to add preference' });
-            // }
             dispatch(updatePreference(req));
             if (!loader.isLoading) {
                 dispatch(closeModal({ messageType: constants.MESSAGE_TYPES.CREATE_PREFERENCE, action: 'close' }))
-                // if (response.success) {
-                // }
-                // else {
-                //     props.closeModal({ type: 'create', action: 'add', success: false, message: 'Unable to edit preference' });
-                // }
             }
         }
         else {
             dispatch(addPreference(req));
             if (!loader.isLoading) {
                 dispatch(closeModal({ messageType: constants.MESSAGE_TYPES.CREATE_PREFERENCE, action: 'close' }))
-                // if(response.success){
-                // }
-                // else{
-                //     props.closeModal({type:'create', action:'add', success:false, message:'Unable to add preference' });
-                // }
             }
-
         }
     }
 
@@ -190,14 +167,14 @@ const CreatePreferences = (props) => {
     return (
         <div>
             <Box sx={style}>
-                <div class="modal-header">
+                <div className="modal-header">
                     <Typography align="left" variant="h6"> Create Preferences </Typography>
-                    <div align="right">
-                        <Button type="submit" onClick={handleCancel}><CloseIcon /></Button>
+                    <div className="modal-close">
+                        <Button type="submit" color="inherit" onClick={handleCancel}><CloseIcon /></Button>
                     </div>
                 </div>
-                <span id="create-preference-message"> Message </span>
                 <div class="form">
+                <span id="create-preference-message"> Message </span>
                     <FormGroup className="form-group">
                         <TextField
                             id="standard-basic"
@@ -213,10 +190,10 @@ const CreatePreferences = (props) => {
                     <FormGroup className="form-group">
                         <FormControlLabel control={<Checkbox checked={defaultVal} onChange={handleDefault} />} label="Make this as default" />
                     </FormGroup>
-                    <div align="right">
-                        <Button type="submit" sx={{ width: '25%' }} variant="contained" onClick={handleFormSubmit}>Save</Button>
-                        <Button type="submit" sx={{ width: '25%' }} color="warning" onClick={handleCancel}>Cancel</Button>
-                    </div>
+                </div>
+                <div className="modal-footer">
+                    <Button type="submit" sx={{ width: '25%' }} variant="contained" onClick={handleFormSubmit}>Save</Button>
+                    <Button type="submit" sx={{ width: '25%' }} color="warning" onClick={handleCancel}>Cancel</Button>
                 </div>
             </Box>
         </div>
