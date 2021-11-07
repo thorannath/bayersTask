@@ -3,7 +3,7 @@ import Authentication from './components/Authentication/Authentication';
 import { BrowserRouter, Route, Switch, Redirect } from 'react-router-dom';
 import Layout from './components/Layout/Layout';
 import { Provider } from "react-redux";
-import store from "./store";
+import store from "./store/index";
 
 function App() {
   return (

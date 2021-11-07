@@ -18,6 +18,11 @@ import FormLabel from '@mui/material/FormLabel';
 import Select from 'react-select';
 import { showModal, closeModal } from '../../store/modals';
 import Cookies from 'js-cookie';
+import GeoChart from './GeoChart';
+import data from "../../US_geo.json";
+import Patients from './Patients';
+
+// import GeoChart from './'
 
 const customStyles = {
     menu: (provided, state) => ({
@@ -67,6 +72,8 @@ const PatientFinder = () => {
     const medicalConditions = useSelector(state => state.labels.medicalConditions);
     const preferences = useSelector(state => state.preferences.preferences);
     const modalStatus = useSelector(state => state.modals);
+
+    const [property, setProperty] = useState("pop_est");
 
     useEffect(() => {
         switch (modalStatus.messageType) {
@@ -362,7 +369,7 @@ const PatientFinder = () => {
                 onTakeScreenshot={takeScreenshot} />
             <div className="main">
                 {treatmentsChartComponent}
-                <FormGroup className="">
+                <FormGroup>
                     <FormLabel >Select Focus Labels</FormLabel>
                     <Select
                         isMulti
@@ -375,7 +382,7 @@ const PatientFinder = () => {
                     />
                 </FormGroup>
                 {medicalChartComponent}
-                <FormGroup className="">
+                <FormGroup>
                     <FormLabel >Select Focus Labels</FormLabel>
                     <Select
                         isMulti
@@ -387,6 +394,12 @@ const PatientFinder = () => {
                         classNamePrefix="select"
                     />
                 </FormGroup>
+{/*             TODO: Heatmap */}
+                <p> Handle Heat Map </p>
+                <div>
+                    <GeoChart data={data} property={property}/>
+
+                </div>
 
                 <Modal
                     open={openCreateModal}
@@ -413,6 +426,8 @@ const PatientFinder = () => {
                         closeModal={(type) => handleCloseModal(type)}
                     />
                 </Modal>
+
+                <Patients/>
             </div>
         </div>
     )
