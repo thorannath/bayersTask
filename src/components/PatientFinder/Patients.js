@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react'
+import React, { useRef, useEffect, useState } from 'react'
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
@@ -6,18 +6,25 @@ import Modal from '@mui/material/Modal';
 import * as constants from '../../Constant';
 import { useSelector, useDispatch } from 'react-redux';
 import { closeModal } from '../../store/modals';
+import CloseIcon from '@mui/icons-material/Close';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
 
 const style = {
     position: 'absolute',
     top: '50%',
     left: '50%',
     transform: 'translate(-50%, -50%)',
-    width: 400,
+    overflowY: 'scroll',
+    width: '50%',
+    borderRadius: 3,
     bgcolor: 'background.paper',
-    border: '2px solid #000',
     boxShadow: 24,
-    p: 4,
-  };
+};
 
 
 const Patients = () => {
@@ -25,10 +32,12 @@ const Patients = () => {
 
     const [open, setOpen] = React.useState(false);
     const handleOpen = () => setOpen(true);
-    const handleClose = () =>{
+    const handleClose = () => {
         // dispatch(closeModal({messageType: constants.MESSAGE_TYPES.VIEW_HEATMAP_PATIENTS, action: 'close'}));
         setOpen(false);
-    }  
+    }
+
+    const [stateSelected, setStateSelected] = useState()
 
     const modalStatus = useSelector(state => state.modals);
 
@@ -39,6 +48,7 @@ const Patients = () => {
                     // let preference = preferences.find(val => val.id === modalStatus.data.id);
                     // initialData.id = preference.id;
                     // initialData.saveName = preference.preferenceName;
+                    setStateSelected(modalStatus.data.name);
                     handleOpen();
                 }
                 else if (modalStatus.action === 'close') {
@@ -64,12 +74,42 @@ const Patients = () => {
                 aria-describedby="modal-modal-description"
             >
                 <Box sx={style}>
-                    <Typography id="modal-modal-title" variant="h6" component="h2">
-                        Text in a modal
-                    </Typography>
-                    <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-                        Duis mollis, est non commodo luctus, nisi erat porttitor ligula.
-                    </Typography>
+                    <div class="modal-header">
+                        <Typography align="left" variant="h6"> Preferences </Typography>
+                        <div className="modal-close">
+                            <Button color="inherit" type="submit" onClick={handleClose}><CloseIcon /></Button>
+                        </div>
+                    </div>
+                    <TableContainer sx={{ padding: 2 }}>
+                        <Table stickyHeader sx={{ minWidth: 650 }} size="small" aria-label="a dense table">
+                            <TableHead>
+                                <TableRow>
+                                    <TableCell>Patient ID</TableCell>
+                                    <TableCell align="center">Sex</TableCell>
+                                    <TableCell align="center">Race</TableCell>
+                                    <TableCell align="center">Age</TableCell>
+                                </TableRow>
+                            </TableHead>
+                            <TableBody>
+                                <TableRow
+                                    key="id"
+                                    sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+                                    <TableCell component="th" scope="row">
+                                       <p>112232</p>
+                                    </TableCell>
+                                    <TableCell component="th" align="center" scope="row">
+                                        <p>Male</p>
+                                    </TableCell>
+                                    <TableCell component="th" align="center" scope="row">
+                                        <p>Hispanic</p>
+                                    </TableCell>
+                                    <TableCell component="th" align="center" scope="row">
+                                        <p>45</p>
+                                    </TableCell>
+                                </TableRow>
+                            </TableBody>
+                        </Table>
+                    </TableContainer>
                 </Box>
             </Modal>
         </div>
