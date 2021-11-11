@@ -75,7 +75,7 @@ const Patients = () => {
             >
                 <Box sx={style}>
                     <div class="modal-header">
-                        <Typography align="left" variant="h6"> Preferences </Typography>
+                        <Typography align="left" variant="h6"> View Patients in {stateSelected}</Typography>
                         <div className="modal-close">
                             <Button color="inherit" type="submit" onClick={handleClose}><CloseIcon /></Button>
                         </div>

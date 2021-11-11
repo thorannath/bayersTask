@@ -50,8 +50,8 @@ const GeoChart = ({ data, property }) => {
             tooltip
             .style("opacity", 1)
             .html(`${d.properties.NAME}`)
-            .style("left", (event.pageX +20) + "px")
-            .style("top", (event.pageY) + "px")
+            .style("left", (event.pageX) + "px")
+            .style("top", (event.pageY-80) + "px")
 
             d3.selectAll(".states")
                 .transition()
@@ -59,6 +59,7 @@ const GeoChart = ({ data, property }) => {
             d3.select(this)
                 .transition()
                 .style("opacity", 0.5)
+                .style("cursor", "pointer")
         }
 
         let mouseLeave = function (d) {
@@ -94,8 +95,6 @@ const GeoChart = ({ data, property }) => {
             .style("stroke", "black")
             .on("mouseover", mouseOver)
             .on("mouseleave", mouseLeave)
-
-
     }, [data, property])
 
     return (

@@ -42,6 +42,7 @@ export const routes = {
     Introduction: '/app/introduction',
     Dashboard: '/app/dashboard',
     Patient_Finder: '/app/patient-finder',
+    Population_Overview:'/app/population-overview',
     Home:'/app/home',
 }
 
