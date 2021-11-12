@@ -339,15 +339,21 @@ const PatientFinder = () => {
     };
 
     const treatmentsChartComponent = (
-        <div id="treatment-chart">
+        <div id="treatment-chart" style={styles.section}>
             <h3> Treatment Chart </h3>
+            <div style={styles.infoBox}>
+                This figure displays the prevalence of specific medical conditions among the target patients. Please hover your cursor above the figure to view numeric values of results in the corresponding pop-up window. In the legend, click to select or unselect specific subgroups from display. Below the figure, select or unselect specific medical conditions to customize the display. Display groups can be presented by cohort (default) or by payor type.
+            </div>
             <Graph chartData={treatmentsChartData} />
         </div>
     );
 
     const medicalChartComponent = (
-        <div id="medical-chart">
+        <div id="medical-chart" style={styles.section}>
             <h3> Medical Conditions Chart </h3>
+            <div style={styles.infoBox}>
+                This figure displays the prevalence of specific medication use among the target patients. Please hover your cursor above the figure to view numeric values of results in the corresponding pop-up window. In the legend, click to select or unselect specific subgroups from display. Below the figure, select or unselect specific medication classes to customize the display. Display groups can be presented by cohort (default) or by payor type.
+            </div>
             <Graph chartData={medicalChartData} />
         </div>
     );
@@ -400,12 +406,15 @@ const PatientFinder = () => {
                         classNamePrefix="select"
                     />
                 </FormGroup>
-{/*             TODO: Heatmap */}
-                <p> Handle Heat Map </p>
-                <div>
+                <div style={styles.section}>
+                    <h3> Geographical Analysis </h3>
+                    <div style={styles.infoBox}>
+                        The presented geographical analysis displays the proportion of target patients among adult members in the Optum administrative claims dataset. You can hover your cursor above a specific state to view numeric values in the corresponding pop-up window.
+                        Please note that patients in Puerto Rico or Unknown geographical regions are not displayed in this figure.
+                    </div>
                     <GeoChart data={Object.assign(data,{stateData: stateData})} property={property}/>
-
                 </div>
+
 
                 <Modal
                     open={openCreateModal}
@@ -433,10 +442,28 @@ const PatientFinder = () => {
                     />
                 </Modal>
 
-                <Patients/>
+                <Patients />
             </div>
         </div>
     )
+}
+
+const styles = {
+    infoBox: {
+        backgroundColor: 'rgb(183,206,206, 0.5)',
+        padding: 12,
+        transparency: 0.5,
+        borderRadius: 5,
+        color: '#2B2118',
+        lineHeight: 1.4,
+        letterSpacing: 0.2,
+        fontSize: '15px'
+    },
+    section: {
+        borderTop: '2px dotted grey',
+        marginTop: '20px',
+        paddingTop: '20px'
+    },
 }
 
 export default PatientFinder;

@@ -140,17 +140,24 @@ const Header = () => {
             </nav>
             <nav className="sub-header">
                 <MenuList className="menu-list">
-                    <Link className="list-link" to="/app/introduction">
+                    <Link className="list-link" to={constants.routes.Introduction}>
                         <MenuItem className={isActive(constants.routes.Introduction)}>
                             <ListItemText disableTypography className='list-item-text'>
                                 Introduction
                             </ListItemText>
                         </MenuItem>
                     </Link>
-                    <Link className="list-link" to="/app/patient-finder">
+                    <Link className="list-link" to={constants.routes.Patient_Finder}>
                         <MenuItem className={isActive(constants.routes.Patient_Finder)}>
                             <ListItemText disableTypography className='list-item-text'>
                                 Patient Finder
+                            </ListItemText>
+                        </MenuItem>
+                    </Link>
+                    <Link className="list-link" to={constants.routes.Population_Overview}>
+                        <MenuItem className={isActive(constants.routes.Population_Overview)}>
+                            <ListItemText disableTypography className='list-item-text'>
+                                Population Overview
                             </ListItemText>
                         </MenuItem>
                     </Link>
