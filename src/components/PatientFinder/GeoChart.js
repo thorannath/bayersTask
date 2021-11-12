@@ -12,12 +12,12 @@ const GeoChart = ({ data, property }) => {
     const dispatch = useDispatch();
     const wrapperRef = useRef();
 
-    const statesData = {
-        "New York": 45,
-        "New Jersey": 99,
-        "Colorado": 140,
-        "California": 10
-    }
+    //console.log(JSON.stringify(data.stateData), "data.stateData");
+    //console.log(JSON.stringify(constants.AcronymToStateNames), "acronym");
+
+    const statesData = {}
+    Object.keys(data.stateData.states).map(e => {statesData.[constants.AcronymToStateNames[e]] = data.stateData.states[e]; console.log(e, statesData[constants.AcronymToStateNames[e]]);})
+    //console.log(JSON.stringify(statesData), "statesData");
 
     useEffect(() => {
         const svg = select(svgRef.current);

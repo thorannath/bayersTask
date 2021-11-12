@@ -73,6 +73,8 @@ const PatientFinder = () => {
     const preferences = useSelector(state => state.preferences.preferences);
     const modalStatus = useSelector(state => state.modals);
 
+    const [stateData, setStateData] = useState({});
+
     const [property, setProperty] = useState("pop_est");
 
     useEffect(() => {
@@ -229,6 +231,10 @@ const PatientFinder = () => {
         const medicalChart = createChartData(res2.medical_conditions)
         setMedicalChartData({ ...medicalChart });
 
+
+        const populationData = await axios.post('http://localhost:3000/patientfinder/states/population', request);
+        const res3 = populationData.data;
+        setStateData(res3);
     }
 
 
@@ -397,7 +403,7 @@ const PatientFinder = () => {
 {/*             TODO: Heatmap */}
                 <p> Handle Heat Map </p>
                 <div>
-                    <GeoChart data={data} property={property}/>
+                    <GeoChart data={Object.assign(data,{stateData: stateData})} property={property}/>
 
                 </div>
 
