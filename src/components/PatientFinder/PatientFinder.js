@@ -370,6 +370,7 @@ const PatientFinder = () => {
         setMedicalConditionsSelected([...medicalConditions]);
     }
 
+    console.log(data);
     return (
         <div className="container">
             <SidebarFilters
