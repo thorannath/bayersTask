@@ -56,7 +56,9 @@ const CreatePreferences = (props) => {
             default:
                 break;
         }
-    }, [modalStatus])
+    }, [modalStatus]);
+
+
     const defaultPreferenceId = useSelector(state => state.preferences.defaultPreferenceId);
     const messageBoxId = 'create-preference-message';
 
@@ -125,6 +127,8 @@ const CreatePreferences = (props) => {
                     (formData.cohorts && Object.keys(formData.cohorts).map(e => Number(formData.cohorts[e])).reduce((p, c) => p + c) > 0) :
                     (formData.payType && Object.keys(formData.payType).map(e => Number(formData.payType[e])).reduce((p, c) => p + c) > 0)
             )
+            &&
+            formData.states.length>0
             &&
             !errorStatus.error
         ) {

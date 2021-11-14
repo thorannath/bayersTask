@@ -20,6 +20,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { closeModal, showModal } from '../../store/modals';
 import * as constants from '../../Constant';
 import moment from 'moment';
+import FilterAltIcon from '@mui/icons-material/FilterAlt';
 
 function createData(id, saveName, createdAt) {
     return { id, saveName, createdAt };
@@ -123,7 +124,7 @@ const ViewPreferences = () => {
                                         <p>{moment(row.createdAt).format('MM/DD/YYYY, h:mm:ss A')}</p>
                                     </TableCell>
                                     <TableCell align="center">
-                                        <Tooltip title="Apply"><Button color="primary" onClick={() => openSettings(row)}> <VisibilityIcon /></Button></Tooltip>
+                                        <Tooltip title="Apply"><Button color="primary" onClick={() => openSettings(row)}> <FilterAltIcon /></Button></Tooltip>
                                         <Tooltip title="Edit"><Button color="info" onClick={() => editSettings(row)}><EditIcon /></Button></Tooltip>
                                         <Tooltip title="Delete"><Button color="warning" onClick={() => deleteSettings(row)}><DeleteIcon /></Button></Tooltip>
                                     </TableCell>

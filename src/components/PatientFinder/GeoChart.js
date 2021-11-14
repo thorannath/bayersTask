@@ -16,10 +16,13 @@ const GeoChart = ({ data, property }) => {
     //console.log(JSON.stringify(constants.AcronymToStateNames), "acronym");
 
     const statesData = {}
-    Object.keys(data.stateData.states).map(e => {statesData.[constants.AcronymToStateNames[e]] = data.stateData.states[e]; console.log(e, statesData[constants.AcronymToStateNames[e]]);})
     //console.log(JSON.stringify(statesData), "statesData");
 
     useEffect(() => {
+
+        if(data.statesData){
+            Object.keys(data.stateData.states).map(e => {statesData[constants.AcronymToStateNames[e]] = data.stateData.states[e]; console.log(e, statesData[constants.AcronymToStateNames[e]]);})
+        }
         const svg = select(svgRef.current);
 
         // Map and projection

@@ -85,6 +85,7 @@ export const deletePreference = (preferenceId) => async (dispatch) => {
 }
 
 export const getPreferences = () => async (dispatch) => {
+    console.log(Cookies.get("userid", { path: '/' }))
     try {
         const params = {
             userid: Cookies.get("userid", { path: '/' }),

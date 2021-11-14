@@ -12,9 +12,8 @@ import Logout from '@mui/icons-material/Logout';
 import Settings from '@mui/icons-material/Settings';
 import MenuList from '@mui/material/MenuList';
 import ListItemText from '@mui/material/ListItemText';
-import { useLocation } from 'react-router-dom';
+import { useLocation, Link } from 'react-router-dom';
 import * as constants from '../../Constant';
-import { Link } from 'react-router-dom';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import BookmarksIcon from '@mui/icons-material/Bookmarks';
 import { showModal } from '../../store/modals';
@@ -50,14 +49,14 @@ const Header = () => {
         return 'menu-item';
     }
 
-    const showCreatePreference = () =>{
-        dispatch(showModal({messageType:constants.MESSAGE_TYPES.CREATE_PREFERENCE, action:'open'}));
+    const showCreatePreference = () => {
+        dispatch(showModal({ messageType: constants.MESSAGE_TYPES.CREATE_PREFERENCE, action: 'open' }));
     }
 
-    const showViewPreference = () =>{
-        dispatch(showModal({messageType:constants.MESSAGE_TYPES.VIEW_PREFERECNE, action:'open'}));
+    const showViewPreference = () => {
+        dispatch(showModal({ messageType: constants.MESSAGE_TYPES.VIEW_PREFERECNE, action: 'open' }));
     }
-    
+
 
     return (
 
@@ -67,7 +66,7 @@ const Header = () => {
                     CKD Population Navigator
                 </Link>
                 <div className="menu-icons">
-                    <span style={{ display: 'flex', alignItems: 'center', fontSize:14, fontWeight: 'bold', letterSpacing: 1.2 }}>Hello {Cookies.get("userid", { path: "/" })},</span>
+                    <span style={{ display: 'flex', alignItems: 'center', fontSize: 14, fontWeight: 'bold', letterSpacing: 1.2 }}>Hello {Cookies.get("userid", { path: "/" })},</span>
                     <IconButton onClick={handleClick} size="small" sx={{ ml: 2 }}>
                         <Avatar sx={{ width: 32, height: 32 }}>M</Avatar>
                     </IconButton>
@@ -107,29 +106,31 @@ const Header = () => {
                     transformOrigin={{ horizontal: 'right', vertical: 'top' }}
                     anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
                 >
-                    <MenuItem>
-                        <Avatar/> Profile
-                    </MenuItem>
-                    <Divider/>
+                    <Link to='profile' style={{ textDecoration: 'none', color:'inherit' }}>
+                        <MenuItem>
+                            <Avatar /> Profile
+                        </MenuItem>
+                    </Link>
+                    <Divider />
                     <MenuItem onClick={showCreatePreference}>
                         <ListItemIcon>
-                            <AddCircleIcon fontSize="small"/>
+                            <AddCircleIcon fontSize="small" />
                         </ListItemIcon>
                         Create Preference
                     </MenuItem>
                     <MenuItem onClick={showViewPreference}>
                         <ListItemIcon>
-                            <BookmarksIcon fontSize="small"/>
+                            <BookmarksIcon fontSize="small" />
                         </ListItemIcon>
-                         View Preferences
+                        View Preferences
                     </MenuItem>
-                    <Divider/>
-                    <MenuItem>
+                    <Divider />
+                    {/* <MenuItem>
                         <ListItemIcon>
                             <Settings fontSize="small" />
                         </ListItemIcon>
                         Settings
-                    </MenuItem>
+                    </MenuItem> */}
                     <MenuItem onClick={logout}>
                         <ListItemIcon>
                             <Logout fontSize="small" />

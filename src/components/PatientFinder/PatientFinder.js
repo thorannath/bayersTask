@@ -20,52 +20,9 @@ import { showModal, closeModal } from '../../store/modals';
 import Cookies from 'js-cookie';
 import GeoChart from './GeoChart';
 import data from "../../US_geo.json";
+import Box from '@mui/material/Box'
 import Patients from './Patients';
-
-// import GeoChart from './'
-
-const customStyles = {
-    menu: (provided, state) => ({
-        ...provided,
-        borderBottom: '1px solid grey',
-        color: state.selectProps.menuColor,
-        width: '50%',
-    }),
-    option: (provided, state) => ({
-        ...provided,
-        padding: 8,
-        fontSize: 'small',
-    }),
-    control: (control) => ({
-        ...control,
-        padding: 4,
-        fontSize: 'small'
-    }),
-    singleValue: (provided, state) => {
-        const opacity = state.isDisabled ? 0.5 : 1;
-        const transition = 'opacity 300ms';
-        return { ...provided, opacity, transition };
-    },
-    multiValue: (styles, { data }) => {
-        return {
-            ...styles,
-            backgroundColor: '#ffae42',
-            color: 'whitesmoke',
-        };
-    },
-    multiValueLabel: (styles, { data }) => ({
-        ...styles,
-        color: data.color,
-    }),
-    multiValueRemove: (styles, { data }) => ({
-        ...styles,
-        color: data.color,
-        ':hover': {
-            backgroundColor: data.color,
-            color: 'white',
-        },
-    }),
-}
+import MultipleSelect from '../Inputs/MultipleSelect';
 
 const PatientFinder = () => {
     const treatments = useSelector(state => state.labels.treatments);
@@ -74,6 +31,7 @@ const PatientFinder = () => {
     const modalStatus = useSelector(state => state.modals);
 
     const [stateData, setStateData] = useState({});
+    const [updateError, setUpdateError] = useState({});
 
     const [property, setProperty] = useState("pop_est");
 
@@ -145,12 +103,19 @@ const PatientFinder = () => {
     const [openViewModal, setOpenViewModal] = useState(false);
     const [openCreateModal, setOpenCreateModal] = useState(false);
 
+    const [graphChange, setGraphChange] = useState(0);
+
     const dispatch = useDispatch();
 
     useEffect(() => {
         dispatch(fetchLabels())
         dispatch(getPreferences());
     }, [dispatch])
+
+    useEffect(() => {
+        console.log(123)
+        fetchGraphData();
+    }, [graphChange])
 
 
     const [loadFormData, setLoadFormData] = useState({ ...initialData });
@@ -176,13 +141,13 @@ const PatientFinder = () => {
             preferenceId: preference.id,
             preferenceName: preference.saveName,
             groupBy: jsonData.group_condition.group_by,
-            states: jsonData.states.map(data => { return { value: data, label: data } }),
+            states: jsonData.states.map(data => { return { value: data, label: constants.AcronymToStateNames[data]} }),
             cohorts: { ckd: false, diab: false, both: false },
             payType: { MCR: false, COM: false },
-            treatmentsOR: treatments.map(data => { if (jsonData.treatments.OR.includes(data.label_val)) { return { value: data.label_val, label: data.name } } return null }).filter(data => data),
-            treatmentsAND: treatments.map(data => { if (jsonData.treatments.AND.includes(data.label_val)) { return { value: data.label_val, label: data.name } } return null }).filter(data => data),
-            medicalConditionsAND: medicalConditions.map(data => { if (jsonData.medical_conditions.AND.includes(data.label_val)) { return { value: data.label_val, label: data.name } } return null }).filter(data => data),
-            medicalConditionsOR: medicalConditions.map(data => { if (jsonData.medical_conditions.OR.includes(data.label_val)) { return { value: data.label_val, label: data.name } } return null }).filter(data => data),
+            // treatmentsOR: treatments.map(data => { if (jsonData.treatments.OR.includes(data.label_val)) { return { value: data.label_val, label: data.name } } return null }).filter(data => data),
+            // treatmentsAND: treatments.map(data => { if (jsonData.treatments.AND.includes(data.label_val)) { return { value: data.label_val, label: data.name } } return null }).filter(data => data),
+            // medicalConditionsAND: medicalConditions.map(data => { if (jsonData.medical_conditions.AND.includes(data.label_val)) { return { value: data.label_val, label: data.name } } return null }).filter(data => data),
+            // medicalConditionsOR: medicalConditions.map(data => { if (jsonData.medical_conditions.OR.includes(data.label_val)) { return { value: data.label_val, label: data.name } } return null }).filter(data => data),
         };
         if (jsonData.group_condition.group_by === 'cohort') {
             for (const [type] of Object.entries(data.cohorts)) {
@@ -339,7 +304,7 @@ const PatientFinder = () => {
     };
 
     const treatmentsChartComponent = (
-        <div id="treatment-chart" style={styles.section}>
+        <div id="treatment-chart">
             <h3> Treatment Chart </h3>
             <div style={styles.infoBox}>
                 This figure displays the prevalence of specific medical conditions among the target patients. Please hover your cursor above the figure to view numeric values of results in the corresponding pop-up window. In the legend, click to select or unselect specific subgroups from display. Below the figure, select or unselect specific medical conditions to customize the display. Display groups can be presented by cohort (default) or by payor type.
@@ -362,57 +327,63 @@ const PatientFinder = () => {
         let res = event.map(data => data.value);
         let treatments = treatment.filter(data => res.includes(data.value));
         setTreatmentsSelected([...treatments]);
+        setGraphChange(graphChange + 1);
     }
 
     const onChangeMedicalConditionsSelected = (event) => {
         let res = event.map(data => data.value);
         let medicalConditions = medicalCondition.filter(data => res.includes(data.value));
         setMedicalConditionsSelected([...medicalConditions]);
+        setGraphChange(graphChange + 1);
+    }
+
+    const onChangeFormData = (data) => {
+        setFormData({...data});
+        setTimeout(()=>{
+            setUpdateError(true);
+        }, 5000)        
+    }
+
+    const onChangeGraphData = (data) => {
+        setFormData({...data});
+        setGraphChange(graphChange + 1)
     }
 
     return (
         <div className="container">
             <SidebarFilters
                 formData={formData}
-                onChangeFormData={setFormData}
+                onChangeFormData={onChangeFormData}
+                onChangeGraphData={onChangeGraphData}
                 onUpdateChart={handleClick}
                 onResetChart={handleReset}
                 onChangePreference={(id) => handlePreferenceChange(id)}
                 onTakeScreenshot={takeScreenshot} />
             <div className="main">
                 {treatmentsChartComponent}
-                <FormGroup>
-                    <FormLabel >Select Focus Labels</FormLabel>
-                    <Select
-                        isMulti
-                        name="selectLabels"
-                        value={treatmentsSelected}
-                        styles={customStyles}
-                        options={treatment}
-                        onChange={onChangeTreatmentSelected}
-                        classNamePrefix="select"
-                    />
-                </FormGroup>
+
+                <MultipleSelect
+                    options={treatment}
+                    name="Treatment Labels"
+                    label="Select Focus Labels"
+                    value={treatmentsSelected}
+                    onChange={onChangeTreatmentSelected}
+                />
                 {medicalChartComponent}
-                <FormGroup>
-                    <FormLabel >Select Focus Labels</FormLabel>
-                    <Select
-                        isMulti
-                        name="selectLabels"
-                        value={medicalConditionsSelected}
-                        styles={customStyles}
-                        options={medicalCondition}
-                        onChange={onChangeMedicalConditionsSelected}
-                        classNamePrefix="select"
-                    />
-                </FormGroup>
+                <MultipleSelect
+                    options={medicalCondition}
+                    name="Medical Condtion Labels"
+                    label="Select Focus Labels"
+                    value={medicalConditionsSelected}
+                    onChange={onChangeMedicalConditionsSelected}
+                />
                 <div style={styles.section}>
                     <h3> Geographical Analysis </h3>
                     <div style={styles.infoBox}>
                         The presented geographical analysis displays the proportion of target patients among adult members in the Optum administrative claims dataset. You can hover your cursor above a specific state to view numeric values in the corresponding pop-up window.
                         Please note that patients in Puerto Rico or Unknown geographical regions are not displayed in this figure.
                     </div>
-                    <GeoChart data={Object.assign(data,{stateData: stateData})} property={property}/>
+                    <GeoChart data={Object.assign(data, { stateData: stateData })} property={property} />
                 </div>
 
 
@@ -441,6 +412,22 @@ const PatientFinder = () => {
                         closeModal={(type) => handleCloseModal(type)}
                     />
                 </Modal>
+                <Modal
+                    open={updateError}
+                    onClose={() => setUpdateError(false)}
+                    closeAfterTransition
+                    BackdropComponent={Backdrop}
+                    disableAutoFocus={true}
+                    BackdropProps={{
+                        timeout: 500,
+                    }}>
+
+                    <Box style={styles.modalInfo}>
+
+                    Results are no longer upto date. Please click on Update!
+                    </Box>
+
+                </Modal>
 
                 <Patients />
             </div>
@@ -464,6 +451,21 @@ const styles = {
         marginTop: '20px',
         paddingTop: '20px'
     },
+    modalInfo: {
+        position: 'absolute',
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
+        borderRadius: 5,
+        backgroundColor:'whitesmoke',
+        border:'2px solid #b22222',
+        fontWeight:'bold',
+        height:'75px',
+        display:'flex',
+        justifyContent:'center',
+        alignItems:'center',
+        boxShadow: 24,
+        padding:5
+    }
 }
-
 export default PatientFinder;

@@ -4,25 +4,20 @@
 
 .sidebar{
     width: 20%;
-    overflow-y: scroll;
-    height: 100%;
     background-color: white;
     box-shadow: 5px 0 5px -2px #888;
-    padding:10px;
-    padding-top: 0;
     position: fixed;
-}
-
-.sidebar-content{
-    width: auto;
-    height:90%;
+    padding:5px;
+    top: 110px; /* Stay at the top */
+    left: 0;
+    height: calc(100vh - 110px);
     overflow-y: scroll;
 }
 
 .main{
     width: 80%;
     margin-left: auto;
-    padding: 40px;
+    padding: 20px 30px;
 }
 
 .box{
@@ -85,4 +80,10 @@
     box-shadow: 0 0 7px grey;
     border-radius: 5px;
     padding:20px;
+}
+
+.section{
+    border-top:'2px dotted grey';
+    margin-top:'20px';
+    padding-top:'20px';
 }

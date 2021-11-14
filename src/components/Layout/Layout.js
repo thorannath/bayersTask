@@ -8,6 +8,7 @@ import './Layout.css';
 import Cookies from 'js-cookie';
 import * as constants from '../../Constant';
 import PopulationOverview from '../PopulationOverview/PopulationOverview';
+import Profile from '../Profile/Profile';
 
 
 const Layout = (props) => {
@@ -19,6 +20,7 @@ const Layout = (props) => {
                     <Route path={constants.routes.Patient_Finder} component={PatientFinder} ></Route>
                     <Route path={constants.routes.Introduction} component={Introduction}></Route>
                     <Route path={constants.routes.Population_Overview} component={PopulationOverview}></Route>
+                    <Route path={constants.routes.Profile} component={Profile}/>
                     <Route path="/app/preference" component={UserHistory}></Route>
                 </div>
             </div>

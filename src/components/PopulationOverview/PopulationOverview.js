@@ -45,7 +45,7 @@ const PopulationOverview = () => {
                 <b>Instructions</b><br/>
                 This page provides an overview of the total patient population (N=2,840,880) who met the pre-specified cohort criteria for inclusion in this cross-sectional analysis. The figures below provide a visual depiction of the total patient population by cohort, state, year of birth, race, and payor type. Please hover your cursor above a specific data point to view specific information in the corresponding pop-up window.
             </div>
-            <div style={styles.section}>
+            <div>
                 <PieChart/>
             </div>
             <div style={styles.section}>

@@ -12,6 +12,7 @@ import RadioGroup from '@mui/material/RadioGroup';
 import Checkbox from '@mui/material/Checkbox';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
+import MultipleSelect from '../Inputs/MultipleSelect';
 
 const customStyles = {
     menu: (provided, state) => ({
@@ -23,11 +24,11 @@ const customStyles = {
     option: (provided, state) => ({
         ...provided,
         padding: 8,
-        fontSize:'small',
+        fontSize: 'small',
     }),
     control: (control) => ({
         ...control,
-        fontSize:'small'
+        fontSize: 'small'
     }),
     singleValue: (provided, state) => {
         const opacity = state.isDisabled ? 0.5 : 1;
@@ -59,8 +60,8 @@ const customStyles = {
 const SidebarFilters = (props) => {
 
     useEffect(() => {
-        if(props.formData.preferenceId){
-           setDefaultPreference({value:props.formData.preferenceId, label:props.formData.preferenceName});
+        if (props.formData.preferenceId) {
+            setDefaultPreference({ value: props.formData.preferenceId, label: props.formData.preferenceName });
         }
         setFormData(props.formData);
     }, [props.formData]);
@@ -93,7 +94,7 @@ const SidebarFilters = (props) => {
     const patientCohort = constants.Patient_Cohort;
 
     const states = Object.keys(constants.States).map(key => {
-        return { value: constants.States[key], label: key}
+        return { value: constants.States[key], label: key }
     });
 
     const validateAndSend = (formData) => {
@@ -108,7 +109,7 @@ const SidebarFilters = (props) => {
     }
 
     const onChangePreference = (event) => {
-        if(!event) return;
+        if (!event) return;
         setDefaultPreference(event);
         props.onChangePreference(event.value);
     };
@@ -155,7 +156,7 @@ const SidebarFilters = (props) => {
                                         onChange={(e) => onChangeGroupBy(e, constants.groupType.Cohort)}
                                         name={data} />
                                 }
-                                label={<Typography variant="body2" color="textSecondary">{data.toUpperCase()}</Typography>}/>
+                                label={<Typography variant="body2" color="textSecondary">{data.toUpperCase()}</Typography>} />
                         })}
                     </div>
                 </FormGroup>
@@ -173,7 +174,7 @@ const SidebarFilters = (props) => {
                                         onChange={(e) => onChangeGroupBy(e, constants.groupType.PayerType)}
                                         name={data} />
                                 }
-                                label={<Typography variant="body2" color="textSecondary">{data.toUpperCase()}</Typography>}/>
+                                label={<Typography variant="body2" color="textSecondary">{data.toUpperCase()}</Typography>} />
                         })}
                     </div>
                 </FormGroup>
@@ -193,9 +194,8 @@ const SidebarFilters = (props) => {
         }
         else if (logic === constants.Logic.OR) {
             formVal.treatmentsOR = treatment.filter(data => treatments.includes(data.value));
-
         }
-        setFormData({ ...formVal });
+        props.onChangeGraphData(formVal);
     }
 
     const onChangeMedicalCondition = (event, logic) => {
@@ -207,112 +207,89 @@ const SidebarFilters = (props) => {
         else if (logic === constants.Logic.OR) {
             formVal.medicalConditionsOR = medicalCondition.filter(data => medicalConditions.includes(data.value));
         }
-        setFormData({ ...formVal });
+        props.onChangeGraphData(formVal);
     }
 
     return (
         <div className="sidebar">
             <div className="sidebar-content">
-            <div id="sidebar-message" style={{visibility: "hidden"}}>
+                {/* <div id="sidebar-message" style={{visibility: "hidden"}}>
                 <p>Message</p>
-            </div>
-            <h3> Patient Finder Definition</h3>
-            <FormGroup className="formGroup">
-                <FormLabel class="formLabel">Preferences <InfoOutlinedIcon fontSize="small" color="primary" /></FormLabel>
-                <Select
-                    name="preferences"
-                    value={defaultPreference}
-                    styles={customStyles}
-                    options={preferences}
-                    key="value"
-                    label="label"
-                    onChange={(e) => onChangePreference(e)}
-                    classNamePrefix="select" />
-            </FormGroup>
-            <FormGroup className="formGroup">
-                <FormLabel class="formLabel">Group By <InfoOutlinedIcon fontSize="small" color="primary" /></FormLabel>
-                <RadioGroup row
-                    value={formData.groupBy}
-                    onClick={onChangeGroup}
-                    name="radio-buttons-group">
-                    <FormControlLabel value={constants.groupType.Cohort} control={<Radio />} 
-                        label={<Typography variant="body2" color="textSecondary">Cohort</Typography>}/>
-                    <FormControlLabel value={constants.groupType.PayerType} control={<Radio />}
-                      label={<Typography variant="body2" color="textSecondary">Payer</Typography>}/>
-                </RadioGroup>
-            </FormGroup>
+            </div> */}
+                <h3> Patient Finder Definition</h3>
+                <FormGroup className="formGroup">
+                    <FormLabel class="formLabel">Preferences <InfoOutlinedIcon fontSize="small" color="primary" /></FormLabel>
+                    <Select
+                        name="preferences"
+                        value={defaultPreference}
+                        styles={customStyles}
+                        options={preferences}
+                        key="value"
+                        label="label"
+                        onChange={(e) => onChangePreference(e)}
+                        classNamePrefix="select" />
+                </FormGroup>
+                <FormGroup className="formGroup">
+                    <FormLabel class="formLabel">Group By <InfoOutlinedIcon fontSize="small" color="primary" /></FormLabel>
+                    <RadioGroup row
+                        value={formData.groupBy}
+                        onClick={onChangeGroup}
+                        name="radio-buttons-group">
+                        <FormControlLabel value={constants.groupType.Cohort} control={<Radio />}
+                            label={<Typography variant="body2" color="textSecondary">Cohort</Typography>} />
+                        <FormControlLabel value={constants.groupType.PayerType} control={<Radio />}
+                            label={<Typography variant="body2" color="textSecondary">Payer</Typography>} />
+                    </RadioGroup>
+                </FormGroup>
 
-            <GroupData />
+                <GroupData />
 
-            <FormGroup className="formGroup">
-                <FormLabel class="formLabel">States <InfoOutlinedIcon fontSize="small" color="primary" /></FormLabel>
-                <Select
-                    isMulti
-                    name="states"
-                    value={formData.states}
-                    styles={customStyles}
+                <MultipleSelect
                     options={states}
-                    key="value"
-                    label="label"
+                    name="states"
+                    label="States"
+                    value={formData.states}
                     onChange={(e) => onChangeStates(e)}
-                    classNamePrefix="select" />
-            </FormGroup>
+                />
 
-            <FormGroup className="formGroup">
-                <FormLabel class="formLabel">Treatment with AND</FormLabel>
-                <Select
-                    isMulti
+                <MultipleSelect
+                    options={treatment}
                     name="treatmentAND"
+                    label="Treatment with AND"
                     value={formData.treatmentsAND}
-                    styles={customStyles}
-                    options={treatment}
                     onChange={(e) => onChangeTreatment(e, constants.Logic.AND)}
-                    classNamePrefix="select"
                 />
-            </FormGroup>
-            <FormGroup className="formGroup">
-                <FormLabel class="formLabel">Treatment with OR</FormLabel>
-                <Select
-                    isMulti
-                    name="treatmentOR"
-                    value={formData.treatmentsOR}
-                    styles={customStyles}
+
+                <MultipleSelect
                     options={treatment}
+                    name="treatmentOR"
+                    label="Treatment with OR"
+                    value={formData.treatmentsOR}
                     onChange={(e) => onChangeTreatment(e, constants.Logic.OR)}
-                    classNamePrefix="select"
                 />
-            </FormGroup>
 
-            <FormGroup className="formGroup">
-                <FormLabel class="formLabel">Medical Conditions with AND</FormLabel>
-                <Select
-                    isMulti
-                    name="colors"
+                <MultipleSelect
+                    options={medicalCondition}
+                    name="medicalConditionAND"
+                    label="Medical Conditions with AND"
                     value={formData.medicalConditionsAND}
-                    styles={customStyles}
-                    options={medicalCondition}
                     onChange={(e) => onChangeMedicalCondition(e, constants.Logic.AND)}
-                    classNamePrefix="select"
                 />
-            </FormGroup>
-            <FormGroup className="formGroup">
-                <FormLabel class="formLabel">Medical Condtions with OR</FormLabel>
-                <Select
-                    isMulti
-                    name="colors"
-                    value={formData.medicalConditionsOR}
-                    styles={customStyles}
-                    options={medicalCondition}
-                    onChange={(e) => onChangeMedicalCondition(e, constants.Logic.OR)}
-                    classNamePrefix="select"
-                />
-            </FormGroup>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', columnGap: '30px', marginTop: '20px', marginBottom: '20px' }}>
-                <Button color="primary" variant="contained" type="submit" onClick={props.onUpdateChart}> Update </Button>
-                <Button color="warning" variant="outlined" onClick={props.onResetChart}> Reset </Button>
-            </div>
-            <Button color="info" fullWidth variant="contained" onClick={props.onTakeScreenshot}> Take Screenshot </Button>
+
+                <MultipleSelect
+                    options={medicalCondition}
+                    name="medicalConditionOR"
+                    label="Medical Conditions with OR"
+                    value={formData.medicalConditionsOR}
+                    onChange={(e) => onChangeMedicalCondition(e, constants.Logic.OR)}
+                />
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', columnGap: '30px', marginTop: '20px', marginBottom: '20px' }}>
+                    <Button color="primary" variant="contained" type="submit" onClick={props.onUpdateChart}> Update </Button>
+                    <Button color="warning" variant="outlined" onClick={props.onResetChart}> Reset </Button>
+                </div>
+                <Button color="info" fullWidth variant="contained" onClick={props.onTakeScreenshot}> Take Screenshot </Button>
 
             </div>
         </div>
