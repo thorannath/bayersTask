@@ -349,6 +349,7 @@ const PatientFinder = () => {
         setGraphChange(graphChange + 1)
     }
 
+    console.log(data);
     return (
         <div className="container">
             <SidebarFilters

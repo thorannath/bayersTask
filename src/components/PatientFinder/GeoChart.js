@@ -16,13 +16,15 @@ const GeoChart = ({ data, property }) => {
     //console.log(JSON.stringify(constants.AcronymToStateNames), "acronym");
 
     const statesData = {}
-    //console.log(JSON.stringify(statesData), "statesData");
 
     useEffect(() => {
-
-        if(data.statesData){
-            Object.keys(data.stateData.states).map(e => {statesData[constants.AcronymToStateNames[e]] = data.stateData.states[e]; console.log(e, statesData[constants.AcronymToStateNames[e]]);})
+        if(Object.keys(data.stateData).length > 0 ){
+            Object.keys(data.stateData.states).map(e => {
+                statesData[constants.AcronymToStateNames[e]] = data.stateData.states[e];
+            });
+            //console.log(JSON.stringify(statesData), "statesData");
         }
+
         const svg = select(svgRef.current);
 
         // Map and projection
@@ -52,7 +54,7 @@ const GeoChart = ({ data, property }) => {
         let mouseOver = function (event, d) {
             tooltip
             .style("opacity", 1)
-            .html(`${d.properties.NAME}`)
+            .html(`${d.properties.NAME} \n Count: ${statesData[d.properties.NAME]}` )
             .style("left", (event.pageX) + "px")
             .style("top", (event.pageY-80) + "px")
 
@@ -98,6 +100,7 @@ const GeoChart = ({ data, property }) => {
             .style("stroke", "black")
             .on("mouseover", mouseOver)
             .on("mouseleave", mouseLeave)
+            
     }, [data, property])
 
     return (
