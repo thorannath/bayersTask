@@ -49,7 +49,8 @@ export const loadPreferencesToStore = (state, payload) => {
             return {preferences: payload.preferences, defaultPreferenceId: payload.preferences[0].id};
         }
     }
-    return state;
+    
+    return {preferences:[], defaultPreferenceId:''};
 }
 
 export const loadLabelsToStore = (state, labels) =>{
