@@ -82,10 +82,11 @@ const SidebarFilters = (props) => {
     useEffect(() => {
         if (defaultPreference.value !== defaultPreferenceId) {
             let preference = preferences.find(data => data.value == defaultPreferenceId);
-            onChangePreference(preference);
+            if(preference){onChangePreference(preference);}
         }
-        else {
-            console.log(preferences);
+        
+        if(!defaultPreferenceId){
+         setDefaultPreference({ value: '', label: '' });   
         }
 
     }, [defaultPreferenceId]);

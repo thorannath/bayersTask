@@ -113,7 +113,6 @@ const PatientFinder = () => {
     }, [dispatch])
 
     useEffect(() => {
-        console.log(123)
         fetchGraphData();
     }, [graphChange])
 
@@ -348,8 +347,7 @@ const PatientFinder = () => {
         setFormData({...data});
         setGraphChange(graphChange + 1)
     }
-
-    console.log(data);
+    
     return (
         <div className="container">
             <SidebarFilters
