@@ -1,89 +1,41 @@
 import React from 'react'
 import './PatientFinder.css';
-import Graph from './Graph';
 import axios from 'axios'
 import { useState, useEffect, useCallback } from 'react';
 import * as constants from '../../Constant';
 import Backdrop from '@mui/material/Backdrop';
 import Modal from '@mui/material/Modal';
-import ViewPreferences from '../Preferences/ViewPreferences';
-import CreatePreferences from '../Preferences/CreatePreferences';
 import html2canvas from "html2canvas";
 import jsPdf from "jspdf";
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchLabels, getPreferences } from '../../store/utils/thunkCreators';
 import SidebarFilters from './SidebarFilters';
-import FormGroup from '@mui/material/FormGroup';
-import FormLabel from '@mui/material/FormLabel';
-import Select from 'react-select';
-import { showModal, closeModal } from '../../store/modals';
 import Cookies from 'js-cookie';
-import GeoChart from './GeoChart';
+import GeoChart from '../Charts/GeoChart';
 import data from "../../US_geo.json";
 import Box from '@mui/material/Box'
 import Patients from './Patients';
 import MultipleSelect from '../Inputs/MultipleSelect';
+import Graph from '../Charts/Graph';
 
 const PatientFinder = () => {
+    const dispatch = useDispatch();
+    const colors = constants.colors;
+
     const treatments = useSelector(state => state.labels.treatments);
     const medicalConditions = useSelector(state => state.labels.medicalConditions);
     const preferences = useSelector(state => state.preferences.preferences);
+    const treatment = useSelector(state => state.labels.treatments).map(data =>({value: data.label_val, label: data.name}));
+    const medicalCondition = useSelector(state => state.labels.medicalConditions).map(data =>({value: data.label_val, label:data.name}));
     const modalStatus = useSelector(state => state.modals);
-
-    const [stateData, setStateData] = useState({});
-    const [updateError, setUpdateError] = useState({});
-
-    const [property, setProperty] = useState("pop_est");
-
-    useEffect(() => {
-        switch (modalStatus.messageType) {
-            case constants.MESSAGE_TYPES.CREATE_PREFERENCE:
-                if (modalStatus.action === 'open') {
-                    setLoadFormData({ ...initialData });
-                    setOpenCreateModal(true)
-                }
-                else {
-                    setOpenCreateModal(false)
-                }
-                break;
-            case constants.MESSAGE_TYPES.VIEW_PREFERECNE:
-                if (modalStatus.action === 'open') {
-                    setOpenViewModal(true)
-                }
-                else {
-                    if (modalStatus.data?.id) {
-                        let data = loadPreferenceForm(modalStatus.data.id);
-                        setFormData({ ...data });
-                    }
-                    setOpenViewModal(false)
-                }
-                break;
-            case constants.MESSAGE_TYPES.EDIT_PREFERENCE:
-                if (modalStatus.action === 'open') {
-                    let data = loadPreferenceForm(modalStatus.data.id);
-                    setLoadFormData({ ...data })
-                    setOpenCreateModal(true)
-                }
-                else {
-                    setOpenViewModal(false)
-                }
-                break
-        }
-    }, [modalStatus])
-
-    const treatment = useSelector(state => state.labels.treatments).map(data => {
-        return { value: data.label_val, label: data.name }
-    });
-    const medicalCondition = useSelector(state => state.labels.medicalConditions).map(data => {
-        return { value: data.label_val, label: data.name }
-    });
 
     const [treatmentsSelected, setTreatmentsSelected] = useState(treatment);
     const [medicalConditionsSelected, setMedicalConditionsSelected] = useState(medicalCondition);
-
-    const colors = constants.colors;
+    const [graphChange, setGraphChange] = useState(0);
     const [treatmentsChartData, setTreatmentsChartData] = useState({});
     const [medicalChartData, setMedicalChartData] = useState({});
+    const [stateData, setStateData] = useState({});
+    const [updateError, setUpdateError] = useState({});
 
     var initialData = {
         preferenceId: '',
@@ -100,13 +52,6 @@ const PatientFinder = () => {
         medicalConditionsOR: []
     }
 
-    const [openViewModal, setOpenViewModal] = useState(false);
-    const [openCreateModal, setOpenCreateModal] = useState(false);
-
-    const [graphChange, setGraphChange] = useState(0);
-
-    const dispatch = useDispatch();
-
     useEffect(() => {
         dispatch(fetchLabels())
         dispatch(getPreferences());
@@ -116,20 +61,16 @@ const PatientFinder = () => {
         fetchGraphData();
     }, [graphChange])
 
+    useEffect(()=> {
+        if(modalStatus.messageType ===  constants.MESSAGE_TYPES.VIEW_PREFERECNE){
+            if(modalStatus.action === 'close' && modalStatus.data?.id){
+                const obj = loadPreferenceForm(modalStatus.data.id);
+                if (obj) setFormData({ ...obj });
+            }
+        }
+    }, [modalStatus])
 
-    const [loadFormData, setLoadFormData] = useState({ ...initialData });
     const [formData, setFormData] = useState({ ...initialData });
-
-
-    const handleCloseModal = (res) => {
-        if (res.action === 'edit') {
-            return dispatch(showModal({ messageType: constants.MESSAGE_TYPES.EDIT_PREFERENCE, action: 'open', data: { id: res.data.id } }));
-        }
-        else if (res.action === 'view') {
-            return dispatch(closeModal({ messageType: constants.MESSAGE_TYPES.VIEW_PREFERECNE, action: 'close', data: { id: res.data.id } }))
-        }
-        return dispatch(closeModal({ messageType: constants.MESSAGE_TYPES.VIEW_PREFERECNE, action: 'close' }))
-    };
 
     const loadPreferenceForm = useCallback((id) => {
         let preference = preferences.find(data => data.id === id);
@@ -140,14 +81,10 @@ const PatientFinder = () => {
             preferenceId: preference.id,
             preferenceName: preference.saveName,
             groupBy: jsonData.group_condition.group_by,
-            states: jsonData.states.map(data => { return { value: data, label: constants.AcronymToStateNames[data]} }),
+            states: jsonData.states.map(data => { return { value: data, label: constants.AcronymToStateNames[data] } }),
             cohorts: { ckd: false, diab: false, both: false },
             payType: { MCR: false, COM: false },
-            // treatmentsOR: treatments.map(data => { if (jsonData.treatments.OR.includes(data.label_val)) { return { value: data.label_val, label: data.name } } return null }).filter(data => data),
-            // treatmentsAND: treatments.map(data => { if (jsonData.treatments.AND.includes(data.label_val)) { return { value: data.label_val, label: data.name } } return null }).filter(data => data),
-            // medicalConditionsAND: medicalConditions.map(data => { if (jsonData.medical_conditions.AND.includes(data.label_val)) { return { value: data.label_val, label: data.name } } return null }).filter(data => data),
-            // medicalConditionsOR: medicalConditions.map(data => { if (jsonData.medical_conditions.OR.includes(data.label_val)) { return { value: data.label_val, label: data.name } } return null }).filter(data => data),
-        };
+     };
         if (jsonData.group_condition.group_by === 'cohort') {
             for (const [type] of Object.entries(data.cohorts)) {
                 if (jsonData.group_condition.selection.includes(type)) {
@@ -195,7 +132,6 @@ const PatientFinder = () => {
         const medicalChart = createChartData(res2.medical_conditions)
         setMedicalChartData({ ...medicalChart });
 
-
         const populationData = await axios.post('http://localhost:3000/patientfinder/states/population', request);
         const res3 = populationData.data;
         setStateData(res3);
@@ -203,10 +139,7 @@ const PatientFinder = () => {
 
 
     const createChartData = (obj) => {
-        const chart = {
-            labels: obj.labels,
-            datasets: []
-        }
+        const chart = { labels: obj.labels, datasets: [] }
 
         obj.data.map((val, index) => {
             chart.datasets.push({
@@ -214,13 +147,11 @@ const PatientFinder = () => {
                 backgroundColor: colors[index],
                 data: val.data
             });
-            return;
         })
         return chart;
     }
 
     const requestObject = () => {
-
         if (formData.states.length == 0) return;
         const groupKeys = (formData.groupBy === constants.groupType.Cohort) ? formData.cohorts : formData.payType;
         const treatmentLabels = treatmentsSelected.map(data => {
@@ -231,7 +162,7 @@ const PatientFinder = () => {
             let medicalCondition = medicalConditions.find(val => val.label_val == data.value);
             if (medicalCondition) return medicalCondition.label;
         });
-        const request = {
+        return {
             jsonData: {
                 group_condition: {
                     group_by: formData.groupBy,
@@ -239,18 +170,17 @@ const PatientFinder = () => {
                 },
                 states: formData.states.map((e) => e['value']),
                 treatments: {
-                    labels: treatmentLabels, //selectedTreatmentLabels,
+                    labels: treatmentLabels,
                     OR: formData.treatmentsOR ? formData.treatmentsOR.map(data => data.value) : null,
                     AND: formData.treatmentsAND ? formData.treatmentsAND.map(data => data.value) : null,
                 },
                 medical_conditions: {
-                    labels: medicalConditionLabels, //selectedMedicalConditionLabels,
+                    labels: medicalConditionLabels,
                     OR: formData.medicalConditionsOR ? formData.medicalConditionsOR.map(data => data.value) : null,
                     AND: formData.medicalConditionsAND ? formData.medicalConditionsAND.map(data => data.value) : null,
                 }
             }
         }
-        return request;
     }
 
     const handleClick = () => {
@@ -337,17 +267,17 @@ const PatientFinder = () => {
     }
 
     const onChangeFormData = (data) => {
-        setFormData({...data});
-        setTimeout(()=>{
+        setFormData({ ...data });
+        setTimeout(() => {
             setUpdateError(true);
-        }, 5000)        
+        }, 5000)
     }
 
     const onChangeGraphData = (data) => {
-        setFormData({...data});
+        setFormData({ ...data });
         setGraphChange(graphChange + 1)
     }
-    
+
     return (
         <div className="container">
             <SidebarFilters
@@ -382,35 +312,11 @@ const PatientFinder = () => {
                         The presented geographical analysis displays the proportion of target patients among adult members in the Optum administrative claims dataset. You can hover your cursor above a specific state to view numeric values in the corresponding pop-up window.
                         Please note that patients in Puerto Rico or Unknown geographical regions are not displayed in this figure.
                     </div>
-                    <GeoChart data={Object.assign(data, { stateData: stateData })} property={property} />
+                    <GeoChart data={Object.assign(data, { stateData: stateData })}/>
                 </div>
 
+                <Patients/>
 
-                <Modal
-                    open={openCreateModal}
-                    onClose={() => handleCloseModal('create')}
-                    closeAfterTransition
-                    BackdropComponent={Backdrop}
-                    BackdropProps={{
-                        timeout: 500,
-                    }}>
-                    <CreatePreferences
-                        loadFormData={loadFormData}
-                        closeModal={(type) => handleCloseModal(type)} />
-                </Modal>
-                <Modal
-                    open={openViewModal}
-                    onClose={() => handleCloseModal('view')}
-                    closeAfterTransition
-                    BackdropComponent={Backdrop}
-                    BackdropProps={{
-                        timeout: 500,
-                    }}>
-                    <ViewPreferences
-                        openModal={openViewModal}
-                        closeModal={(type) => handleCloseModal(type)}
-                    />
-                </Modal>
                 <Modal
                     open={updateError}
                     onClose={() => setUpdateError(false)}
@@ -420,15 +326,8 @@ const PatientFinder = () => {
                     BackdropProps={{
                         timeout: 500,
                     }}>
-
-                    <Box style={styles.modalInfo}>
-
-                    Results are no longer upto date. Please click on Update!
-                    </Box>
-
+                    <Box style={styles.modalInfo}> <h3>Results are no longer upto date. Please click on Update!</h3></Box>
                 </Modal>
-
-                <Patients />
             </div>
         </div>
     )
@@ -456,15 +355,15 @@ const styles = {
         left: '50%',
         transform: 'translate(-50%, -50%)',
         borderRadius: 5,
-        backgroundColor:'whitesmoke',
-        border:'2px solid #b22222',
-        fontWeight:'bold',
-        height:'75px',
-        display:'flex',
-        justifyContent:'center',
-        alignItems:'center',
+        backgroundColor: 'whitesmoke',
+        border: '2px solid #b22222',
+        fontWeight: 'bold',
+        height: '75px',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
         boxShadow: 24,
-        padding:5
+        padding: 5
     }
 }
 export default PatientFinder;

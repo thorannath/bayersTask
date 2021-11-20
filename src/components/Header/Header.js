@@ -1,7 +1,6 @@
 import './Header.css';
 import IconButton from '@mui/material/IconButton';
 import Avatar from '@mui/material/Avatar';
-import { useHistory } from "react-router-dom";
 import Cookies from 'js-cookie';
 import { useState } from 'react';
 import Menu from '@mui/material/Menu';
@@ -17,13 +16,13 @@ import * as constants from '../../Constant';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import BookmarksIcon from '@mui/icons-material/Bookmarks';
 import { showModal } from '../../store/modals';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { logout } from '../../store/utils/thunkCreators';
 
 
 const Header = () => {
     const dispatch = useDispatch();
 
-    const history = useHistory();
     const [anchorEl, setAnchorEl] = useState(null);
     const open = Boolean(anchorEl);
 
@@ -35,12 +34,8 @@ const Header = () => {
         setAnchorEl(null);
     };
 
-    const logout = () => {
-        /* TODO: (Rahul-Part) call Axios for updating logout in database record belonging to user */
-        Cookies.remove("userid");
-        Cookies.remove("password");
-        history.push("/");
-        console.log("Successfully Logout");
+    const logoutFn = () => {
+        dispatch(logout());
     }
 
     const location = useLocation();
@@ -125,13 +120,7 @@ const Header = () => {
                         View Preferences
                     </MenuItem>
                     <Divider />
-                    {/* <MenuItem>
-                        <ListItemIcon>
-                            <Settings fontSize="small" />
-                        </ListItemIcon>
-                        Settings
-                    </MenuItem> */}
-                    <MenuItem onClick={logout}>
+                    <MenuItem onClick={logoutFn}>
                         <ListItemIcon>
                             <Logout fontSize="small" />
                         </ListItemIcon>

@@ -71,8 +71,7 @@ const Histogram = ({ data, title }) => {
     })
 
     return (
-        <div id="histogram" align="center">
-        </div>
+        <div id="histogram" align="center"></div>
     )
 }
 

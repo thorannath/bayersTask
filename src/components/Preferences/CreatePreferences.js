@@ -1,11 +1,10 @@
-import React from 'react'
+import React, { useState } from 'react'
 import Box from '@mui/material/Box'
 import FormGroup from '@mui/material/FormGroup';
 import Checkbox from '@mui/material/Checkbox';
 import { Button, TextField } from '@mui/material';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import './Preferences.css';
-import { useState } from 'react';
 import CloseIcon from '@mui/icons-material/Close';
 import Filters from '../PatientFinder/Filters';
 import * as constants from '../../Constant';
@@ -15,7 +14,7 @@ import { useEffect } from 'react';
 import { validateName } from '../common/validation';
 import { closeModal } from '../../store/modals';
 import Typography from '@mui/material/Typography';
-
+import Modal from '@mui/material/Modal';
 
 const style = {
     position: 'absolute',
@@ -31,26 +30,33 @@ const style = {
 
 const CreatePreferences = (props) => {
     const dispatch = useDispatch();
+    const [open, setOpen] = useState(false);
 
-    const initialData = props.loadFormData;
-    const [name, setName] = useState(props.loadFormData.preferenceName);
+    const [name, setName] = useState('');
     const [defaultVal, setDefaultVal] = useState(false);
-    const [formData, setFormData] = useState({ ...initialData });
-    const [errorStatus, setErrorStatus] = useState((initialData.saveName || initialData.preferenceName) ? { error: false, message: "" } : { error: true, message: "Please fill up the form!" });
+    const [formData, setFormData] = useState({});
+    const [errorStatus, setErrorStatus] = useState(('initialData.saveName' || 'initialData.preferenceName') ? { error: false, message: "" } : { error: true, message: "Please fill up the form!" });
 
-    const treatments = useSelector(state => state.labels.treatments);
-    const medicalConditions = useSelector(state => state.labels.medicalConditions);
     const modalStatus = useSelector(state => state.modals);
     const preferences = useSelector(state => state.preferences.preferences);
-
+    const defaultPreferenceId = useSelector(state => state.preferences.defaultPreferenceId);
 
     useEffect(() => {
         switch (modalStatus.messageType) {
+            case constants.MESSAGE_TYPES.CREATE_PREFERENCE:
+                modalStatus.action === 'open'? setOpen(true):setOpen(false);
+                break;
+
             case constants.MESSAGE_TYPES.EDIT_PREFERENCE:
                 if (modalStatus.action === 'open') {
-                    let preference = preferences.find(val => val.id === modalStatus.data.id);
-                    initialData.id = preference.id;
-                    initialData.saveName = preference.preferenceName;
+                    let data = loadPreferenceForm(modalStatus.data.id);
+                    setFormData({...data});
+                    setName(data.preferenceName);
+                    setDefaultVal((defaultPreferenceId === data.id) ? true : false);
+                    setOpen(true);
+                }
+                else {
+                    setOpen(false);
                 }
                 break;
             default:
@@ -58,14 +64,42 @@ const CreatePreferences = (props) => {
         }
     }, [modalStatus]);
 
+    const loadPreferenceForm = (id) => {
+        let preference = preferences.find(data => data.id === id);
+        if (!preference) return null;
+        console.log(preference)
+        let jsonData = preference.jsonData;
+        const data = {
+            preferenceId: preference.id,
+            preferenceName: preference.saveName,
+            groupBy: jsonData.group_condition.group_by,
+            states: jsonData.states.map(data => { return { value: data, label: constants.AcronymToStateNames[data] } }),
+            cohorts: { ckd: false, diab: false, both: false },
+            payType: { MCR: false, COM: false },
+         };
+        if (jsonData.group_condition.group_by === 'cohort') {
+            for (const [type] of Object.entries(data.cohorts)) {
+                if (jsonData.group_condition.selection.includes(type)) {
+                    data.cohorts[type] = true;
+                }
+            }
+        }
+        else {
+            for (const [type] of Object.entries(data.payType)) {
+                if (jsonData.group_condition.selection.includes(type)) {
+                    data.payType[type] = true;
+                }
+            }
+        }
+        return data;
+    }
 
-    const defaultPreferenceId = useSelector(state => state.preferences.defaultPreferenceId);
+
     const messageBoxId = 'create-preference-message';
 
     useEffect(() => {
-        let defaultVal = (defaultPreferenceId === initialData.id) ? true : false;
-        setDefaultVal(defaultVal);
-    }, [defaultPreferenceId, initialData]);
+        setDefaultVal((defaultPreferenceId === formData.id) ? true : false);
+    }, [defaultPreferenceId]);
 
 
     const loader = useSelector(state => state.loader);
@@ -89,9 +123,6 @@ const CreatePreferences = (props) => {
 
     const requestObject = () => {
         const groupKeys = (formData.groupBy === constants.groupType.Cohort) ? formData.cohorts : formData.payType;
-        const treatmentLabels = treatments.map((e, i) => { return e["label"] })
-        const medicalConditionLabels = medicalConditions.map((e, i) => { return e["label"] })
-
         const request = {
             saveName: name,
             makeDefault: defaultVal,
@@ -101,19 +132,8 @@ const CreatePreferences = (props) => {
                     selection: Object.keys(groupKeys).filter((e, i) => { return groupKeys[e] })
                 },
                 states: formData.states.map(data => data.value),
-                treatments: {
-                    labels: treatmentLabels, //selectedTreatmentLabels,
-                    OR: formData.treatmentsOR ? formData.treatmentsOR.map(data => data.value) : null,
-                    AND: formData.treatmentsAND ? formData.treatmentsAND.map(data => data.value) : null,
-                },
-                medical_conditions: {
-                    labels: medicalConditionLabels, //selectedMedicalConditionLabels,
-                    OR: formData.medicalConditionsOR ? formData.medicalConditionsOR.map(data => data.value) : null,
-                    AND: formData.medicalConditionsAND ? formData.medicalConditionsAND.map(data => data.value) : null,
-                }
             }
         }
-
         return request;
     }
 
@@ -128,7 +148,7 @@ const CreatePreferences = (props) => {
                     (formData.payType && Object.keys(formData.payType).map(e => Number(formData.payType[e])).reduce((p, c) => p + c) > 0)
             )
             &&
-            formData.states.length>0
+            formData.states.length > 0
             &&
             !errorStatus.error
         ) {
@@ -169,7 +189,10 @@ const CreatePreferences = (props) => {
     }
 
     return (
-        <div>
+        <Modal
+            open={open}
+            onClose={()=> setOpen(false)}
+            closeAfterTransition>
             <Box sx={style}>
                 <div className="modal-header">
                     <Typography align="left" variant="h6"> Create Preferences </Typography>
@@ -177,8 +200,8 @@ const CreatePreferences = (props) => {
                         <Button type="submit" color="inherit" onClick={handleCancel}><CloseIcon /></Button>
                     </div>
                 </div>
-                <div class="form">
-                <span id="create-preference-message"> Message </span>
+                <div className="form">
+                    <span id="create-preference-message"> Message </span>
                     <FormGroup className="form-group">
                         <TextField
                             id="standard-basic"
@@ -200,7 +223,7 @@ const CreatePreferences = (props) => {
                     <Button type="submit" sx={{ width: '25%' }} color="warning" onClick={handleCancel}>Cancel</Button>
                 </div>
             </Box>
-        </div>
+        </Modal>
     )
 }
 

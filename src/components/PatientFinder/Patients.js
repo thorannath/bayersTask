@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
@@ -28,12 +28,9 @@ const style = {
 
 
 const Patients = () => {
-    const dispatch = useDispatch();
-
-    const [open, setOpen] = React.useState(false);
+    const [open, setOpen] = useState(false);
     const handleOpen = () => setOpen(true);
     const handleClose = () => {
-        // dispatch(closeModal({messageType: constants.MESSAGE_TYPES.VIEW_HEATMAP_PATIENTS, action: 'close'}));
         setOpen(false);
     }
 
@@ -45,16 +42,10 @@ const Patients = () => {
         switch (modalStatus.messageType) {
             case constants.MESSAGE_TYPES.VIEW_HEATMAP_PATIENTS:
                 if (modalStatus.action === 'open') {
-                    // let preference = preferences.find(val => val.id === modalStatus.data.id);
-                    // initialData.id = preference.id;
-                    // initialData.saveName = preference.preferenceName;
                     setStateSelected(modalStatus.data.name);
                     handleOpen();
                 }
                 else if (modalStatus.action === 'close') {
-                    // let preference = preferences.find(val => val.id === modalStatus.data.id);
-                    // initialData.id = preference.id;
-                    // initialData.saveName = preference.preferenceName;
                     handleClose();
                 }
                 break;
@@ -66,53 +57,51 @@ const Patients = () => {
 
 
     return (
-        <div>
-            <Modal
-                open={open}
-                onClose={handleClose}
-                aria-labelledby="modal-modal-title"
-                aria-describedby="modal-modal-description"
-            >
-                <Box sx={style}>
-                    <div class="modal-header">
-                        <Typography align="left" variant="h6"> View Patients in {stateSelected}</Typography>
-                        <div className="modal-close">
-                            <Button color="inherit" type="submit" onClick={handleClose}><CloseIcon /></Button>
-                        </div>
+        <Modal
+            open={open}
+            onClose={handleClose}
+            aria-labelledby="modal-modal-title"
+            aria-describedby="modal-modal-description"
+        >
+            <Box sx={style}>
+                <div class="modal-header">
+                    <Typography align="left" variant="h6"> View Patients in {stateSelected}</Typography>
+                    <div className="modal-close">
+                        <Button color="inherit" type="submit" onClick={handleClose}><CloseIcon /></Button>
                     </div>
-                    <TableContainer sx={{ padding: 2 }}>
-                        <Table stickyHeader sx={{ minWidth: 650 }} size="small" aria-label="a dense table">
-                            <TableHead>
-                                <TableRow>
-                                    <TableCell>Patient ID</TableCell>
-                                    <TableCell align="center">Sex</TableCell>
-                                    <TableCell align="center">Race</TableCell>
-                                    <TableCell align="center">Age</TableCell>
-                                </TableRow>
-                            </TableHead>
-                            <TableBody>
-                                <TableRow
-                                    key="id"
-                                    sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
-                                    <TableCell component="th" scope="row">
-                                       <p>112232</p>
-                                    </TableCell>
-                                    <TableCell component="th" align="center" scope="row">
-                                        <p>Male</p>
-                                    </TableCell>
-                                    <TableCell component="th" align="center" scope="row">
-                                        <p>Hispanic</p>
-                                    </TableCell>
-                                    <TableCell component="th" align="center" scope="row">
-                                        <p>45</p>
-                                    </TableCell>
-                                </TableRow>
-                            </TableBody>
-                        </Table>
-                    </TableContainer>
-                </Box>
-            </Modal>
-        </div>
+                </div>
+                <TableContainer sx={{ padding: 2 }}>
+                    <Table stickyHeader sx={{ minWidth: 650 }} size="small" aria-label="a dense table">
+                        <TableHead>
+                            <TableRow>
+                                <TableCell>Patient ID</TableCell>
+                                <TableCell align="center">Sex</TableCell>
+                                <TableCell align="center">Race</TableCell>
+                                <TableCell align="center">Age</TableCell>
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            <TableRow
+                                key="id"
+                                sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+                                <TableCell component="th" scope="row">
+                                    <p>112232</p>
+                                </TableCell>
+                                <TableCell component="th" align="center" scope="row">
+                                    <p>Male</p>
+                                </TableCell>
+                                <TableCell component="th" align="center" scope="row">
+                                    <p>Hispanic</p>
+                                </TableCell>
+                                <TableCell component="th" align="center" scope="row">
+                                    <p>45</p>
+                                </TableCell>
+                            </TableRow>
+                        </TableBody>
+                    </Table>
+                </TableContainer>
+            </Box>
+        </Modal>
     )
 }
 

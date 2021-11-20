@@ -3,7 +3,6 @@ import React, { useRef } from 'react';
 import FormGroup from '@mui/material/FormGroup';
 import FormLabel from '@mui/material/FormLabel';
 import ReactSelect from 'react-select';
-import * as constants from '../../Constant';
 
 const customStyles = {
     menu: (provided, state) => ({
@@ -109,10 +108,9 @@ const MultipleSelect = (props) => {
         }
     };
 
-
     return (
         <FormGroup className="formGroup">
-            <FormLabel class="formLabel">{props.actionlabel}</FormLabel>
+            <FormLabel className="formLabel">{props.label}</FormLabel>
             <ReactSelect
                 isOptionSelected={isOptionSelected}
                 options={getOptions()}

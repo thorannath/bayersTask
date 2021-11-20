@@ -7,8 +7,9 @@ import preferences from './preferences';
 import labels from './labels';
 import loader from './loader';
 import modals from './modals';
+import authenticationErrors from './authenticationErrors';
 
-const appReducer = combineReducers({users, labels, preferences, modals, loader});
+const appReducer = combineReducers({users, labels, preferences, modals, loader, authenticationErrors});
 
 const rootReducer = (state, action) => {
     return appReducer(state, action);

@@ -146,7 +146,7 @@ const SidebarFilters = (props) => {
         if (formData.groupBy === constants.groupType.Cohort) {
             return (
                 <FormGroup className="formGroup">
-                    <FormLabel class="formLabel">Cohort Type</FormLabel>
+                    <FormLabel className="formLabel">Cohort Type</FormLabel>
                     <div row>
                         {patientCohort.map((data, i) => {
                             return <FormControlLabel key={`cohort-formgrp-${i}`}
@@ -166,7 +166,7 @@ const SidebarFilters = (props) => {
         else if (formData.groupBy === constants.groupType.PayerType) {
             return (
                 <FormGroup className="formGroup" >
-                    <FormLabel class="formLabel">Payer Type</FormLabel>
+                    <FormLabel className="formLabel">Payer Type</FormLabel>
                     <div row>
                         {payerType.map((data, i) => {
                             return <FormControlLabel key={`paytyp-formgrp-${i}`}
@@ -219,7 +219,7 @@ const SidebarFilters = (props) => {
             </div> */}
                 <h3> Patient Finder Definition</h3>
                 <FormGroup className="formGroup">
-                    <FormLabel class="formLabel">Preferences <InfoOutlinedIcon fontSize="small" color="primary" /></FormLabel>
+                    <FormLabel className="formLabel">Preferences <InfoOutlinedIcon fontSize="small" color="primary" /></FormLabel>
                     <Select
                         name="preferences"
                         value={defaultPreference}
@@ -231,7 +231,7 @@ const SidebarFilters = (props) => {
                         classNamePrefix="select" />
                 </FormGroup>
                 <FormGroup className="formGroup">
-                    <FormLabel class="formLabel">Group By <InfoOutlinedIcon fontSize="small" color="primary" /></FormLabel>
+                    <FormLabel className="formLabel">Group By <InfoOutlinedIcon fontSize="small" color="primary" /></FormLabel>
                     <RadioGroup row
                         value={formData.groupBy}
                         onClick={onChangeGroup}

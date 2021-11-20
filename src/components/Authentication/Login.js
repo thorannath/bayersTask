@@ -2,56 +2,24 @@ import { Button, TextField } from '@mui/material';
 import './Authentication.css';
 import Form from 'react-bootstrap/Form';
 import { useState, forwardRef } from 'react';
-import axios from 'axios';
-import { useHistory } from "react-router-dom";
-import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
-import Cookies from 'js-cookie';
+import { useDispatch } from 'react-redux';
+import { login } from '../../store/utils/thunkCreators';
 
 const Alert = forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
 
-
 const Login = () => {
-    const history = useHistory();
-
+    const dispatch = useDispatch();
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
-    const [open, setOpen] = useState(false);
-    const [message, setMessage] = useState('');
-    const [severity, setSeverity] = useState('error');
-
-    const handleFormSubmit = async () => {
+    
+    const handleFormSubmit = async () =>{
         if (username && password) {
-            try{
-                const response = await axios.put('http://localhost:3000/users', { userid: username, password: password})
-                if (response && response.data.success) {
-                    setMessage(response.data.message);
-                    setSeverity('success');
-                    Cookies.set('userid', username, {expires: 1, path:'/'}); 
-                    Cookies.set('password', password, {expires: 1, path:'/'});
-                    Cookies.set('authToken', response.data.userData.authToken, {expires: 1, path:'/'});
-                    history.push("/app/patient-finder");
-                }
-                else {
-                    setSeverity('error');
-                    setMessage(response.data.message);
-                }
-            } catch(err){
-                setSeverity('error');
-                setMessage(err.response.data.message);
-            }
-            setOpen(true);
+            dispatch(login({username, password}))
         }
     }
-
-    const handleClose = (event, reason) => {
-        if (reason === 'clickaway') {
-          return;
-        }
-        setOpen(false);
-    };
     
     return (
         <div className="login-cls">
@@ -62,6 +30,7 @@ const Login = () => {
                 className="form-input" 
                 variant="standard"  
                 label="Username" 
+                value={username}
                 onChange={(e) => setUsername(e.target.value)} required 
                 />
             </Form.Group>
@@ -73,6 +42,7 @@ const Login = () => {
                     variant="standard" 
                     type="password"
                     autoComplete="current-password"
+                    value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
                 />
@@ -81,16 +51,6 @@ const Login = () => {
             <Button type="submit" sx={{width:'50%'}} variant="contained" onClick={handleFormSubmit}>Login</Button>
             <Button sx={{width:'50%'}}>Forget Password</Button>
             </div>
-            <Snackbar
-                open={open}
-                autoHideDuration={6000}
-                onClose={handleClose}
-                anchorOrigin={{ vertical:'top', horizontal:'right' }}
-            > 
-                <Alert severity={severity}>{message}</Alert>
-
-            </Snackbar>
-
         </div>
     )
 }

@@ -34,12 +34,11 @@
 }
 
 .card{
-    width: 450px;
+    max-width: 500px;
     margin-right: 5em;
-    border-radius: 10px;
-    background-color: whitesmoke;
-    
-    padding: 2em;
+    border-radius: 20px;
+    background-color: white;
+    padding: 3em;
     text-align: center; 
     box-shadow: 0px 2px 5px #888;
 }

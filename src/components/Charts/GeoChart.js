@@ -4,17 +4,11 @@ import { select, geoPath, geoAlbersUsa } from 'd3';
 import { showModal } from '../../store/modals';
 import * as constants from '../../Constant';
 import { useSelector, useDispatch } from 'react-redux';
-import './PatientFinder.css';
 
 const GeoChart = ({ data, property }) => {
-
     const svgRef = useRef();
     const dispatch = useDispatch();
     const wrapperRef = useRef();
-
-    //console.log(JSON.stringify(data.stateData), "data.stateData");
-    //console.log(JSON.stringify(constants.AcronymToStateNames), "acronym");
-
     const statesData = {}
 
     useEffect(() => {
@@ -22,7 +16,6 @@ const GeoChart = ({ data, property }) => {
             Object.keys(data.stateData.states).map(e => {
                 statesData[constants.AcronymToStateNames[e]] = data.stateData.states[e];
             });
-            //console.log(JSON.stringify(statesData), "statesData");
         }
 
         const svg = select(svgRef.current);
