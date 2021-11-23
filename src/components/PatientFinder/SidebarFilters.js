@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import * as constants from '../../Constant';
 import FormGroup from '@mui/material/FormGroup';
 import FormLabel from '@mui/material/FormLabel';
@@ -6,7 +6,6 @@ import Select from 'react-select';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import { FormControlLabel } from '@mui/material';
 import { useSelector } from 'react-redux';
-import { useState, useEffect } from 'react';
 import Radio from '@mui/material/Radio';
 import RadioGroup from '@mui/material/RadioGroup';
 import Checkbox from '@mui/material/Checkbox';
@@ -56,9 +55,17 @@ const customStyles = {
     }),
 }
 
-
 const SidebarFilters = (props) => {
+    const payerType = constants.Paytype;
+    const patientCohort = constants.Patient_Cohort;
 
+    const [formData, setFormData] = useState(props.formData);
+    const [defaultPreference, setDefaultPreference] = useState({ value: '', label: '' });
+
+
+    const preferences = useSelector(state => state.preferences.preferences.map(data => { return { value: data.id, label: data.saveName } }));
+    const defaultPreferenceId = useSelector(state => state.preferences.defaultPreferenceId);
+    
     useEffect(() => {
         if (props.formData.preferenceId) {
             setDefaultPreference({ value: props.formData.preferenceId, label: props.formData.preferenceName });
@@ -66,9 +73,14 @@ const SidebarFilters = (props) => {
         setFormData(props.formData);
     }, [props.formData]);
 
-    const [formData, setFormData] = useState(props.formData);
-    const preferences = useSelector(state => state.preferences.preferences.map(data => { return { value: data.id, label: data.saveName } }));
-    const defaultPreferenceId = useSelector(state => state.preferences.defaultPreferenceId);
+    useEffect(() => {
+        if (defaultPreference.value !== defaultPreferenceId) {
+            let preference = preferences.find(data => data.value == defaultPreferenceId);
+            if(preference){onChangePreference(preference);}
+        }
+        if(!defaultPreferenceId) setDefaultPreference({ value: '', label: '' });
+    }, [defaultPreferenceId]);
+
 
     const treatment = useSelector(state => state.labels.treatments).map(data => {
         return { value: data.label_val, label: data.name }
@@ -76,23 +88,6 @@ const SidebarFilters = (props) => {
     const medicalCondition = useSelector(state => state.labels.medicalConditions).map(data => {
         return { value: data.label_val, label: data.name }
     });
-
-    const [defaultPreference, setDefaultPreference] = useState({ value: '', label: '' });
-
-    useEffect(() => {
-        if (defaultPreference.value !== defaultPreferenceId) {
-            let preference = preferences.find(data => data.value == defaultPreferenceId);
-            if(preference){onChangePreference(preference);}
-        }
-        
-        if(!defaultPreferenceId){
-         setDefaultPreference({ value: '', label: '' });   
-        }
-
-    }, [defaultPreferenceId]);
-
-    const payerType = constants.Paytype;
-    const patientCohort = constants.Patient_Cohort;
 
     const states = Object.keys(constants.States).map(key => {
         return { value: constants.States[key], label: key }
@@ -214,9 +209,6 @@ const SidebarFilters = (props) => {
     return (
         <div className="sidebar">
             <div className="sidebar-content">
-                {/* <div id="sidebar-message" style={{visibility: "hidden"}}>
-                <p>Message</p>
-            </div> */}
                 <h3> Patient Finder Definition</h3>
                 <FormGroup className="formGroup">
                     <FormLabel className="formLabel">Preferences <InfoOutlinedIcon fontSize="small" color="primary" /></FormLabel>

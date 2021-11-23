@@ -102,9 +102,7 @@ const Header = () => {
                     anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
                 >
                     <Link to='profile' style={{ textDecoration: 'none', color:'inherit' }}>
-                        <MenuItem>
-                            <Avatar /> Profile
-                        </MenuItem>
+                        <MenuItem> <Avatar/> Profile </MenuItem>
                     </Link>
                     <Divider />
                     <MenuItem onClick={showCreatePreference}>

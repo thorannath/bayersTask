@@ -9,7 +9,6 @@ import RadioGroup from '@mui/material/RadioGroup';
 import { useEffect, useState } from 'react';
 import MultipleSelect from '../Inputs/MultipleSelect';
 
-
 export const Filters = (props) => {
   const payerType = constants.Paytype;
   const patientCohort = constants.Patient_Cohort;

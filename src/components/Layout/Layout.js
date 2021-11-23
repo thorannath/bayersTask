@@ -3,7 +3,6 @@ import { Route } from "react-router-dom";
 import PatientFinder from '../PatientFinder/PatientFinder';
 import Header from '../Header/Header';
 import Introduction from '../Introduction/Introduction';
-import UserHistory from '../UserHistory/UserHistory';
 import './Layout.css';
 import * as constants from '../../Constant';
 import PopulationOverview from '../PopulationOverview/PopulationOverview';
@@ -12,6 +11,9 @@ import { useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import ViewPreferences from '../Preferences/ViewPreferences';
 import CreatePreferences from '../Preferences/CreatePreferences';
+import Loader from '../Widgets/Loader/Loader';
+import SnackbarError from '../Widgets/Snackbar/SnackbarError';
+
 const Layout = () => {
     const history = useHistory()
     const userStatus = useSelector(state => state.users);
@@ -31,14 +33,19 @@ const Layout = () => {
                 <Route path={constants.routes.Introduction} component={Introduction}></Route>
                 <Route path={constants.routes.Population_Overview} component={PopulationOverview}></Route>
                 <Route path={constants.routes.Profile} component={Profile} />
-                <Route path="/app/preference" component={UserHistory}></Route>
             </div>
 
             {/* Create Preference Modal */}
-            <CreatePreferences/>
+            <CreatePreferences />
 
             {/* View Preference Modal */}
-            <ViewPreferences/>
+            <ViewPreferences />
+
+            {/** Loader */}
+            <Loader />
+
+            {/** API Error messages */}
+            <SnackbarError/>
         </div>
     )
 }

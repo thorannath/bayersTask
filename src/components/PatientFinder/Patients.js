@@ -4,8 +4,7 @@ import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import Modal from '@mui/material/Modal';
 import * as constants from '../../Constant';
-import { useSelector, useDispatch } from 'react-redux';
-import { closeModal } from '../../store/modals';
+import { useSelector } from 'react-redux';
 import CloseIcon from '@mui/icons-material/Close';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -26,16 +25,9 @@ const style = {
     boxShadow: 24,
 };
 
-
 const Patients = () => {
     const [open, setOpen] = useState(false);
-    const handleOpen = () => setOpen(true);
-    const handleClose = () => {
-        setOpen(false);
-    }
-
     const [stateSelected, setStateSelected] = useState()
-
     const modalStatus = useSelector(state => state.modals);
 
     useEffect(() => {
@@ -43,10 +35,10 @@ const Patients = () => {
             case constants.MESSAGE_TYPES.VIEW_HEATMAP_PATIENTS:
                 if (modalStatus.action === 'open') {
                     setStateSelected(modalStatus.data.name);
-                    handleOpen();
+                    setOpen(true);
                 }
                 else if (modalStatus.action === 'close') {
-                    handleClose();
+                    setOpen(false);
                 }
                 break;
             default:
@@ -59,15 +51,15 @@ const Patients = () => {
     return (
         <Modal
             open={open}
-            onClose={handleClose}
+            onClose={()=> setOpen(false)}
             aria-labelledby="modal-modal-title"
             aria-describedby="modal-modal-description"
         >
             <Box sx={style}>
-                <div class="modal-header">
+                <div className="modal-header">
                     <Typography align="left" variant="h6"> View Patients in {stateSelected}</Typography>
                     <div className="modal-close">
-                        <Button color="inherit" type="submit" onClick={handleClose}><CloseIcon /></Button>
+                        <Button color="inherit" type="submit" onClick={()=> setOpen(false)}><CloseIcon /></Button>
                     </div>
                 </div>
                 <TableContainer sx={{ padding: 2 }}>

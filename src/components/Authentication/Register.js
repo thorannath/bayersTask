@@ -1,18 +1,11 @@
 import React from 'react'
 import Form from 'react-bootstrap/Form';
 import { Button, TextField } from '@mui/material';
-import { useState, forwardRef} from 'react';
-import MuiAlert from '@mui/material/Alert';
+import { useState } from 'react';
 import { validateName } from '../common/validation';
 import { validateEmail } from '../common/validation';
 import { register } from '../../store/utils/thunkCreators';
 import { useDispatch } from 'react-redux';
-
-
-const Alert = forwardRef(function Alert(props, ref) {
-    return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
-  });
-  
 
 export const Register = () => {
     const dispatch = useDispatch();
@@ -21,10 +14,9 @@ export const Register = () => {
     const [fullName, setFullName] = useState('');
     const [password, setPassword] = useState('');
     const [retype, setRetype] = useState('');
-    const messageBoxId = 'register-message', maxLength=128;
-
-
     const [errorStatus, setErrorStatus] = useState({error: true, message: ""});
+
+    const messageBoxId = 'register-message', maxLength=128;
 
     const handleFormSubmit = async (e) => {
         e.preventDefault();
@@ -131,4 +123,4 @@ export const Register = () => {
     )
 }
 
-export default Register
+export default React.memo(Register)

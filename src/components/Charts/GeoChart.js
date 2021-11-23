@@ -47,7 +47,7 @@ const GeoChart = ({ data, property }) => {
         let mouseOver = function (event, d) {
             tooltip
             .style("opacity", 1)
-            .html(`${d.properties.NAME} \n Count: ${statesData[d.properties.NAME]}` )
+            .html(`${d.properties.NAME} \n Count: ${statesData[d.properties.NAME] || 0}` )
             .style("left", (event.pageX) + "px")
             .style("top", (event.pageY-80) + "px")
 

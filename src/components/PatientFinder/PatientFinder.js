@@ -17,6 +17,8 @@ import Box from '@mui/material/Box'
 import Patients from './Patients';
 import MultipleSelect from '../Inputs/MultipleSelect';
 import Graph from '../Charts/Graph';
+import { setLoadingStatus } from '../../store/loader';
+import eventBus from '../../services/EventBus';
 
 const PatientFinder = () => {
     const dispatch = useDispatch();
@@ -25,8 +27,8 @@ const PatientFinder = () => {
     const treatments = useSelector(state => state.labels.treatments);
     const medicalConditions = useSelector(state => state.labels.medicalConditions);
     const preferences = useSelector(state => state.preferences.preferences);
-    const treatment = useSelector(state => state.labels.treatments).map(data =>({value: data.label_val, label: data.name}));
-    const medicalCondition = useSelector(state => state.labels.medicalConditions).map(data =>({value: data.label_val, label:data.name}));
+    const treatment = useSelector(state => state.labels.treatments).map(data => ({ value: data.label_val, label: data.name }));
+    const medicalCondition = useSelector(state => state.labels.medicalConditions).map(data => ({ value: data.label_val, label: data.name }));
     const modalStatus = useSelector(state => state.modals);
 
     const [treatmentsSelected, setTreatmentsSelected] = useState(treatment);
@@ -37,7 +39,7 @@ const PatientFinder = () => {
     const [stateData, setStateData] = useState({});
     const [updateError, setUpdateError] = useState({});
 
-    var initialData = {
+    const initialData = {
         preferenceId: '',
         preferenceName: '',
         groupBy: constants.groupType.Cohort,
@@ -61,9 +63,9 @@ const PatientFinder = () => {
         fetchGraphData();
     }, [graphChange])
 
-    useEffect(()=> {
-        if(modalStatus.messageType ===  constants.MESSAGE_TYPES.VIEW_PREFERECNE){
-            if(modalStatus.action === 'close' && modalStatus.data?.id){
+    useEffect(() => {
+        if (modalStatus.messageType === constants.MESSAGE_TYPES.VIEW_PREFERECNE) {
+            if (modalStatus.action === 'close' && modalStatus.data?.id) {
                 const obj = loadPreferenceForm(modalStatus.data.id);
                 if (obj) setFormData({ ...obj });
             }
@@ -84,7 +86,7 @@ const PatientFinder = () => {
             states: jsonData.states.map(data => { return { value: data, label: constants.AcronymToStateNames[data] } }),
             cohorts: { ckd: false, diab: false, both: false },
             payType: { MCR: false, COM: false },
-     };
+        };
         if (jsonData.group_condition.group_by === 'cohort') {
             for (const [type] of Object.entries(data.cohorts)) {
                 if (jsonData.group_condition.selection.includes(type)) {
@@ -102,45 +104,69 @@ const PatientFinder = () => {
         return data;
     }, [medicalConditions, preferences, treatments]);
 
-    const fetchGraphData = async () => {
+    const fetchGraphData = () => {
         const request = requestObject();
-
         if (!request) return;
-
-        request.userid = Cookies.get("userid", { path: '/' });
-        request.authToken = Cookies.get('authToken', { path: '/' });
-        const treatmentResponse = await axios.post('http://localhost:3000/patientfinder/treatments', request);
-        const res = treatmentResponse.data;
-        res.treatments.labels.shift();
-        res.treatments.data = res.treatments.data.map((e, i) => {
-            const ALL_DATA = e.data.shift();
-            const result = e.data.map((ele, i) => (ele / ALL_DATA * 100));
-            return { type: e.type, data: result };
-        });
-        const treatmentsChart = createChartData(res.treatments);
-        setTreatmentsChartData({ ...treatmentsChart });
-
-        const medicalResponse = await axios.post('http://localhost:3000/patientfinder/medicals', request);
-        const res2 = medicalResponse.data;
-        res2.medical_conditions.labels.shift();
-        res2.medical_conditions.data = res2.medical_conditions.data.map((e, i) => {
-            const ALL_DATA = e.data.shift();
-            const result = e.data.map((ele, i) => (ele / ALL_DATA * 100));
-            return { type: e.type, data: result };
-        });
-
-        const medicalChart = createChartData(res2.medical_conditions)
-        setMedicalChartData({ ...medicalChart });
-
-        const populationData = await axios.post('http://localhost:3000/patientfinder/states/population', request);
-        const res3 = populationData.data;
-        setStateData(res3);
+        dispatch(setLoadingStatus(true));
+        setTimeout(async () => {
+            await Promise.all([
+                getTreatmentsData(request),
+                getMedicalData(request),
+                getStatsData(request),
+            ])
+            dispatch(setLoadingStatus(false));
+        }, 1500)
     }
 
+    const getTreatmentsData = async (request) => {
+        try {
+            const treatmentResponse = await axios.post('http://localhost:3000/patientfinder/treatments', request);
+            const res = treatmentResponse.data;
+            res.treatments.labels.shift();
+            res.treatments.data = res.treatments.data.map((e, i) => {
+                const ALL_DATA = e.data.shift();
+                const result = e.data.map((ele, i) => (ele / ALL_DATA * 100));
+                return { type: e.type, data: result };
+            });
+            const treatmentsChart = createChartData(res.treatments);
+            setTreatmentsChartData({ ...treatmentsChart });
+        }
+        catch (error) {
+            eventBus.dispatch("treatmentsGraphError", { message: "Unable to retrive the Treatments chart data" });
+        }
+    }
+
+    const getMedicalData = async (request) => {
+        try {
+            const medicalResponse = await axios.post('http://localhost:3000/patientfinder/medicals', request);
+            const res2 = medicalResponse.data;
+            res2.medical_conditions.labels.shift();
+            res2.medical_conditions.data = res2.medical_conditions.data.map((e, i) => {
+                const ALL_DATA = e.data.shift();
+                const result = e.data.map((ele, i) => (ele / ALL_DATA * 100));
+                return { type: e.type, data: result };
+            });
+
+            const medicalChart = createChartData(res2.medical_conditions)
+            setMedicalChartData({ ...medicalChart });
+        }
+        catch (error) {
+            eventBus.dispatch("medicalGraphError", { message: "Unable to retrive the Medical Chart data" });
+        }
+    }
+
+    const getStatsData = async (request) => {
+        try {
+            const populationData = await axios.post('http://localhost:3000/patientfinder/states/population', request);
+            setStateData(populationData.data);
+        }
+        catch (error) {
+            eventBus.dispatch("statesGraphError", { message: "Unable to retrive the States map data" });
+        }
+    }
 
     const createChartData = (obj) => {
         const chart = { labels: obj.labels, datasets: [] }
-
         obj.data.map((val, index) => {
             chart.datasets.push({
                 label: val.type,
@@ -156,13 +182,16 @@ const PatientFinder = () => {
         const groupKeys = (formData.groupBy === constants.groupType.Cohort) ? formData.cohorts : formData.payType;
         const treatmentLabels = treatmentsSelected.map(data => {
             let treatment = treatments.find(val => val.label_val == data.value);
-            if (treatment) return treatment.label;
+            return treatment?.label;
         });
         const medicalConditionLabels = medicalConditionsSelected.map((data) => {
             let medicalCondition = medicalConditions.find(val => val.label_val == data.value);
-            if (medicalCondition) return medicalCondition.label;
+            return medicalCondition?.label;
         });
+
         return {
+            userid: Cookies.get("userid", { path: '/' }),
+            authToken: Cookies.get('authToken', { path: '/' }),
             jsonData: {
                 group_condition: {
                     group_by: formData.groupBy,
@@ -183,20 +212,9 @@ const PatientFinder = () => {
         }
     }
 
-    const handleClick = () => {
-        fetchGraphData();
-    }
-
-    const handleReset = () => {
-        setFormData({ ...initialData });
-    }
-
     const handlePreferenceChange = useCallback((event) => {
         const data = loadPreferenceForm(event);
-
-        if (data) {
-            setFormData({ ...data });
-        }
+        if (data) setFormData({ ...data });
     }, [loadPreferenceForm]);
 
 
@@ -232,26 +250,6 @@ const PatientFinder = () => {
         });
     };
 
-    const treatmentsChartComponent = (
-        <div id="treatment-chart">
-            <h3> Treatment Chart </h3>
-            <div style={styles.infoBox}>
-                This figure displays the prevalence of specific medical conditions among the target patients. Please hover your cursor above the figure to view numeric values of results in the corresponding pop-up window. In the legend, click to select or unselect specific subgroups from display. Below the figure, select or unselect specific medical conditions to customize the display. Display groups can be presented by cohort (default) or by payor type.
-            </div>
-            <Graph chartData={treatmentsChartData} />
-        </div>
-    );
-
-    const medicalChartComponent = (
-        <div id="medical-chart" style={styles.section}>
-            <h3> Medical Conditions Chart </h3>
-            <div style={styles.infoBox}>
-                This figure displays the prevalence of specific medication use among the target patients. Please hover your cursor above the figure to view numeric values of results in the corresponding pop-up window. In the legend, click to select or unselect specific subgroups from display. Below the figure, select or unselect specific medication classes to customize the display. Display groups can be presented by cohort (default) or by payor type.
-            </div>
-            <Graph chartData={medicalChartData} />
-        </div>
-    );
-
     const onChangeTreatmentSelected = (event) => {
         let res = event.map(data => data.value);
         let treatments = treatment.filter(data => res.includes(data.value));
@@ -278,19 +276,38 @@ const PatientFinder = () => {
         setGraphChange(graphChange + 1)
     }
 
+    const TreatmentsChartComponent = () => (
+        <div id="treatment-chart">
+            <h3> Treatment Chart </h3>
+            <div style={styles.infoBox}>
+                This figure displays the prevalence of specific medical conditions among the target patients. Please hover your cursor above the figure to view numeric values of results in the corresponding pop-up window. In the legend, click to select or unselect specific subgroups from display. Below the figure, select or unselect specific medical conditions to customize the display. Display groups can be presented by cohort (default) or by payor type.
+            </div>
+            <Graph chartData={treatmentsChartData} />
+        </div>
+    );
+
+    const MedicalChartComponent = () => (
+        <div id="medical-chart" style={styles.section}>
+            <h3> Medical Conditions Chart </h3>
+            <div style={styles.infoBox}>
+                This figure displays the prevalence of specific medication use among the target patients. Please hover your cursor above the figure to view numeric values of results in the corresponding pop-up window. In the legend, click to select or unselect specific subgroups from display. Below the figure, select or unselect specific medication classes to customize the display. Display groups can be presented by cohort (default) or by payor type.
+            </div>
+            <Graph chartData={medicalChartData} />
+        </div>
+    );
+
     return (
         <div className="container">
             <SidebarFilters
                 formData={formData}
                 onChangeFormData={onChangeFormData}
                 onChangeGraphData={onChangeGraphData}
-                onUpdateChart={handleClick}
-                onResetChart={handleReset}
+                onUpdateChart={fetchGraphData}
+                onResetChart={() => setFormData({ ...initialData })}
                 onChangePreference={(id) => handlePreferenceChange(id)}
                 onTakeScreenshot={takeScreenshot} />
             <div className="main">
-                {treatmentsChartComponent}
-
+                <TreatmentsChartComponent />
                 <MultipleSelect
                     options={treatment}
                     name="Treatment Labels"
@@ -298,7 +315,8 @@ const PatientFinder = () => {
                     value={treatmentsSelected}
                     onChange={onChangeTreatmentSelected}
                 />
-                {medicalChartComponent}
+
+                <MedicalChartComponent />
                 <MultipleSelect
                     options={medicalCondition}
                     name="Medical Condtion Labels"
@@ -312,10 +330,10 @@ const PatientFinder = () => {
                         The presented geographical analysis displays the proportion of target patients among adult members in the Optum administrative claims dataset. You can hover your cursor above a specific state to view numeric values in the corresponding pop-up window.
                         Please note that patients in Puerto Rico or Unknown geographical regions are not displayed in this figure.
                     </div>
-                    <GeoChart data={Object.assign(data, { stateData: stateData })}/>
+                    <GeoChart data={Object.assign(data, { stateData: stateData })} />
                 </div>
 
-                <Patients/>
+                <Patients />
 
                 <Modal
                     open={updateError}

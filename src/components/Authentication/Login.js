@@ -1,14 +1,10 @@
+import React from 'react'
 import { Button, TextField } from '@mui/material';
 import './Authentication.css';
 import Form from 'react-bootstrap/Form';
-import { useState, forwardRef } from 'react';
-import MuiAlert from '@mui/material/Alert';
+import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { login } from '../../store/utils/thunkCreators';
-
-const Alert = forwardRef(function Alert(props, ref) {
-  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
-});
 
 const Login = () => {
     const dispatch = useDispatch();
@@ -31,7 +27,8 @@ const Login = () => {
                 variant="standard"  
                 label="Username" 
                 value={username}
-                onChange={(e) => setUsername(e.target.value)} required 
+                onChange={(e) => setUsername(e.target.value)} 
+                required 
                 />
             </Form.Group>
             <Form.Group className="form-group" controlId="password">
@@ -55,4 +52,4 @@ const Login = () => {
     )
 }
 
-export default Login
+export default React.memo(Login)

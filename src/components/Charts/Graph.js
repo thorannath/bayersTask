@@ -7,9 +7,7 @@ export const Graph = (props) => {
           maintainAspectRatio: false,
      }
 
-     return (
-          <div className="graph-container"><Bar className="graph" options={options} data={props.chartData}/></div>
-     )
+     return ( <div className="graph-container"><Bar className="graph" options={options} data={props.chartData}/></div> )
 }
 
 export default Graph
