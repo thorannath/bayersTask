@@ -1,10 +1,10 @@
 import React from 'react'
 import { Button, TextField } from '@mui/material';
 import './Authentication.css';
-import Form from 'react-bootstrap/Form';
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { login } from '../../store/utils/thunkCreators';
+import FormGroup from '@mui/material/FormGroup';
 
 const Login = () => {
     const dispatch = useDispatch();
@@ -19,7 +19,7 @@ const Login = () => {
     
     return (
         <div className="login-cls">
-            <Form.Group className="form-group" controlId="username">
+            <FormGroup className="form-group" controlId="username">
                 <TextField 
                 id="outlined-basic" 
                 type="text"
@@ -30,8 +30,8 @@ const Login = () => {
                 onChange={(e) => setUsername(e.target.value)} 
                 required 
                 />
-            </Form.Group>
-            <Form.Group className="form-group" controlId="password">
+            </FormGroup>
+            <FormGroup className="form-group" controlId="password">
                 <TextField
                     id="outlined-password-input"
                     label="Password"
@@ -43,7 +43,7 @@ const Login = () => {
                     onChange={(e) => setPassword(e.target.value)}
                     required
                 />
-            </Form.Group>
+            </FormGroup>
             <div>
             <Button type="submit" sx={{width:'50%'}} variant="contained" onClick={handleFormSubmit}>Login</Button>
             <Button sx={{width:'50%'}}>Forget Password</Button>

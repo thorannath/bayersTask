@@ -45,7 +45,7 @@ const SnackbarError = () => {
   return (
     <Snackbar
       open={open}
-      autoHideDuration={6000}
+      autoHideDuration={2000}
       onClose={handleClose}
       onClick={handleClose}
       message={message}

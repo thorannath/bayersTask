@@ -1,10 +1,7 @@
-import React from 'react'
 import './PatientFinder.css';
 import axios from 'axios'
-import { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import * as constants from '../../Constant';
-import Backdrop from '@mui/material/Backdrop';
-import Modal from '@mui/material/Modal';
 import html2canvas from "html2canvas";
 import jsPdf from "jspdf";
 import { useSelector, useDispatch } from 'react-redux';
@@ -13,12 +10,12 @@ import SidebarFilters from './SidebarFilters';
 import Cookies from 'js-cookie';
 import GeoChart from '../Charts/GeoChart';
 import data from "../../US_geo.json";
-import Box from '@mui/material/Box'
 import Patients from './Patients';
 import MultipleSelect from '../Inputs/MultipleSelect';
 import Graph from '../Charts/Graph';
 import { setLoadingStatus } from '../../store/loader';
 import eventBus from '../../services/EventBus';
+import UpdateChartNotice from '../Widgets/UpdateChartNotice';
 
 const PatientFinder = () => {
     const dispatch = useDispatch();
@@ -37,7 +34,6 @@ const PatientFinder = () => {
     const [treatmentsChartData, setTreatmentsChartData] = useState({});
     const [medicalChartData, setMedicalChartData] = useState({});
     const [stateData, setStateData] = useState({});
-    const [updateError, setUpdateError] = useState({});
 
     const initialData = {
         preferenceId: '',
@@ -266,9 +262,7 @@ const PatientFinder = () => {
 
     const onChangeFormData = (data) => {
         setFormData({ ...data });
-        setTimeout(() => {
-            setUpdateError(true);
-        }, 5000)
+        eventBus.dispatch("updateChartNotice", {status: true});
     }
 
     const onChangeGraphData = (data) => {
@@ -333,19 +327,11 @@ const PatientFinder = () => {
                     <GeoChart data={Object.assign(data, { stateData: stateData })} />
                 </div>
 
+                {/** Patient list in a state */}
                 <Patients />
 
-                <Modal
-                    open={updateError}
-                    onClose={() => setUpdateError(false)}
-                    closeAfterTransition
-                    BackdropComponent={Backdrop}
-                    disableAutoFocus={true}
-                    BackdropProps={{
-                        timeout: 500,
-                    }}>
-                    <Box style={styles.modalInfo}> <h3>Results are no longer upto date. Please click on Update!</h3></Box>
-                </Modal>
+                {/** Update chart notice */}
+                <UpdateChartNotice/>
             </div>
         </div>
     )
@@ -366,22 +352,6 @@ const styles = {
         borderTop: '2px dotted grey',
         marginTop: '20px',
         paddingTop: '20px'
-    },
-    modalInfo: {
-        position: 'absolute',
-        top: '50%',
-        left: '50%',
-        transform: 'translate(-50%, -50%)',
-        borderRadius: 5,
-        backgroundColor: 'whitesmoke',
-        border: '2px solid #b22222',
-        fontWeight: 'bold',
-        height: '75px',
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        boxShadow: 24,
-        padding: 5
     }
 }
 export default PatientFinder;

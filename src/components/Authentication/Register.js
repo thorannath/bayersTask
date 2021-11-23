@@ -1,11 +1,11 @@
 import React from 'react'
-import Form from 'react-bootstrap/Form';
 import { Button, TextField } from '@mui/material';
 import { useState } from 'react';
 import { validateName } from '../common/validation';
 import { validateEmail } from '../common/validation';
 import { register } from '../../store/utils/thunkCreators';
 import { useDispatch } from 'react-redux';
+import FormGroup from '@mui/material/FormGroup';
 
 export const Register = () => {
     const dispatch = useDispatch();
@@ -29,7 +29,7 @@ export const Register = () => {
         <div>
             <Form>
                 <div id="register-message"><p></p></div>
-                <Form.Group className="form-group" controlId="username">
+                <FormGroup className="form-group" controlId="username">
                     <TextField type="text" className="form-input" label="Username" variant="standard"  onChange={(e) => {
                         /* Name Validation Checking */
                         const errorStat = validateName(e.target.value);
@@ -42,9 +42,9 @@ export const Register = () => {
                         }
                         return setUsername(e.target.value)
                     }} required />
-                </Form.Group>
+                </FormGroup>
 
-                <Form.Group className="form-group" controlId="email">
+                <FormGroup className="form-group" controlId="email">
                     <TextField type="email" className="form-input" label="Email" variant="standard" onChange={(e) => {
                         /* Email Validation Checking */
                         const errorStat = validateEmail(e.target.value);
@@ -57,9 +57,9 @@ export const Register = () => {
                         }
                         return setEmail(e.target.value)
                     }} required />
-                </Form.Group>
+                </FormGroup>
 
-                <Form.Group className="form-group" controlId="fullName">
+                <FormGroup className="form-group" controlId="fullName">
                     <TextField type="text" className="form-input" label="Full Name" variant="standard" onChange={(e) => {
                         /* Name Validation Checking */
                         const errorStat = validateName(e.target.value);
@@ -72,9 +72,9 @@ export const Register = () => {
                         }
                         setFullName(e.target.value)
                     }} required />
-                </Form.Group>
+                </FormGroup>
 
-                <Form.Group className="form-group" controlId="password">
+                <FormGroup className="form-group" controlId="password">
                     <TextField
                         label="Password"
                         type="password"
@@ -96,12 +96,12 @@ export const Register = () => {
                             }
                             setPassword(e.target.value);
                         }} required />
-                </Form.Group>
+                </FormGroup>
                 <div style={{width: '90%', margin: '1px auto'}}>
                     <small>Password Strength</small>
                     <div id="pwd-measure"></div>
                 </div>
-                <Form.Group className="form-group" controlId="retype_password">
+                <FormGroup className="form-group" controlId="retype_password">
                     <TextField
                         label="Retype Password"
                         type="password"
@@ -116,7 +116,7 @@ export const Register = () => {
                             }
                             setRetype(e.target.value);
                         }} required />
-                </Form.Group>
+                </FormGroup>
                 <Button type="submit" sx={{width:'50%'}} color="primary" variant="contained" onClick={handleFormSubmit}>Register</Button>
             </Form>
         </div>
