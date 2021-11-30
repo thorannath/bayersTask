@@ -50,11 +50,6 @@
     margin: 10px;
 }
 
-.graph-container{
-    height:400px;
-    width: 90%;
-}
-
 .states>div, .treatment>div, .medical-conditions>div{
     overflow-y:scroll
 }

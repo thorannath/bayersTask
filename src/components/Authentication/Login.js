@@ -19,7 +19,7 @@ const Login = () => {
     
     return (
         <div className="login-cls">
-            <FormGroup className="form-group" controlId="username">
+            <FormGroup className="form-group">
                 <TextField 
                 id="outlined-basic" 
                 type="text"
@@ -31,7 +31,7 @@ const Login = () => {
                 required 
                 />
             </FormGroup>
-            <FormGroup className="form-group" controlId="password">
+            <FormGroup className="form-group">
                 <TextField
                     id="outlined-password-input"
                     label="Password"

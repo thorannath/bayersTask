@@ -46,6 +46,7 @@ export const register = ({ username, password, fullName, email }) => async (disp
     try {
         const response = await axios.post('http://localhost:3000/users/register', { userid: username, password, fullName, email })
         if (response && Number(response.data.success)) {
+            dispatch(loginAction());
             Cookies.set('userid', username, { expires: 1, path: '/' });
             Cookies.set('password', password, { expires: 1, path: '/' });
             Cookies.set('authToken', response.data.userData.authToken, { expires: 1, path: '/' });

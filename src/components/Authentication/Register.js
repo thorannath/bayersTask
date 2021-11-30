@@ -27,7 +27,6 @@ export const Register = () => {
 
     return (
         <div>
-            <Form>
                 <div id="register-message"><p></p></div>
                 <FormGroup className="form-group" controlId="username">
                     <TextField type="text" className="form-input" label="Username" variant="standard"  onChange={(e) => {
@@ -118,7 +117,6 @@ export const Register = () => {
                         }} required />
                 </FormGroup>
                 <Button type="submit" sx={{width:'50%'}} color="primary" variant="contained" onClick={handleFormSubmit}>Register</Button>
-            </Form>
         </div>
     )
 }
