@@ -1,11 +1,10 @@
 import React, { StyleSheet, useEffect, useRef } from 'react';
 import * as d3 from 'd3';
 import { select, geoPath, geoAlbersUsa } from 'd3';
-import { showModal } from '../../store/modals';
 import * as constants from '../../Constant';
 import { useSelector, useDispatch } from 'react-redux';
 
-const GeoChart = ({ data, property }) => {
+const GeoChart = ({ data, property , viewPatients}) => {
     const svgRef = useRef();
     const dispatch = useDispatch();
     const wrapperRef = useRef();
@@ -71,9 +70,6 @@ const GeoChart = ({ data, property }) => {
                 .style("opacity", 1)
         }
 
-        let viewPaitents = (event, d) => {
-            dispatch(showModal({ messageType: constants.MESSAGE_TYPES.VIEW_HEATMAP_PATIENTS, action: 'open', data: { name: d.properties.NAME } }));
-        }
 
         svg.append("g")
             .selectAll("path")
@@ -88,13 +84,13 @@ const GeoChart = ({ data, property }) => {
                 let val = statesData[d.properties.NAME] || 0;
                 return colorScale(val * 1000000);
             })
-            .on("click", viewPaitents)
+            .on("click", viewPatients)
             .attr("class", function (d) { return "states" })
             .style("stroke", "black")
             .on("mouseover", mouseOver)
             .on("mouseleave", mouseLeave)
             
-    }, [data, property])
+    }, [data, property, statesData])
 
     return (
         <div ref={wrapperRef} style={{ marginBottom: '2rem' }}>

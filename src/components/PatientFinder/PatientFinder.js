@@ -16,6 +16,7 @@ import Graph from '../Charts/Graph';
 import { setLoadingStatus } from '../../store/loader';
 import eventBus from '../../services/EventBus';
 import UpdateChartNotice from '../Widgets/UpdateChartNotice';
+import { showModal } from '../../store/modals';
 
 const PatientFinder = () => {
     const dispatch = useDispatch();
@@ -34,6 +35,7 @@ const PatientFinder = () => {
     const [treatmentsChartData, setTreatmentsChartData] = useState({});
     const [medicalChartData, setMedicalChartData] = useState({});
     const [stateData, setStateData] = useState({});
+    const [patientData, setPatientData] = useState({});
 
     const initialData = {
         preferenceId: '',
@@ -108,10 +110,10 @@ const PatientFinder = () => {
             await Promise.all([
                 getTreatmentsData(request),
                 getMedicalData(request),
-                getStatsData(request),
+                getStatsData(request)
             ])
             dispatch(setLoadingStatus(false));
-        }, 1500)
+        }, 2000)
     }
 
     const getTreatmentsData = async (request) => {
@@ -158,6 +160,18 @@ const PatientFinder = () => {
         }
         catch (error) {
             eventBus.dispatch("statesGraphError", { message: "Unable to retrive the States map data" });
+        }
+    }
+
+    
+    const getPatientData = async (selectedState) => {
+        try {
+            const request = requestObject();
+            const patientData = await axios.post('http://localhost:3000/patientfinder/patients/details', {...request, selectedState: selectedState});
+            setPatientData(patientData.data);
+        }
+        catch (error) {
+            eventBus.dispatch("patientDataError", { message: "Unable to retrive the Patient details from all states in map data" });
         }
     }
 
@@ -290,6 +304,13 @@ const PatientFinder = () => {
         </div>
     );
 
+
+    const viewPatients = (event, d) => {
+        getPatientData(constants.States[d.properties.NAME])
+        dispatch(showModal({ messageType: constants.MESSAGE_TYPES.VIEW_HEATMAP_PATIENTS, action: 'open', data: { name: d.properties.NAME } }));
+        
+    }
+
     return (
         <div className="container">
             <SidebarFilters
@@ -324,11 +345,11 @@ const PatientFinder = () => {
                         The presented geographical analysis displays the proportion of target patients among adult members in the Optum administrative claims dataset. You can hover your cursor above a specific state to view numeric values in the corresponding pop-up window.
                         Please note that patients in Puerto Rico or Unknown geographical regions are not displayed in this figure.
                     </div>
-                    <GeoChart data={Object.assign(data, { stateData: stateData })} />
+                    <GeoChart data={Object.assign(data, { stateData: stateData })} viewPatients={viewPatients}/>
                 </div>
 
                 {/** Patient list in a state */}
-                <Patients />
+                <Patients data={patientData}/>
 
                 {/** Update chart notice */}
                 <UpdateChartNotice/>

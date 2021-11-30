@@ -25,11 +25,12 @@ const style = {
     boxShadow: 24,
 };
 
-const Patients = () => {
+const Patients = (props) => {
     const [open, setOpen] = useState(false);
     const [stateSelected, setStateSelected] = useState()
     const modalStatus = useSelector(state => state.modals);
 
+    console.log(props.data);
     useEffect(() => {
         switch (modalStatus.messageType) {
             case constants.MESSAGE_TYPES.VIEW_HEATMAP_PATIENTS:
