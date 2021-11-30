@@ -1,20 +1,22 @@
-import React, { StyleSheet, useEffect, useRef } from 'react';
+import React, { StyleSheet, useEffect, useRef, useState } from 'react';
 import * as d3 from 'd3';
 import { select, geoPath, geoAlbersUsa } from 'd3';
 import * as constants from '../../Constant';
-import { useSelector, useDispatch } from 'react-redux';
+import {useSelector, useDispatch } from 'react-redux';
 
 const GeoChart = ({ data, property , viewPatients}) => {
     const svgRef = useRef();
     const dispatch = useDispatch();
     const wrapperRef = useRef();
-    const statesData = {}
+    const [statesData, setStateData] = useState({})
 
     useEffect(() => {
         if(Object.keys(data.stateData).length > 0 ){
+            const states={}
             Object.keys(data.stateData.states).map(e => {
-                statesData[constants.AcronymToStateNames[e]] = data.stateData.states[e];
+                states[constants.AcronymToStateNames[e]] = data.stateData.states[e];
             });
+            setStateData(states);
         }
 
         const svg = select(svgRef.current);
@@ -90,7 +92,7 @@ const GeoChart = ({ data, property , viewPatients}) => {
             .on("mouseover", mouseOver)
             .on("mouseleave", mouseLeave)
             
-    }, [data, property, statesData])
+    }, [data, property])
 
     return (
         <div ref={wrapperRef} style={{ marginBottom: '2rem' }}>

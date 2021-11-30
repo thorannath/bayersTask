@@ -34,6 +34,7 @@ const PatientFinder = () => {
     const [medicalChartData, setMedicalChartData] = useState({});
     const [stateData, setStateData] = useState({});
     const [patientData, setPatientData] = useState({});
+    const [filteredPatients, setFilteredPatients] = useState({});
 
     const initialData = {
         preferenceId: '',
@@ -166,7 +167,11 @@ const PatientFinder = () => {
         try {
             const request = requestObject();
             const patientData = await axios.post('http://localhost:3000/patientfinder/patients/details', {...request, selectedState: selectedState});
-            setPatientData(patientData.data);
+            if(!selectedState){
+                setPatientData(patientData.data);
+            }else{
+                setFilteredPatients(patientData.data);
+            }
         }
         catch (error) {
             eventBus.dispatch("patientDataError", { message: "Unable to retrive the Patient details from all states in map data" });
@@ -277,6 +282,7 @@ const PatientFinder = () => {
 
     const viewPatients = (event, d) => {
         getPatientData(constants.States[d.properties.NAME])
+        
         dispatch(showModal({ messageType: constants.MESSAGE_TYPES.VIEW_HEATMAP_PATIENTS, action: 'open', data: { name: d.properties.NAME } }));
         
     }
@@ -319,7 +325,7 @@ const PatientFinder = () => {
                 </div>
 
                 {/** Patient list in a state */}
-                <Patients data={patientData}/>
+                <Patients data={filteredPatients}/>
 
                 {/** Update chart notice */}
                 <UpdateChartNotice/>
