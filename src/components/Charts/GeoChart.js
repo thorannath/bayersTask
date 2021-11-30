@@ -4,19 +4,18 @@ import { select, geoPath, geoAlbersUsa } from 'd3';
 import * as constants from '../../Constant';
 import {useSelector, useDispatch } from 'react-redux';
 
-const GeoChart = ({ data, property , viewPatients}) => {
+const GeoChart = ({ data, stateData, property , viewPatients}) => {
     const svgRef = useRef();
     const dispatch = useDispatch();
     const wrapperRef = useRef();
-    const [statesData, setStateData] = useState({})
+    const [states, setStates] = useState({})
 
     useEffect(() => {
-        if(Object.keys(data.stateData).length > 0 ){
-            const states={}
-            Object.keys(data.stateData.states).map(e => {
-                states[constants.AcronymToStateNames[e]] = data.stateData.states[e];
+        if(Object.keys(stateData).length > 0 ){
+            Object.keys(stateData.states).map(e => {
+                states[constants.AcronymToStateNames[e]] = stateData.states[e];
             });
-            setStateData(states);
+            setStates(states);
         }
 
         const svg = select(svgRef.current);
@@ -48,7 +47,7 @@ const GeoChart = ({ data, property , viewPatients}) => {
         let mouseOver = function (event, d) {
             tooltip
             .style("opacity", 1)
-            .html(`${d.properties.NAME} \n Count: ${statesData[d.properties.NAME] || 0}` )
+            .html(`${d.properties.NAME} \n Count: ${states[d.properties.NAME] || 0}` )
             .style("left", (event.pageX) + "px")
             .style("top", (event.pageY-80) + "px")
 
@@ -83,7 +82,7 @@ const GeoChart = ({ data, property , viewPatients}) => {
             .attr("d", d3.geoPath()
                 .projection(projection))
             .attr("fill", function (d) {
-                let val = statesData[d.properties.NAME] || 0;
+                let val = states[d.properties.NAME] || 0;
                 return colorScale(val * 1000000);
             })
             .on("click", viewPatients)
@@ -92,7 +91,7 @@ const GeoChart = ({ data, property , viewPatients}) => {
             .on("mouseover", mouseOver)
             .on("mouseleave", mouseLeave)
             
-    }, [data, property])
+    }, [data, property, stateData])
 
     return (
         <div ref={wrapperRef} style={{ marginBottom: '2rem' }}>
