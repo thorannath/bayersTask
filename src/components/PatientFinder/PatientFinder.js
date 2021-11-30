@@ -2,8 +2,6 @@ import './PatientFinder.css';
 import axios from 'axios'
 import React, { useState, useEffect, useCallback } from 'react';
 import * as constants from '../../Constant';
-import html2canvas from "html2canvas";
-import jsPdf from "jspdf";
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchLabels, getPreferences } from '../../store/utils/thunkCreators';
 import SidebarFilters from './SidebarFilters';
@@ -229,35 +227,7 @@ const PatientFinder = () => {
 
 
     const takeScreenshot = () => {
-        html2canvas(document.getElementById("medical-chart")/*, {
-            onclone: document => {
-                document.getElementById("image-render-medical").style.visibility = "hidden";
-            }
-        }*/).then(canvas => {
-
-            const imgData = canvas.toDataURL("image/png");
-            const pdf = new jsPdf("l", "mm", "a4");
-            const width = pdf.internal.pageSize.getWidth();
-            const height = pdf.internal.pageSize.getHeight();
-            pdf.addImage(imgData, "JPEG", 10, 20, width - 10, height - 20);
-            pdf.save(`medical-chart_${new Date().toISOString()}.pdf`);
-        })/*.catch(err=>{
-            console.log(err);
-        });*/
-
-        html2canvas(document.getElementById("treatment-chart")/*, {
-            onclone: document => {
-                document.getElementById("image-render-treatment").style.visibility = "hidden";
-            }
-        }*/).then(canvas => {
-
-            const imgData = canvas.toDataURL("image/png");
-            const pdf = new jsPdf("l", "mm", "a4");
-            const width = pdf.internal.pageSize.getWidth();
-            const height = pdf.internal.pageSize.getHeight();
-            pdf.addImage(imgData, "JPEG", 10, 20, width - 10, height - 20);
-            pdf.save(`treatment-chart_${new Date().toISOString()}.pdf`);
-        });
+ 
     };
 
     const onChangeTreatmentSelected = (event) => {
@@ -290,7 +260,7 @@ const PatientFinder = () => {
             <div style={styles.infoBox}>
                 This figure displays the prevalence of specific medical conditions among the target patients. Please hover your cursor above the figure to view numeric values of results in the corresponding pop-up window. In the legend, click to select or unselect specific subgroups from display. Below the figure, select or unselect specific medical conditions to customize the display. Display groups can be presented by cohort (default) or by payor type.
             </div>
-            <Graph chartData={treatmentsChartData} />
+            <Graph chartData={treatmentsChartData} name="treatment"/>
         </div>
     );
 
@@ -300,7 +270,7 @@ const PatientFinder = () => {
             <div style={styles.infoBox}>
                 This figure displays the prevalence of specific medication use among the target patients. Please hover your cursor above the figure to view numeric values of results in the corresponding pop-up window. In the legend, click to select or unselect specific subgroups from display. Below the figure, select or unselect specific medication classes to customize the display. Display groups can be presented by cohort (default) or by payor type.
             </div>
-            <Graph chartData={medicalChartData} />
+            <Graph chartData={medicalChartData} name="medication"/>
         </div>
     );
 

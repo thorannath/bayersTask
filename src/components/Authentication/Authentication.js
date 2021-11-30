@@ -15,15 +15,9 @@ const Alert = forwardRef(function Alert(props, ref) {
     return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
 
-const LoginRef = forwardRef(function Login(props, ref) {
-    return <Login/>;
-});
-
-const RegisterRef = forwardRef(function Register(props, ref) {
-    return <Register/>;
-});
-
 const Authentication = () => {
+
+    console.log(123);
 
     const dispatch = useDispatch();
 
@@ -89,7 +83,7 @@ const Authentication = () => {
             </div>
             <Snackbar
                 open={open}
-                autoHideDuration={6000}
+                autoHideDuration={2000}
                 onClose={handleClose}
                 anchorOrigin={{ vertical: 'top', horizontal: 'right' }}>
                 <Alert severity='error'>{message}</Alert>
@@ -105,4 +99,4 @@ const styles = {
     }
 }
 
-export default Authentication
+export default React.memo(Authentication)

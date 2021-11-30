@@ -282,8 +282,6 @@ const SidebarFilters = (props) => {
                     <Button color="primary" variant="contained" type="submit" onClick={props.onUpdateChart}> Update </Button>
                     <Button color="warning" variant="outlined" onClick={props.onResetChart}> Reset </Button>
                 </div>
-                <Button color="info" fullWidth variant="contained" onClick={props.onTakeScreenshot}> Take Screenshot </Button>
-
             </div>
         </div>
     )
