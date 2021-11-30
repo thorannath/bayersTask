@@ -17,6 +17,7 @@ export const Filters = (props) => {
     return { value: constants.States[key], label: key }
   });
 
+  console.log(props.formData);
   const [formData, setFormData] = useState(props.formData);
 
   useEffect(() => {
@@ -67,7 +68,7 @@ export const Filters = (props) => {
         <FormGroup className="">
           <FormLabel component="legend">Cohort Type</FormLabel>
           <div row>
-            {patientCohort.map((data, i) => {
+            {formData.cohorts && patientCohort.map((data, i) => {
               return <FormControlLabel key={`cohort-formgrp-${i}`}
                 control={
                   <Checkbox
@@ -87,7 +88,7 @@ export const Filters = (props) => {
         <FormGroup className="" >
           <FormLabel component="legend">Payer Type</FormLabel>
           <div row>
-            {payerType.map((data, i) => {
+            {formData.payType && payerType.map((data, i) => {
               return <FormControlLabel key={`paytyp-formgrp-${i}`}
                 control={
                   <Checkbox checked={formData.payType[data]}
