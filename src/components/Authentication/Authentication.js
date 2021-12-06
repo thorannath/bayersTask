@@ -1,4 +1,4 @@
-import React, { useState, useEffect, forwardRef } from 'react'
+import React, { useState, useEffect, useCallback, forwardRef } from 'react'
 import { useSelector, useDispatch } from 'react-redux';
 import Login from './Login';
 import Register from './Register';
@@ -16,9 +16,6 @@ const Alert = forwardRef(function Alert(props, ref) {
 });
 
 const Authentication = () => {
-
-    console.log(123);
-
     const dispatch = useDispatch();
 
     if(Cookies.get('userid', {path:'/'})){
@@ -55,9 +52,9 @@ const Authentication = () => {
         }, 1500)
     }, [open])
 
-    const Auth = () => {
+    const Auth = useCallback(() => {
         return authType === 'login' ? <Login/> : <Register />
-    }
+    }, [authType])
 
     const handleAuth = (type) => {
         setAuthType(type);

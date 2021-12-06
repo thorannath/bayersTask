@@ -1,7 +1,18 @@
-.formGroup{
-
+.checkbox-grid{
+    display: grid;
+    grid-auto-columns: auto;
 }
 
-.formLabel{
-    
+.checkbox-grid-4{
+    padding: 20px;
+    display: grid;
+    overflow:scroll;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+}
+
+.moreButton{
+    display: flex;
+    justify-content: left;
+    align-items: center;
+    color: royalblue;
 }

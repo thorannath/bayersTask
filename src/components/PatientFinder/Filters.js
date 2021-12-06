@@ -67,7 +67,7 @@ export const Filters = (props) => {
       return (
         <FormGroup className="">
           <FormLabel component="legend">Cohort Type</FormLabel>
-          <div row>
+          <div row={true}>
             {formData.cohorts && patientCohort.map((data, i) => {
               return <FormControlLabel key={`cohort-formgrp-${i}`}
                 control={
@@ -87,7 +87,7 @@ export const Filters = (props) => {
       return (
         <FormGroup className="" >
           <FormLabel component="legend">Payer Type</FormLabel>
-          <div row>
+          <div row={true}>
             {formData.payType && payerType.map((data, i) => {
               return <FormControlLabel key={`paytyp-formgrp-${i}`}
                 control={

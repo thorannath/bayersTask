@@ -15,6 +15,7 @@ import { setLoadingStatus } from '../../store/loader';
 import eventBus from '../../services/EventBus';
 import UpdateChartNotice from '../Widgets/UpdateChartNotice';
 import { showModal } from '../../store/modals';
+import { debounce } from 'lodash';
 
 const PatientFinder = () => {
     const dispatch = useDispatch();
@@ -32,14 +33,14 @@ const PatientFinder = () => {
     const [graphChange, setGraphChange] = useState(0);
     const [treatmentsChartData, setTreatmentsChartData] = useState({});
     const [medicalChartData, setMedicalChartData] = useState({});
-    const [stateData, setStateData] = useState({});
+    const [stateData, setStateData] = useState([]);
     const [patientData, setPatientData] = useState({});
 
     const initialData = {
         preferenceId: '',
         preferenceName: '',
         groupBy: constants.groupType.Cohort,
-        states: '',
+        states: [],
         cohorts: { ckd: true, diab: true, both: true },
         payType: { MCR: true, COM: true },
         treatmentSelected: treatment,
@@ -53,7 +54,7 @@ const PatientFinder = () => {
     useEffect(() => {
         dispatch(fetchLabels())
         dispatch(getPreferences());
-    }, [dispatch])
+    }, [])
 
     useEffect(() => {
         fetchGraphData();
@@ -66,7 +67,14 @@ const PatientFinder = () => {
                 if (obj) setFormData({ ...obj });
             }
         }
-    }, [modalStatus])
+    }, [modalStatus]);
+
+    useEffect(()=> {
+        if(preferences.defaultPreferenceId) handlePreferenceChange(preferences.defaultPreferenceId);
+        else if(preferences.preferences?.length>0){
+            handlePreferenceChange(preferences.preferences[0].id);
+        }
+    }, [])
 
     const [formData, setFormData] = useState({ ...initialData });
 
@@ -153,25 +161,20 @@ const PatientFinder = () => {
     }
 
     const getStatesData = async (request) => {
-
-        console.log(request);
         try {
             const populationData = await axios.post('http://localhost:3000/patientfinder/states/population', request);
-            setStateData(populationData.data);
+            setStateData(populationData.data || '');
         }
         catch (error) {
             eventBus.dispatch("statesGraphError", { message: "Unable to retrive the States map data" });
         }
     }
-
     
     const getPatientData = async (selectedState) => {
         try {
             const request = requestObject();
-            console.log( {...request, selectedState: selectedState});
             const patientData = await axios.post('http://localhost:3000/patientfinder/patients/details', {...request, selectedState: selectedState});
             setPatientData(patientData.data);
-
         }
         catch (error) {
             eventBus.dispatch("patientDataError", { message: "Unable to retrive the Patient details from all states in map data" });
@@ -210,7 +213,7 @@ const PatientFinder = () => {
                     group_by: formData.groupBy,
                     selection: Object.keys(groupKeys).filter((e, i) => { return groupKeys[e] })
                 },
-                states: formData.states.map((e) => e['value']),
+                states: formData.states ? formData.states.map(data=> data.value): null,
                 treatments: {
                     labels: treatmentLabels,
                     OR: formData.treatmentsOR ? formData.treatmentsOR.map(data => data.value) : null,
@@ -230,11 +233,6 @@ const PatientFinder = () => {
         if (data) setFormData({ ...data });
     }, [loadPreferenceForm]);
 
-
-    const takeScreenshot = () => {
- 
-    };
-
     const onChangeTreatmentSelected = (event) => {
         let res = event.map(data => data.value);
         let treatments = treatment.filter(data => res.includes(data.value));
@@ -250,13 +248,17 @@ const PatientFinder = () => {
     }
 
     const onChangeFormData = (data) => {
-        setFormData({ ...data });
-        eventBus.dispatch("updateChartNotice", {status: true});
+        setFormData({ ...formData, ...data });
+        debouncedCallNotice();
     }
 
+    const [debouncedCallNotice] = useState(() => debounce(()=> {
+        eventBus.dispatch("updateChartNotice", {status: true});
+    }, 2000));
+
     const onChangeGraphData = (data) => {
-        setFormData({ ...data });
-        setGraphChange(graphChange + 1)
+        setFormData({ ...formData, ...data });
+        setGraphChange(graphChange + 1);
     }
 
     const TreatmentsChartComponent = () => (
@@ -282,9 +284,7 @@ const PatientFinder = () => {
 
     const viewPatients = (event, d) => {
         getPatientData(constants.States[d.properties.NAME])
-        
         dispatch(showModal({ messageType: constants.MESSAGE_TYPES.VIEW_HEATMAP_PATIENTS, action: 'open', data: { name: d.properties.NAME } }));
-        
     }
 
     return (
@@ -296,7 +296,7 @@ const PatientFinder = () => {
                 onUpdateChart={fetchGraphData}
                 onResetChart={() => setFormData({ ...initialData })}
                 onChangePreference={(id) => handlePreferenceChange(id)}
-                onTakeScreenshot={takeScreenshot} />
+            />
             <div className="main">
                 <TreatmentsChartComponent />
                 <MultipleSelect
@@ -321,7 +321,7 @@ const PatientFinder = () => {
                         The presented geographical analysis displays the proportion of target patients among adult members in the Optum administrative claims dataset. You can hover your cursor above a specific state to view numeric values in the corresponding pop-up window.
                         Please note that patients in Puerto Rico or Unknown geographical regions are not displayed in this figure.
                     </div>
-                    <GeoChart data={data}   stateData={stateData} viewPatients={viewPatients}/>
+                    <GeoChart data={data} stateData={stateData} viewPatients={viewPatients}/>
                 </div>
 
                 {/** Patient list in a state */}

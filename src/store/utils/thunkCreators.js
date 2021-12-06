@@ -147,23 +147,3 @@ export const fetchLabels = () => async (dispatch) => {
         console.error(error);
     }
 }
-
-export const generateTreatmentGraph = (credentials) => async (dispatch) => {
-    try {
-        const { data } = await axios.post(baseURL + "patientfinder/treatments", credentials);
-
-
-    } catch (error) {
-        console.error(error);
-    }
-}
-
-export const generateMedicalConditionsGraph = (credentials) => async (dispatch) => {
-    try {
-        const { data } = await axios.post(baseURL + "patientfinder/medicals", credentials);
-
-
-    } catch (error) {
-        console.error(error);
-    }
-}

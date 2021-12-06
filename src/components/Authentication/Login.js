@@ -13,7 +13,7 @@ const Login = () => {
     
     const handleFormSubmit = async () =>{
         if (username && password) {
-            dispatch(login({username, password}))
+            dispatch(login({username, password}));
         }
     }
     

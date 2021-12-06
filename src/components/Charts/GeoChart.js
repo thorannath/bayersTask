@@ -1,17 +1,15 @@
-import React, { StyleSheet, useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import * as d3 from 'd3';
-import { select, geoPath, geoAlbersUsa } from 'd3';
+import { select } from 'd3';
 import * as constants from '../../Constant';
-import {useSelector, useDispatch } from 'react-redux';
 
 const GeoChart = ({ data, stateData, property , viewPatients}) => {
     const svgRef = useRef();
-    const dispatch = useDispatch();
     const wrapperRef = useRef();
     const [states, setStates] = useState({})
 
     useEffect(() => {
-        if(Object.keys(stateData).length > 0 ){
+        if(stateData.states && Object.keys(stateData).length > 0 ){
             Object.keys(stateData.states).map(e => {
                 states[constants.AcronymToStateNames[e]] = stateData.states[e];
             });

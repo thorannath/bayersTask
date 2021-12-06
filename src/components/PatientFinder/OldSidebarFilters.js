@@ -1,18 +1,18 @@
 import React, { useState, useEffect } from 'react'
 import * as constants from '../../Constant';
+import FormGroup from '@mui/material/FormGroup';
+import FormLabel from '@mui/material/FormLabel';
+import Select from 'react-select';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import { FormControlLabel } from '@mui/material';
 import { useSelector } from 'react-redux';
-import { invert } from 'lodash';
 import Radio from '@mui/material/Radio';
 import RadioGroup from '@mui/material/RadioGroup';
-import Select from 'react-select';
-import FormGroup from '@mui/material/FormGroup';
-import { FormControlLabel } from '@mui/material';
-import FormLabel from '@mui/material/FormLabel';
-import AccordianCheckbox from '../Inputs/AccordianCheckbox';
-import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
-import Typography from '@mui/material/Typography';
-import { Button } from '@mui/material';
 import Checkbox from '@mui/material/Checkbox';
+import Button from '@mui/material/Button';
+import Typography from '@mui/material/Typography';
+import MultipleSelect from '../Inputs/MultipleSelect';
+import AccordianCheckbox from '../Inputs/AccordianCheckbox';
 
 const customStyles = {
     menu: (provided, state) => ({
@@ -57,43 +57,16 @@ const customStyles = {
 }
 
 const SidebarFilters = (props) => {
-
-    console.log('sidebar filters');
     const payerType = constants.Paytype;
     const patientCohort = constants.Patient_Cohort;
-    const states = invert(constants.States);
-
-    const treatments = useSelector(state => state.labels.treatments);
-
-    const [treatmentLabels, setTreatmentLabels] = useState({});
-
-    useEffect(()=>{
-        let object = {};
-        treatments.map(val=> {
-            object[val.label_val]= val.name;
-        });
-        setTreatmentLabels(object);
-    }, [treatments]);
-
-    const medicalConditions = useSelector(state => state.labels.medicalConditions);
-
-    const [medicalConditionLabels, setMedicalConditionLabels] = useState({});
-
-    useEffect(()=>{
-        let object = {};
-        medicalConditions.map(val=> {
-            object[val.label_val]= val.name;
-        });
-        setMedicalConditionLabels(object);
-    }, [medicalConditions]);
 
     const [formData, setFormData] = useState(props.formData);
+    const [defaultPreference, setDefaultPreference] = useState({ value: '', label: '' });
+
 
     const preferences = useSelector(state => state.preferences.preferences.map(data => { return { value: data.id, label: data.saveName } }));
     const defaultPreferenceId = useSelector(state => state.preferences.defaultPreferenceId);
-
-    const [defaultPreference, setDefaultPreference] = useState({ value: '', label: '' });
-
+    
     useEffect(() => {
         if (props.formData.preferenceId) {
             setDefaultPreference({ value: props.formData.preferenceId, label: props.formData.preferenceName });
@@ -101,6 +74,44 @@ const SidebarFilters = (props) => {
         setFormData(props.formData);
     }, [props.formData]);
 
+    useEffect(() => {
+        if (defaultPreference.value !== defaultPreferenceId) {
+            let preference = preferences.find(data => data.value == defaultPreferenceId);
+            if(preference){onChangePreference(preference);}
+        }
+        if(!defaultPreferenceId) setDefaultPreference({ value: '', label: '' });
+    }, [defaultPreferenceId]);
+
+
+    const treatment = useSelector(state => state.labels.treatments).map(data => {
+        return { value: data.label_val, label: data.name }
+    });
+    const medicalCondition = useSelector(state => state.labels.medicalConditions).map(data => {
+        return { value: data.label_val, label: data.name }
+    });
+
+    const states = Object.keys(constants.States).map(key => {
+        return { value: constants.States[key], label: key }
+    });
+
+
+    const treatments = useSelector(state => state.labels.treatments).map(data => {
+        return { [data.label_val]: data.name }
+    });
+
+
+
+
+    const validateAndSend = (formData) => {
+        props.onChangeFormData(formData);
+    };
+
+    const onChangeStates = (event) => {
+        let formVal = { ...formData };
+        let statesData = event.map((data) => data.value);
+        formVal.states = states.filter(data => statesData.includes(data.value))
+        validateAndSend(formVal);
+    }
 
     const onChangePreference = (event) => {
         if (!event) return;
@@ -110,32 +121,37 @@ const SidebarFilters = (props) => {
 
     const onChangeGroup = (event) => {
         let groupType = event.target.value;
-        props.onChangeFormData({groupBy: (groupType === constants.groupType.Cohort) ? constants.groupType.Cohort : constants.groupType.PayerType});
-
+        let formVal = { ...formData };
+        formVal.groupBy = (groupType === constants.groupType.Cohort) ? constants.groupType.Cohort : constants.groupType.PayerType;
+        validateAndSend(formVal);
     }
 
     const onChangeGroupBy = (event, filterType) => {
         let formVal = { ...formData };
         switch (filterType) {
             case constants.groupType.Cohort:
-                props.onChangeFormData({cohorts: { ...formVal.cohorts,
-                    [event.target.name]: event.target.checked,}})
+                formVal.cohorts = {
+                    ...formVal.cohorts,
+                    [event.target.name]: event.target.checked,
+                }
                 break;
 
             case constants.groupType.PayerType:
-                props.onChangeFormData({payType: { ...formVal.payType,
-                    [event.target.name]: event.target.checked,}})
+                formVal.payType = {
+                    ...formVal.payType,
+                    [event.target.name]: event.target.checked,
+                };
                 break;
         }
+        validateAndSend(formVal);
     }
-
 
     const GroupData = () => {
         if (formData.groupBy === constants.groupType.Cohort) {
             return (
                 <FormGroup className="formGroup">
                     <FormLabel className="formLabel">Cohort Type</FormLabel>
-                    <div row='true'>
+                    <div row>
                         {patientCohort.map((data, i) => {
                             return <FormControlLabel key={`cohort-formgrp-${i}`}
                                 control={
@@ -155,7 +171,7 @@ const SidebarFilters = (props) => {
             return (
                 <FormGroup className="formGroup" >
                     <FormLabel className="formLabel">Payer Type</FormLabel>
-                    <div row='true'>
+                    <div row>
                         {payerType.map((data, i) => {
                             return <FormControlLabel key={`paytyp-formgrp-${i}`}
                                 control={
@@ -174,31 +190,55 @@ const SidebarFilters = (props) => {
         }
     }
 
-    const onChangeStates = (data) => {
-        props.onChangeFormData({states: data});
+    const onChangeTreatment = (event, logic) => {
+        let treatments = event.map(data => data.value);
+        let formVal = { ...formData };
+        if (logic === constants.Logic.AND) {
+            formVal.treatmentsAND = treatment.filter(data => treatments.includes(data.value));
+
+        }
+        else if (logic === constants.Logic.OR) {
+            formVal.treatmentsOR = treatment.filter(data => treatments.includes(data.value));
+        }
+        props.onChangeGraphData(formVal);
     }
 
-    const onChangeTreatmentsAND = (data)=> {
-        props.onChangeGraphData({treatmentsAND: data});
+    const onChangeMedicalCondition = (event, logic) => {
+        let medicalConditions = event.map(data => data.value);
+        let formVal = { ...formData };
+        if (logic === constants.Logic.AND) {
+            formVal.medicalConditionsAND = medicalCondition.filter(data => medicalConditions.includes(data.value));
+        }
+        else if (logic === constants.Logic.OR) {
+            formVal.medicalConditionsOR = medicalCondition.filter(data => medicalConditions.includes(data.value));
+        }
+        props.onChangeGraphData(formVal);
     }
 
-    const onChangeTreatmentsOR = (data)=> {
-        props.onChangeGraphData({treatmentsOR: data});
+    const onChangeNewStates = (data)=>{
+        console.log(data);
     }
 
-    const onChangeMedicalConditionsAND = (data)=> {
-        props.onChangeGraphData({medicalConditionsAND: data});
+    const onChangeTreatmentAND = (data) => {
+
     }
 
-    const onChangeMedicalConditionsOR = (data)=> {
-        props.onChangeGraphData({medicalConditionsOR: data});
+    const onChangeTreatmentOR = (data) => {
+
+    }
+
+    const onChangeMedicalConditionAND = (data) => {
+
+    }
+
+    const onChangeMedicalConditionOR = (data) => {
+
     }
 
     return (
         <div className="sidebar">
             <div className="sidebar-content">
                 <h3> Patient Finder Definition</h3>
-
                 <FormGroup className="formGroup">
                     <FormLabel className="formLabel">Preferences <InfoOutlinedIcon fontSize="small" color="primary" /></FormLabel>
                     <Select
@@ -211,7 +251,6 @@ const SidebarFilters = (props) => {
                         onChange={(e) => onChangePreference(e)}
                         classNamePrefix="select" />
                 </FormGroup>
-
                 <FormGroup className="formGroup">
                     <FormLabel className="formLabel">Group By <InfoOutlinedIcon fontSize="small" color="primary" /></FormLabel>
                     <RadioGroup row
@@ -227,19 +266,64 @@ const SidebarFilters = (props) => {
 
                 <GroupData />
 
-                <AccordianCheckbox name="States" data={props.formData.states} labels={states} onChange={onChangeStates} />
-                <AccordianCheckbox name="Treatments with AND" data={props.formData.treatmentsAND} labels={treatmentLabels} onChange={onChangeTreatmentsAND} />
-                <AccordianCheckbox name="Treatments with OR" data={props.formData.treatmentsOR} labels={treatmentLabels} onChange={onChangeTreatmentsOR} />
-                <AccordianCheckbox name="Medical Conditions with AND" data={props.formData.medicalConditionsAND} labels={medicalConditionLabels} onChange={onChangeMedicalConditionsAND} />
-                <AccordianCheckbox name="Medical Conditions with OR" data={props.formData.medicalConditionsOR} labels={medicalConditionLabels} onChange={onChangeMedicalConditionsOR} />
-            </div>
+                <AccordianCheckbox name="States" data={{'Alabama':true}} labels={constants.States}  onChange={onChangeNewStates}/>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', columnGap: '30px', marginTop: '20px', marginBottom: '20px' }}>
+                <AccordianCheckbox name="Treatment with AND" data={{'Alabama':true}} labels={treatmentLabels}  onChange={onChangeTreatmentAND}/>
+
+                <AccordianCheckbox name="Treatment with OR" data={{'Alabama':true}} labels={constants.States}  onChange={onChangeTreatmentOR}/>
+
+                <AccordianCheckbox name="Medical Condition with AND" data={{'Alabama':true}} labels={constants.States}  onChange={onChangeMedicalConditionAND}/>
+
+                <AccordianCheckbox name="Medical Condition with OR" data={{'Alabama':true}} labels={constants.States}  onChange={onChangeMedicalConditionOR}/>
+
+                {/* <MultipleSelect
+                    options={states}
+                    name="states"
+                    label="States"
+                    value={formData.states}
+                    onChange={(e) => onChangeStates(e)}
+                /> 
+
+                <MultipleSelect
+                    options={treatment}
+                    name="treatmentAND"
+                    label="Treatment with AND"
+                    value={formData.treatmentsAND}
+                    onChange={(e) => onChangeTreatment(e, constants.Logic.AND)}
+                /> 
+
+                <MultipleSelect
+                    options={treatment}
+                    name="treatmentOR"
+                    label="Treatment with OR"
+                    value={formData.treatmentsOR}
+                    onChange={(e) => onChangeTreatment(e, constants.Logic.OR)}
+                />
+
+                <MultipleSelect
+                    options={medicalCondition}
+                    name="medicalConditionAND"
+                    label="Medical Conditions with AND"
+                    value={formData.medicalConditionsAND}
+                    onChange={(e) => onChangeMedicalCondition(e, constants.Logic.AND)}
+                />
+
+
+                <MultipleSelect
+                    options={medicalCondition}
+                    name="medicalConditionOR"
+                    label="Medical Conditions with OR"
+                    value={formData.medicalConditionsOR}
+                    onChange={(e) => onChangeMedicalCondition(e, constants.Logic.OR)}
+                /> */}
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', columnGap: '30px', marginTop: '20px', marginBottom: '20px' }}>
                     <Button color="primary" variant="contained" type="submit" onClick={props.onUpdateChart}> Update </Button>
                     <Button color="warning" variant="outlined" onClick={props.onResetChart}> Reset </Button>
                 </div>
+            </div>
         </div>
     )
 }
 
-export default React.memo(SidebarFilters)
+export default SidebarFilters
