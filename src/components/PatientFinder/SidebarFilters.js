@@ -92,6 +92,16 @@ const SidebarFilters = (props) => {
     const preferences = useSelector(state => state.preferences.preferences.map(data => { return { value: data.id, label: data.saveName } }));
     const defaultPreferenceId = useSelector(state => state.preferences.defaultPreferenceId);
 
+    useEffect(()=> {
+        if(defaultPreferenceId){
+            let preference = preferences.find((data)=> data.id == defaultPreferenceId);
+            setDefaultPreference({ value: preference?.id ||'', label: preference?.saveName ||'' });
+        }
+        else{
+            setDefaultPreference({ value: preferences[0]?.id || '', label: preferences[0]?.saveName || '' });
+        }
+    }, [])
+
     const [defaultPreference, setDefaultPreference] = useState({ value: '', label: '' });
 
     useEffect(() => {

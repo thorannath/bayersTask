@@ -11,7 +11,7 @@ import * as constants from '../../Constant';
 import { useSelector, useDispatch } from 'react-redux';
 import { addPreference, updatePreference } from '../../store/utils/thunkCreators';
 import { useEffect } from 'react';
-import { validateName } from '../common/validation';
+import { validateName } from '../Common/validation';
 import { closeModal } from '../../store/modals';
 import Typography from '@mui/material/Typography';
 import Modal from '@mui/material/Modal';
@@ -32,25 +32,35 @@ const CreatePreferences = (props) => {
     const dispatch = useDispatch();
     const [open, setOpen] = useState(false);
 
+
+    const initialData = {
+        preferenceId: '',
+        preferenceName: '',
+        groupBy: constants.groupType.Cohort,
+        states: [],
+        cohorts: { ckd: true, diab: true, both: true },
+        payType: { MCR: true, COM: true },
+    }
     const [name, setName] = useState('');
     const [defaultVal, setDefaultVal] = useState(false);
-    const [formData, setFormData] = useState({});
+    const [formData, setFormData] = useState(initialData);
     const [errorStatus, setErrorStatus] = useState(('initialData.saveName' || 'initialData.preferenceName') ? { error: false, message: "" } : { error: true, message: "Please fill up the form!" });
 
     const modalStatus = useSelector(state => state.modals);
     const preferences = useSelector(state => state.preferences.preferences);
     const defaultPreferenceId = useSelector(state => state.preferences.defaultPreferenceId);
+    const loader = useSelector(state => state.loader);
 
     useEffect(() => {
         switch (modalStatus.messageType) {
             case constants.MESSAGE_TYPES.CREATE_PREFERENCE:
-                modalStatus.action === 'open'? setOpen(true):setOpen(false);
+                modalStatus.action === 'open' ? setOpen(true) : setOpen(false);
                 break;
 
             case constants.MESSAGE_TYPES.EDIT_PREFERENCE:
                 if (modalStatus.action === 'open') {
                     let data = loadPreferenceForm(modalStatus.data.id);
-                    setFormData({...data});
+                    setFormData({ ...data });
                     setName(data.preferenceName);
                     setDefaultVal((defaultPreferenceId === data.id) ? true : false);
                     setOpen(true);
@@ -67,7 +77,6 @@ const CreatePreferences = (props) => {
     const loadPreferenceForm = (id) => {
         let preference = preferences.find(data => data.id === id);
         if (!preference) return null;
-        console.log(preference)
         let jsonData = preference.jsonData;
         const data = {
             preferenceId: preference.id,
@@ -76,7 +85,7 @@ const CreatePreferences = (props) => {
             states: jsonData.states.map(data => { return { value: data, label: constants.AcronymToStateNames[data] } }),
             cohorts: { ckd: false, diab: false, both: false },
             payType: { MCR: false, COM: false },
-         };
+        };
         if (jsonData.group_condition.group_by === 'cohort') {
             for (const [type] of Object.entries(data.cohorts)) {
                 if (jsonData.group_condition.selection.includes(type)) {
@@ -100,9 +109,6 @@ const CreatePreferences = (props) => {
     useEffect(() => {
         setDefaultVal((defaultPreferenceId === formData.id) ? true : false);
     }, [defaultPreferenceId]);
-
-
-    const loader = useSelector(state => state.loader);
 
     const handleName = (event) => {
         /* Name Validation Checking */
@@ -165,12 +171,8 @@ const CreatePreferences = (props) => {
         if (!validateFormData(formData)) return;
         const req = requestObject();
         if (initialData.saveName || initialData.preferenceName) {
-            if (initialData.id) {
-                req.preferenceId = initialData.id;
-            }
-            if (initialData.preferenceId) {
-                req.preferenceId = initialData.preferenceId;
-            }
+            req.preferenceId = initialData?.id;
+            req.preferenceId = initialData?.preferenceId;
             dispatch(updatePreference(req));
             if (!loader.isLoading) {
                 dispatch(closeModal({ messageType: constants.MESSAGE_TYPES.CREATE_PREFERENCE, action: 'close' }))
@@ -191,7 +193,7 @@ const CreatePreferences = (props) => {
     return (
         <Modal
             open={open}
-            onClose={()=> setOpen(false)}
+            onClose={() => setOpen(false)}
             closeAfterTransition>
             <Box sx={style}>
                 <div className="modal-header">
@@ -215,7 +217,7 @@ const CreatePreferences = (props) => {
                         onChangeFormData={setFormData}
                     />
                     <FormGroup className="form-group">
-                        <FormControlLabel control={<Checkbox checked={defaultVal} onChange={handleDefault} />} label="Make this as default" />
+                        <FormControlLabel style={{ color: 'grey' }} control={<Checkbox checked={defaultVal} onChange={handleDefault} />} label="Make this as default" />
                     </FormGroup>
                 </div>
                 <div className="modal-footer">

@@ -17,11 +17,12 @@ const Alert = forwardRef(function Alert(props, ref) {
 
 const Authentication = () => {
     const dispatch = useDispatch();
+    const history = useHistory();
 
-    if(Cookies.get('userid', {path:'/'})){
+    if (Cookies.get('userid', { path: '/' })) {
+        history.push("/app/patient-finder");
         dispatch(loginAction());
     }
-    const history = useHistory();
     const authenticationErrors = useSelector(state => state.authenticationErrors);
     const userStatus = useSelector(state => state.users);
 
@@ -53,7 +54,7 @@ const Authentication = () => {
     }, [open])
 
     const Auth = useCallback(() => {
-        return authType === 'login' ? <Login/> : <Register />
+        return authType === 'login' ? <Login /> : <Register />
     }, [authType])
 
     const handleAuth = (type) => {
@@ -92,7 +93,6 @@ const Authentication = () => {
 const styles = {
     title: {
         borderBottom: '2px solid grey',
-        padding:5
     }
 }
 

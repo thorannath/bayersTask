@@ -3,6 +3,7 @@ import { Bar } from 'react-chartjs-2';
 import './Charts.css';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import jsPDF from 'jspdf'
+import { Button } from '@mui/material';
 
 export const Graph = (props) => {
      const options = {
@@ -20,13 +21,14 @@ export const Graph = (props) => {
 
      return (
           <div className="graph-container">
-               {Object.keys(props.chartData).length !=0 && <a id={props.name+'-download'}
+               {Object.keys(props.chartData).length !=0 && <Button id={props.name+'-download'}
                     onClick={downloadGraph}
                     className="download-icon"
-                    href=""
+                    style={{color:'royalblue'}}
                     title="Download">
-                    <FileDownloadIcon />
-               </a>}
+                    <FileDownloadIcon/>
+                    Download
+               </Button>}
                <Bar className="graph" id={props.name+'-graph'} options={options} data={props.chartData} />
           </div>
      )

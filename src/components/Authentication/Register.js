@@ -1,8 +1,7 @@
 import React from 'react'
 import { Button, TextField } from '@mui/material';
 import { useState } from 'react';
-import { validateName } from '../common/validation';
-import { validateEmail } from '../common/validation';
+import { validateName, validateEmail } from '../Common/validation';
 import { register } from '../../store/utils/thunkCreators';
 import { useDispatch } from 'react-redux';
 import FormGroup from '@mui/material/FormGroup';

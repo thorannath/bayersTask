@@ -8,6 +8,8 @@ import Radio from '@mui/material/Radio';
 import RadioGroup from '@mui/material/RadioGroup';
 import { useEffect, useState } from 'react';
 import MultipleSelect from '../Inputs/MultipleSelect';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import Typography from '@mui/material/Typography';
 
 export const Filters = (props) => {
   const payerType = constants.Paytype;
@@ -17,7 +19,6 @@ export const Filters = (props) => {
     return { value: constants.States[key], label: key }
   });
 
-  console.log(props.formData);
   const [formData, setFormData] = useState(props.formData);
 
   useEffect(() => {
@@ -26,9 +27,7 @@ export const Filters = (props) => {
 
   const onChangeGroup = (event) => {
     let groupType = event.target.value;
-    let formVal = { ...formData };
-    formVal.groupBy = (groupType === constants.groupType.Cohort) ? constants.groupType.Cohort : constants.groupType.PayerType;
-    validateAndSend(formVal);
+    props.onChangeFormData({...formData,  groupBy: (groupType === constants.groupType.Cohort) ? constants.groupType.Cohort : constants.groupType.PayerType });
   }
 
   const onChangeGroupBy = (event, filterType) => {
@@ -48,79 +47,76 @@ export const Filters = (props) => {
         };
         break;
     }
-    validateAndSend(formVal);
+    props.onChangeFormData(formVal);
   }
 
   const onChangeStates = (event) => {
     let formVal = { ...formData };
     let statesData = event.map((data) => data.value);
     formVal.states = states.filter(data => statesData.includes(data.value))
-    validateAndSend(formVal);
+    props.onChangeFormData(formVal);
   }
-
-  const validateAndSend = (formData) => {
-    props.onChangeFormData(formData);
-  };
 
   const GroupData = () => {
     if (formData.groupBy === constants.groupType.Cohort) {
-      return (
-        <FormGroup className="">
-          <FormLabel component="legend">Cohort Type</FormLabel>
-          <div row={true}>
-            {formData.cohorts && patientCohort.map((data, i) => {
-              return <FormControlLabel key={`cohort-formgrp-${i}`}
-                control={
-                  <Checkbox
-                    checked={formData.cohorts[data]}
-                    onChange={(e) => onChangeGroupBy(e, constants.groupType.Cohort)}
-                    name={data} />
-                }
-                label={data.toUpperCase()}
-              />
-            })}
-          </div>
-        </FormGroup>
-      )
+        return (
+            <FormGroup className="formGroup">
+                <FormLabel className="formLabel">Cohort Type</FormLabel>
+                <div row='true'>
+                    {patientCohort.map((data, i) => {
+                        return <FormControlLabel key={`cohort-formgrp-${i}`}
+                            control={
+                                <Checkbox
+                                    checked={formData.cohorts[data]}
+                                    sx={{ '& .MuiSvgIcon-root': { fontSize: 20 } }}
+                                    onChange={(e) => onChangeGroupBy(e, constants.groupType.Cohort)}
+                                    name={data} />
+                            }
+                            label={<Typography variant="body2" color="textSecondary">{data.toUpperCase()}</Typography>} />
+                    })}
+                </div>
+            </FormGroup>
+        )
     }
     else if (formData.groupBy === constants.groupType.PayerType) {
-      return (
-        <FormGroup className="" >
-          <FormLabel component="legend">Payer Type</FormLabel>
-          <div row={true}>
-            {formData.payType && payerType.map((data, i) => {
-              return <FormControlLabel key={`paytyp-formgrp-${i}`}
-                control={
-                  <Checkbox checked={formData.payType[data]}
-                    onChange={(e) => onChangeGroupBy(e, constants.groupType.PayerType)}
-                    name={data} />
-                }
-                label={data} />
-            })}
-          </div>
-        </FormGroup>
-      )
+        return (
+            <FormGroup className="formGroup" >
+                <FormLabel className="formLabel">Payer Type</FormLabel>
+                <div row='true'>
+                    {payerType.map((data, i) => {
+                        return <FormControlLabel key={`paytyp-formgrp-${i}`}
+                            control={
+                                <Checkbox checked={formData.payType[data]}
+                                    onChange={(e) => onChangeGroupBy(e, constants.groupType.PayerType)}
+                                    name={data} />
+                            }
+                            label={<Typography variant="body2" color="textSecondary">{data.toUpperCase()}</Typography>} />
+                    })}
+                </div>
+            </FormGroup>
+        )
     }
     else {
-      return null
+        return null
     }
-  }
+}
 
   return (
     <div className="filters">
-      <FormGroup className="">
-        <FormLabel component="legend">Group By</FormLabel>
+      <FormGroup className="formGroup">
+        <FormLabel className="formLabel">Group By <InfoOutlinedIcon fontSize="small" color="primary" /></FormLabel>
         <RadioGroup row
           value={formData.groupBy}
           onClick={onChangeGroup}
           name="radio-buttons-group">
-          <FormControlLabel value={constants.groupType.Cohort} control={<Radio />} label="Cohort" />
-          <FormControlLabel value={constants.groupType.PayerType} control={<Radio />} label="Payer" />
+          <FormControlLabel value={constants.groupType.Cohort} control={<Radio />}
+            label={<Typography variant="body2" color="textSecondary">Cohort</Typography>} />
+          <FormControlLabel value={constants.groupType.PayerType} control={<Radio />}
+            label={<Typography variant="body2" color="textSecondary">Payer</Typography>} />
         </RadioGroup>
       </FormGroup>
 
       <GroupData />
-
 
       <MultipleSelect
         options={states}

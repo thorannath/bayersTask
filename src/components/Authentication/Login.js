@@ -44,7 +44,7 @@ const Login = () => {
                     required
                 />
             </FormGroup>
-            <div>
+            <div className="card-footer">
             <Button type="submit" sx={{width:'50%'}} variant="contained" onClick={handleFormSubmit}>Login</Button>
             <Button sx={{width:'50%'}}>Forget Password</Button>
             </div>
