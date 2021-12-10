@@ -10,6 +10,7 @@ import { useEffect, useState } from 'react';
 import MultipleSelect from '../Inputs/MultipleSelect';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import Typography from '@mui/material/Typography';
+import { FormHelperText } from '@mui/material';
 
 export const Filters = (props) => {
   const payerType = constants.Paytype;
@@ -20,13 +21,26 @@ export const Filters = (props) => {
   });
 
   const [formData, setFormData] = useState(props.formData);
+  const [formErrors, setFormErrors] = useState({});
 
   useEffect(() => {
     setFormData(props.formData);
+    if(props.formData.states.length == 0){
+      setFormErrors({...formErrors, states: 'Select atleast one state'});
+    }
+    else{
+      if(formErrors.hasOwnProperty('states'))delete formErrors.states;
+    }
   }, [props.formData]);
 
   const onChangeGroup = (event) => {
     let groupType = event.target.value;
+    if(!groupType){
+      setFormErrors({...formErrors, 'groupType':'Group Type is required'});
+    }
+    else{
+      if(formErrors.hasOwnProperty('groupType'))delete formErrors.groupType;
+    }
     props.onChangeFormData({...formData,  groupBy: (groupType === constants.groupType.Cohort) ? constants.groupType.Cohort : constants.groupType.PayerType });
   }
 
@@ -38,6 +52,7 @@ export const Filters = (props) => {
           ...formVal.cohorts,
           [event.target.name]: event.target.checked,
         }
+        validateCheckbox(formVal.cohorts,'cohort');
         break;
 
       case constants.groupType.PayerType:
@@ -45,15 +60,32 @@ export const Filters = (props) => {
           ...formVal.payType,
           [event.target.name]: event.target.checked,
         };
+        validateCheckbox(formVal.payType,'paytype');
         break;
     }
     props.onChangeFormData(formVal);
   }
 
+  const validateCheckbox = (data, type) => {
+    if(Object.values(data).find(val=> val == true)){
+      if(formErrors.hasOwnProperty([type]))delete formErrors[type];
+    }
+    else{
+        setFormErrors({...formErrors, [type]: 'Slect atleast on checkbox'});
+    }
+  }
+
   const onChangeStates = (event) => {
     let formVal = { ...formData };
     let statesData = event.map((data) => data.value);
-    formVal.states = states.filter(data => statesData.includes(data.value))
+    formVal.states = states.filter(data => statesData.includes(data.value));
+
+    if(formVal.states.length == 0){
+      setFormErrors({...formErrors, states: 'Select atleast one state'});
+    }
+    else{
+      if(formErrors.hasOwnProperty('states'))delete formErrors.states;
+    }
     props.onChangeFormData(formVal);
   }
 
@@ -74,6 +106,7 @@ export const Filters = (props) => {
                             }
                             label={<Typography variant="body2" color="textSecondary">{data.toUpperCase()}</Typography>} />
                     })}
+                    {formErrors?.cohort && <FormHelperText id="error-message">{formErrors?.cohort}</FormHelperText>}
                 </div>
             </FormGroup>
         )
@@ -92,6 +125,7 @@ export const Filters = (props) => {
                             }
                             label={<Typography variant="body2" color="textSecondary">{data.toUpperCase()}</Typography>} />
                     })}
+                    {formErrors?.paytype && <FormHelperText id="error-message">{formErrors?.paytype}</FormHelperText>}
                 </div>
             </FormGroup>
         )
@@ -114,6 +148,7 @@ export const Filters = (props) => {
           <FormControlLabel value={constants.groupType.PayerType} control={<Radio />}
             label={<Typography variant="body2" color="textSecondary">Payer</Typography>} />
         </RadioGroup>
+        {formErrors?.groupBy && <FormHelperText id="error-message">{formErrors?.groupBy}</FormHelperText>}
       </FormGroup>
 
       <GroupData />
@@ -125,6 +160,7 @@ export const Filters = (props) => {
         value={formData.states}
         onChange={(e) => onChangeStates(e)}
       />
+      {formErrors?.states && <FormHelperText id="error-message">{formErrors?.states}</FormHelperText>}
     </div>
   )
 }
