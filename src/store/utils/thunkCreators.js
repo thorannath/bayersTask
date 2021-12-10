@@ -7,11 +7,9 @@ import { setLoadingStatus } from "../loader";
 import { loginAction, logoutAction } from "../users";
 import { LOGIN_FAILED, REGISTER_FAILED, setError } from "../authenticationErrors";
 
-const baseURL = "http://localhost:3000/"
-
 export const login = ({ username, password }) => async (dispatch) => {
     try {
-        const response = await axios.put(baseURL + "users/login", { userid: username, password: password })
+        const response = await axios.put(constants.API_URL+ "/users/login", { userid: username, password: password })
         if (response && response.data.success) {
             dispatch(loginAction());
             Cookies.set('userid', username, { expires: 1, path: '/' });
@@ -33,7 +31,7 @@ export const logout = () => async (dispatch) => {
             userid: Cookies.get("userid", { path: '/' }),
             authToken: Cookies.get('authToken', { path: '/' }),
         }
-        const response = await axios.post(baseURL + "users/logout", { ...params });
+        const response = await axios.post(constants.API_URL + "/users/logout", { ...params });
         Cookies.remove("userid");
         Cookies.remove("password");
         dispatch(logoutAction());
@@ -44,7 +42,7 @@ export const logout = () => async (dispatch) => {
 
 export const register = ({ username, password, fullName, email }) => async (dispatch) => {
     try {
-        const response = await axios.post('http://localhost:3000/users/register', { userid: username, password, fullName, email })
+        const response = await axios.post(`${constants.API_URL}/users/register`, { userid: username, password, fullName, email })
         if (response && Number(response.data.success)) {
             dispatch(loginAction());
             Cookies.set('userid', username, { expires: 1, path: '/' });
@@ -66,7 +64,7 @@ export const addPreference = (obj) => async (dispatch) => {
             userid: Cookies.get("userid", { path: '/' }),
             authToken: Cookies.get('authToken', { path: '/' }),
         }
-        const { data } = await axios.post(baseURL + "users/preferences", { ...obj, ...params });
+        const { data } = await axios.post(constants.API_URL + "/users/preferences", { ...obj, ...params });
 
         if (data.success) {
             let defaultPreferenceId = obj.makeDefault ? data.data.id : '';
@@ -85,7 +83,7 @@ export const updatePreference = (obj) => async (dispatch) => {
             userid: Cookies.get("userid", { path: '/' }),
             authToken: Cookies.get('authToken', { path: '/' }),
         }
-        const { data } = await axios.put(baseURL + "users/preferences", { ...obj, ...params });
+        const { data } = await axios.put(constants.API_URL + "/users/preferences", { ...obj, ...params });
 
         if (data.success) {
             dispatch(editPreferenceAction({ preference: data.data, defaultPreferenceId: obj.makeDefault }));
@@ -103,7 +101,7 @@ export const deletePreference = (preferenceId) => async (dispatch) => {
             authToken: Cookies.get('authToken', { path: '/' }),
             preferenceId
         }
-        const { data } = await axios.delete(baseURL + "users/preferences", { params });
+        const { data } = await axios.delete(constants.API_URL + "/users/preferences", { params });
 
         if (data.success) {
             dispatch(deletePreferenceAction(preferenceId));
@@ -119,7 +117,7 @@ export const getPreferences = () => async (dispatch) => {
             userid: Cookies.get("userid", { path: '/' }),
             authToken: Cookies.get('authToken', { path: '/' }),
         }
-        const { data } = await axios.get(baseURL + "users/preferences", { params });
+        const { data } = await axios.get(constants.API_URL + "users/preferences", { params });
         if (data.success) {
             dispatch(loadPreferences({ preferences: data.preferenceData, defaultPreferenceId: data.defaultPreferenceId }));
         }
@@ -135,7 +133,7 @@ export const fetchLabels = () => async (dispatch) => {
             userid: Cookies.get("userid", { path: '/' }),
             authToken: Cookies.get('authToken', { path: '/' }),
         }
-        const { data } = await axios.get(baseURL + "patientfinder/labels", { params });
+        const { data } = await axios.get(constants.API_URL+ "/patientfinder/labels", { params });
 
         if (data.success) {
             let medicalConditions = data.labelData.filter(data => data.label_type === constants.labelTypes.MEDICAL_CONDITION);

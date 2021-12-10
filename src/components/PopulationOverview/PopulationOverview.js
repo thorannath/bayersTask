@@ -1,10 +1,10 @@
 import axios from 'axios';
 import React from 'react'
+import { API_URL } from '../../Constant';
 import Histogram from '../Charts/Histogram';
 import PieChart from '../Charts/PieChart';
 import './PopulationOverview.css';
 
-const baseURL = "http://localhost:3000";
 const styles = {
     container:{
         padding:'50px 20px 20px 20px'
@@ -33,7 +33,7 @@ class PopulationOverview extends React.Component{
         this.state = {}
         
         setTimeout(async () => {
-            const data = {... (await axios.get(baseURL + "/population/overview")).data};
+            const data = {... (await axios.get(`${API_URL}/population/overview`)).data};
             if(data.status===200) {
                 const ageData = {}, raceData = {};
                 data.ageData.map(e=>ageData[e["group"]]=e["count"]);

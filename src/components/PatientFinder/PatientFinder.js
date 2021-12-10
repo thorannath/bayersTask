@@ -125,7 +125,7 @@ const PatientFinder = () => {
 
     const getTreatmentsData = async (request) => {
         try {
-            const treatmentResponse = await axios.post('http://localhost:3000/patientfinder/treatments', request);
+            const treatmentResponse = await axios.post(`${constants.API_URL}/patientfinder/treatments`, request);
             const res = treatmentResponse.data;
             res.treatments.labels.shift();
             res.treatments.data = res.treatments.data.map((e, i) => {
@@ -143,7 +143,7 @@ const PatientFinder = () => {
 
     const getMedicalData = async (request) => {
         try {
-            const medicalResponse = await axios.post('http://localhost:3000/patientfinder/medicals', request);
+            const medicalResponse = await axios.post(`${constants.API_URL}/patientfinder/medicals`, request);
             const res2 = medicalResponse.data;
             res2.medical_conditions.labels.shift();
             res2.medical_conditions.data = res2.medical_conditions.data.map((e, i) => {
@@ -162,7 +162,7 @@ const PatientFinder = () => {
 
     const getStatesData = async (request) => {
         try {
-            const populationData = await axios.post('http://localhost:3000/patientfinder/states/population', request);
+            const populationData = await axios.post(`${constants.API_URL}/patientfinder/states/population`, request);
             setStateData(populationData.data || '');
         }
         catch (error) {
@@ -173,7 +173,7 @@ const PatientFinder = () => {
     const getPatientData = async (selectedState) => {
         try {
             const request = requestObject();
-            const patientData = await axios.post('http://localhost:3000/patientfinder/patients/details', {...request, selectedState: selectedState});
+            const patientData = await axios.post(`${constants.API_URL}/patientfinder/patients/details`, {...request, selectedState: selectedState});
             setPatientData(patientData.data);
         }
         catch (error) {

@@ -54,3 +54,5 @@ const stateAcronymMapping = {}
 Object.keys(States).map(k=>{stateAcronymMapping[States[k]]=k;});
 
 export const AcronymToStateNames = stateAcronymMapping;
+
+export const API_URL="http://ec2-54-147-53-219.compute-1.amazonaws.com:3000";
