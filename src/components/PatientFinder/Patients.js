@@ -45,8 +45,6 @@ const Patients = (props) => {
         }
     }, [modalStatus])
 
-
-
     return (
         <Modal
             open={open}
@@ -54,16 +52,16 @@ const Patients = (props) => {
             aria-labelledby="modal-modal-title"
             aria-describedby="modal-modal-description"
         >
-            <Box sx={style}>
+            <Box sx={{...style, overflow: "hidden"}}>
                 <div className="modal-header">
                     <Typography align="left" variant="h6"> View Patients in {stateSelected}</Typography>
                     <div className="modal-close">
                         <Button color="inherit" type="submit" onClick={()=> setOpen(false)}><CloseIcon /></Button>
                     </div>
                 </div>
-                <TableContainer sx={{ padding: 2 }}>
-                    <Table stickyHeader sx={{ minWidth: 650 }} size="small" aria-label="a dense table">
-                        <TableHead>
+                <TableContainer sx={{ paddingBottom: 2, maxHeight: "500px" , overflowY: "scroll"}}>
+                    <Table stickyHeader sx={{ minWidth: 650 }} size="small" aria-label="a dense table" >
+                        <TableHead >
                             <TableRow>
                                 <TableCell>Patient ID</TableCell>
                                 <TableCell align="center">Sex</TableCell>
@@ -71,23 +69,29 @@ const Patients = (props) => {
                                 <TableCell align="center">Age</TableCell>
                             </TableRow>
                         </TableHead>
-                        <TableBody>
-                            <TableRow
-                                key="id"
-                                sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
-                                <TableCell component="th" scope="row">
-                                    <p>112232</p>
-                                </TableCell>
-                                <TableCell component="th" align="center" scope="row">
-                                    <p>Male</p>
-                                </TableCell>
-                                <TableCell component="th" align="center" scope="row">
-                                    <p>Hispanic</p>
-                                </TableCell>
-                                <TableCell component="th" align="center" scope="row">
-                                    <p>45</p>
-                                </TableCell>
-                            </TableRow>
+                        <TableBody sx={{overflow: "hidden"}}>
+                            {
+                                (props.data.patientData)?(
+                                    props.data.patientData.map(e=>{
+                                        return(
+                                            <TableRow key={e.patid} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+                                                <TableCell component="th" scope="row">
+                                                    <p>{e.patid}</p>
+                                                </TableCell>
+                                                <TableCell component="th" align="center" scope="row">
+                                                    <p>{e.sex}</p>
+                                                </TableCell>
+                                                <TableCell component="th" align="center" scope="row">
+                                                    <p>{e.race}</p>
+                                                </TableCell>
+                                                <TableCell component="th" align="center" scope="row">
+                                                    <p>{e.pat_age}</p>
+                                                </TableCell>
+                                            </TableRow>
+                                        );
+                                    })
+                                ):""
+                            }
                         </TableBody>
                     </Table>
                 </TableContainer>

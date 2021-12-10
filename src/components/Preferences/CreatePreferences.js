@@ -11,7 +11,7 @@ import * as constants from '../../Constant';
 import { useSelector, useDispatch } from 'react-redux';
 import { addPreference, updatePreference } from '../../store/utils/thunkCreators';
 import { useEffect } from 'react';
-import { validateName } from '../Common/validation';
+import { validateName } from '../common/validation';
 import { closeModal } from '../../store/modals';
 import Typography from '@mui/material/Typography';
 import Modal from '@mui/material/Modal';

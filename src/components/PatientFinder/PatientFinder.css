@@ -82,3 +82,8 @@
     margin-top:'20px';
     padding-top:'20px';
 }
+
+.table-body{
+    max-height: 100%;
+    overflow:scroll;
+}
