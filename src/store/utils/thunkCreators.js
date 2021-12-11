@@ -10,6 +10,7 @@ import { LOGIN_FAILED, REGISTER_FAILED, setError } from "../authenticationErrors
 const baseURL = constants.BACKEND_URL;
 
 export const login = ({ username, password }) => async (dispatch) => {
+    console.log(process.env.NODE_ENV)
     try {
         const response = await axios.put(baseURL + "users/login", { userid: username, password: password })
         if (response && response.data.success) {
