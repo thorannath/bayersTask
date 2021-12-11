@@ -57,15 +57,19 @@ const customStyles = {
 }
 
 const SidebarFilters = (props) => {
-
-    console.log('sidebar filters');
     const payerType = constants.Paytype;
     const patientCohort = constants.Patient_Cohort;
     const states = invert(constants.States);
 
-    const treatments = useSelector(state => state.labels.treatments);
-
     const [treatmentLabels, setTreatmentLabels] = useState({});
+    const [medicalConditionLabels, setMedicalConditionLabels] = useState({});
+    const [formData, setFormData] = useState(props.formData);
+
+    const treatments = useSelector(state => state.labels.treatments);
+    const medicalConditions = useSelector(state => state.labels.medicalConditions);
+    const preferences = useSelector(state => state.preferences.preferences.map(data => { return { value: data.id, label: data.saveName } }));
+    const defaultPreferenceId = useSelector(state => state.preferences.defaultPreferenceId);
+    const [defaultPreference, setDefaultPreference] = useState({ value: '', label: '' });
 
     useEffect(()=>{
         let object = {};
@@ -75,10 +79,6 @@ const SidebarFilters = (props) => {
         setTreatmentLabels(object);
     }, [treatments]);
 
-    const medicalConditions = useSelector(state => state.labels.medicalConditions);
-
-    const [medicalConditionLabels, setMedicalConditionLabels] = useState({});
-
     useEffect(()=>{
         let object = {};
         medicalConditions.map(val=> {
@@ -87,22 +87,16 @@ const SidebarFilters = (props) => {
         setMedicalConditionLabels(object);
     }, [medicalConditions]);
 
-    const [formData, setFormData] = useState(props.formData);
-
-    const preferences = useSelector(state => state.preferences.preferences.map(data => { return { value: data.id, label: data.saveName } }));
-    const defaultPreferenceId = useSelector(state => state.preferences.defaultPreferenceId);
 
     useEffect(()=> {
         if(defaultPreferenceId){
-            let preference = preferences.find((data)=> data.id == defaultPreferenceId);
-            setDefaultPreference({ value: preference?.id ||'', label: preference?.saveName ||'' });
+            let preference = preferences.find((data)=> data.value === defaultPreferenceId);
+            setDefaultPreference({ value: preference?.value ||'', label: preference?.label ||'' });
         }
         else{
-            setDefaultPreference({ value: preferences[0]?.id || '', label: preferences[0]?.saveName || '' });
+            setDefaultPreference({ value: preferences[0]?.value || '', label: preferences[0]?.label || '' });
         }
-    }, [])
-
-    const [defaultPreference, setDefaultPreference] = useState({ value: '', label: '' });
+    }, [defaultPreferenceId])
 
     useEffect(() => {
         if (props.formData.preferenceId) {
@@ -138,7 +132,6 @@ const SidebarFilters = (props) => {
                 break;
         }
     }
-
 
     const GroupData = () => {
         if (formData.groupBy === constants.groupType.Cohort) {

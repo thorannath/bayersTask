@@ -38,7 +38,6 @@ class PopulationOverview extends React.Component{
                 const ageData = {}, raceData = {};
                 data.ageData.map(e=>ageData[e["group"]]=e["count"]);
                 data.raceData.map(e=>raceData[ ({'W':'White','B':'Black','0':'Other','H':'Hipsanic','A':'Asian'}[e["race"]])]=e["count"]);
-                console.log()
                 this.setState({
                     ageData,
                     raceData,

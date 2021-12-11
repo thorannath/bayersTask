@@ -125,8 +125,6 @@ const GeoChart = ({ data, stateData, property, viewPatients }) => {
 
     }, [data, property, stateData])
 
-    console.log(stateData);
-
     return (
         <div ref={wrapperRef} style={{ marginBottom: '2rem' }}>
 
@@ -146,4 +144,4 @@ const GeoChart = ({ data, stateData, property, viewPatients }) => {
     )
 }
 
-export default GeoChart
+export default React.memo(GeoChart)

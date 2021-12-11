@@ -65,7 +65,7 @@ const AccordianCheckbox = ({ name, labels, data, onChange }) => {
 
     useEffect(() => {
         let mapData = {};
-        if (data) {
+        if (data.length >0) {
             if (Object.keys(labels).length === Object.keys(data).length) {
                 setSelectAll(true);
             }
@@ -75,14 +75,22 @@ const AccordianCheckbox = ({ name, labels, data, onChange }) => {
             })
             setFormData(mapData);
         }
+        else{
+            setFormData({});
+            setSelectAll(false);
+        }
 
     }, [data]);
 
     const handleCheckboxChange = (e) => {
         let values = { ...formData };
+        if (Object.keys(labels).length === Object.keys(data).length && !e.target.checked) {
+            setSelectAll(false);
+        }
+
         if (e.target.checked) {
             values = { ...formData, [e.target.name]: e.target.checked };
-        }
+        }        
         else delete values[e.target.name];
         let outputData = Object.keys(values).map((val) => { return { value: val, label: labels[val] } })
         onChange(outputData);

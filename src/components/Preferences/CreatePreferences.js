@@ -116,8 +116,6 @@ const CreatePreferences = () => {
         /* Name Validation Checking */
         const errorStatus = validateName(event.target.value);
         if (errorStatus.error) {
-
-            console.log({...formErrors, 'name':errorStatus.message})
             setFormErrors({...formErrors, 'name':errorStatus.message});
         } else {
             if(formErrors.hasOwnProperty('name')) delete formErrors.name;

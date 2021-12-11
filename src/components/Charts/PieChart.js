@@ -18,7 +18,6 @@ const PieChart = () => {
             .style("padding", "5px")
 
         let mouseOver = function (event, d) {
-            console.log(d)
             tooltip
             .style("opacity", 1)
             .html(`${d.data[0]}`)
