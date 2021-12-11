@@ -125,7 +125,8 @@ const PatientFinder = () => {
 
     const getTreatmentsData = async (request) => {
         try {
-            const treatmentResponse = await axios.post('http://localhost:3000/patientfinder/treatments', request);
+            let url = constants.BACKEND_URL + 'patientfinder/treatments';
+            const treatmentResponse = await axios.post(url, request);
             const res = treatmentResponse.data;
             res.treatments.labels.shift();
             res.treatments.data = res.treatments.data.map((e, i) => {
@@ -143,7 +144,8 @@ const PatientFinder = () => {
 
     const getMedicalData = async (request) => {
         try {
-            const medicalResponse = await axios.post('http://localhost:3000/patientfinder/medicals', request);
+            let url = constants.BACKEND_URL + 'patientfinder/medicals';
+            const medicalResponse = await axios.post(url, request);
             const res2 = medicalResponse.data;
             res2.medical_conditions.labels.shift();
             res2.medical_conditions.data = res2.medical_conditions.data.map((e, i) => {
@@ -162,7 +164,8 @@ const PatientFinder = () => {
 
     const getStatesData = async (request) => {
         try {
-            const populationData = await axios.post('http://localhost:3000/patientfinder/states/population', request);
+            let url = constants.BACKEND_URL + 'patientfinder/states/population';
+            const populationData = await axios.post(url, request);
             setStateData(populationData.data || '');
         }
         catch (error) {

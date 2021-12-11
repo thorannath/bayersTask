@@ -7,7 +7,7 @@ import { setLoadingStatus } from "../loader";
 import { loginAction, logoutAction } from "../users";
 import { LOGIN_FAILED, REGISTER_FAILED, setError } from "../authenticationErrors";
 
-const baseURL = "http://localhost:3000/"
+const baseURL = constants.BACKEND_URL;
 
 export const login = ({ username, password }) => async (dispatch) => {
     try {
