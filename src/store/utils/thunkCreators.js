@@ -45,7 +45,7 @@ export const logout = () => async (dispatch) => {
 
 export const register = ({ username, password, fullName, email }) => async (dispatch) => {
     try {
-        const response = await axios.post(baseURL + 'users/register', { userid: username, password, fullName, email })
+        const response = await axios.post(baseURL + "users/register", { userid: username, password, fullName, email })
         if (response && Number(response.data.success)) {
             dispatch(loginAction());
             Cookies.set('userid', username, { expires: 1, path: '/' });
