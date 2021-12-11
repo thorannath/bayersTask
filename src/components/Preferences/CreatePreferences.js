@@ -11,7 +11,6 @@ import * as constants from '../../Constant';
 import { useSelector, useDispatch } from 'react-redux';
 import { addPreference, updatePreference } from '../../store/utils/thunkCreators';
 import { useEffect } from 'react';
-import { validateName } from '../Common/validation';
 import { closeModal } from '../../store/modals';
 import Typography from '@mui/material/Typography';
 import Modal from '@mui/material/Modal';
@@ -55,6 +54,46 @@ const CreatePreferences = () => {
 
     const defaultPreferenceId = useSelector(state => state.preferences.defaultPreferenceId);
     const loader = useSelector(state => state.loader);
+
+    const validateName = (nameString)=>{
+        /**
+         * Validation function for Name in Form
+         * NOTE: Element with id as in `messageBoxId`, must be set to `{visibility: hidden}` style before running this function.
+         * @function: validateName
+         * @param {string} nameString - string for name value which is required to validate
+         * @returns {Object} {
+         *   error: true if there is an error else false (incase of no errors in validation).
+         *   message: indicating why the error has occured
+         * }
+         */
+        nameString = nameString.trim();
+        const errorStatus = {error: false, message: ""}, namePattern = /^[a-zA-Z\s0-9]+$/, maxLength = 128;
+        if(!namePattern.test(nameString) || nameString.length > maxLength){
+            errorStatus.message = `Name must only contain (0-9), (A-Z), (a-z) or spaces with max ${maxLength} characters.`;
+            errorStatus.error = true;
+        }
+        return errorStatus;
+    }
+    
+    const validateEmail = (nameString)=>{
+        /**
+         * Validation function for Name in Form
+         * NOTE: Element with id as in `messageBoxId`, must be set to `{visibility: hidden}` style before running this function.
+         * @function: validateName
+         * @param {string} nameString - string for name value which is required to validate
+         * @returns {Object} {
+         *   error: true if there is an error else false (incase of no errors in validation).
+         *   message: indicating why the error has occured
+         * }
+         */
+        nameString = nameString.trim();
+        const errorStatus = {error: false, message: ""}, namePattern = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/, maxLength = 128;
+        if(!namePattern.test(nameString) || nameString.length > maxLength){
+            errorStatus.message = `Enter a valid email!`;
+            errorStatus.error = true;
+        }
+        return errorStatus;
+    }
 
     useEffect(() => {
         switch (modalStatus.messageType) {
