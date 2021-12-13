@@ -62,7 +62,7 @@ const AccordianCheckbox = ({ name, labels, data, onChange }) => {
 
     useEffect(() => {
         let mapData = {};
-        if (data?.length>0 && labels?.length>0) {
+        if (data?.length>0) {
             if (Object.keys(labels).length === Object.keys(data).length) {
                 setSelectAll(true);
             }
