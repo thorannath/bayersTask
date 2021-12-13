@@ -53,10 +53,7 @@ const accordianStyle = {
 const AccordianCheckbox = ({ name, labels, data, onChange }) => {
     const [expanded, setExpanded] = useState(false);
     const [formData, setFormData] = useState({});
-
-
     const [selectAll, setSelectAll] = useState(false);
-
     const [open, setOpen] = useState(false);
 
     const handleAccordianChange = (panel) => (event, isExpanded) => {
@@ -65,7 +62,7 @@ const AccordianCheckbox = ({ name, labels, data, onChange }) => {
 
     useEffect(() => {
         let mapData = {};
-        if (data.length >0) {
+        if (data?.length>0 && labels?.length>0) {
             if (Object.keys(labels).length === Object.keys(data).length) {
                 setSelectAll(true);
             }
@@ -154,7 +151,6 @@ const AccordianCheckbox = ({ name, labels, data, onChange }) => {
                                 }
                             })
                         }
-
                     </div>
                 </AccordionDetails>
             </Accordion>
