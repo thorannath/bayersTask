@@ -125,4 +125,4 @@ const MultipleSelect = (props) => {
     )
 }
 
-export default MultipleSelect
+export default React.memo(MultipleSelect)

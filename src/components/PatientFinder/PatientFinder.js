@@ -176,7 +176,8 @@ const PatientFinder = () => {
     const getPatientData = async (selectedState) => {
         try {
             const request = requestObject();
-            const patientData = await axios.post('http://localhost:3000/patientfinder/patients/details', {...request, selectedState: selectedState});
+            let url = constants.BACKEND_URL + 'patientfinder/patients/details';
+            const patientData = await axios.post(url, {...request, selectedState: selectedState});
             setPatientData(patientData.data);
         }
         catch (error) {
