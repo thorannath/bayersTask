@@ -15,16 +15,23 @@ const Alert = forwardRef(function Alert(props, ref) {
     return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
 
+/**
+ * 
+ * This is  parent component for both login and register components
+ */
 const Authentication = () => {
     const dispatch = useDispatch();
     const history = useHistory();
 
-    if (Cookies.get('userid', { path: '/' })) {
-        history.push("/app/patient-finder");
-        dispatch(loginAction());
-    }
     const authenticationErrors = useSelector(state => state.authenticationErrors);
     const userStatus = useSelector(state => state.users);
+    /**
+     * Checking if the user is already logged in or not
+     */
+    if (Cookies.get('userid', { path: '/' }) && !userStatus.isLoggedIn) {
+        /** This is update the userStatus state to all the subscribed components */
+        dispatch(loginAction());
+    }
 
     const [open, setOpen] = useState(false);
     const [authType, setAuthType] = useState('login');
@@ -36,6 +43,7 @@ const Authentication = () => {
     };
 
     useEffect(() => {
+        /** If the user status is loggedIn then move to the patient finder page*/
         if (userStatus.isLoggedIn) {
             history.push("/app/patient-finder");
             return;
@@ -46,7 +54,6 @@ const Authentication = () => {
         }
     }, [authenticationErrors, userStatus]);
 
-
     useEffect(() => {
         setTimeout(() => {
             setOpen(false);
@@ -54,7 +61,8 @@ const Authentication = () => {
     }, [open])
 
     const Auth = useCallback(() => {
-        return authType === 'login' ? <Login /> : <Register />
+        /** Checks button selected to display the child component based on the authType selected */
+        return authType === 'login' ? <Login/> : <Register/>
     }, [authType])
 
     const handleAuth = (type) => {
@@ -79,6 +87,8 @@ const Authentication = () => {
                     <Auth />
                 </div>
             </div>
+            
+            {/* Displays the error message in the right-top corner */}
             <Snackbar
                 open={open}
                 autoHideDuration={2000}

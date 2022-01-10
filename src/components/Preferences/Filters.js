@@ -78,9 +78,9 @@ export const Filters = (props) => {
   const onChangeStates = (event) => {
     let formVal = { ...formData };
     let statesData = event.map((data) => data.value);
+
     formVal.states = states.filter(data => statesData.includes(data.value));
-    
-    console.log(statesData);
+
     if(formVal.states.length == 0){
       setFormErrors({...formErrors, states: 'Select atleast one state'});
     }

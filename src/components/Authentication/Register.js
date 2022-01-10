@@ -7,11 +7,15 @@ import FormGroup from '@mui/material/FormGroup';
 
 export const Register = () => {
     const dispatch = useDispatch();
+
+
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
     const [fullName, setFullName] = useState('');
     const [password, setPassword] = useState('');
     const [retype, setRetype] = useState('');
+
+    
     const [errorStatus, setErrorStatus] = useState({error: true, message: ""});
 
     const messageBoxId = 'register-message', maxLength=128;
@@ -19,6 +23,7 @@ export const Register = () => {
     const handleFormSubmit = async (e) => {
         e.preventDefault();
         if (username && password && fullName && email && !errorStatus.error && retype && retype===password) {
+            //Send the user information to redux service to perform the registration to the backend
             dispatch(register({username, password, fullName, email}));
         }
     }

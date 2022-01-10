@@ -74,18 +74,17 @@ const MultipleSelect = (props) => {
 
     const getValue = () =>{
         if(isSelectAllSelected()){
-            return [selectAllOption]; 
+            return [selectAllOption];
         }
 
         if(props.value && props.value.length>5){
-            return [ ...props.value.slice(0,5), moreOption(props.value.length-5)];
+            return [ ...props.value];
         }
         return props.value || ''
     }
 
     const onChange = (newValue, actionMeta) => {
         const { action, option, removedValue } = actionMeta;
-
         if (action === "select-option" && option.value === selectAllOption.value) {
             props.onChange(props.options, actionMeta);
         } else if (
@@ -104,6 +103,9 @@ const MultipleSelect = (props) => {
                 actionMeta
             );
         } else {
+
+            console.log(newValue, actionMeta);
+
             props.onChange(newValue || [], actionMeta);
         }
     };

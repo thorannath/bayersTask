@@ -90,7 +90,9 @@ const Patients = (props) => {
                                             </TableRow>
                                         );
                                     })
-                                ):""
+                                ): <TableRow >
+                                    <TableCell colSpan={4} align="center"><b> No data available </b></TableCell>
+                                    </TableRow>
                             }
                         </TableBody>
                     </Table>

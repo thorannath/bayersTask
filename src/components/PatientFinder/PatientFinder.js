@@ -7,7 +7,7 @@ import { fetchLabels, getPreferences } from '../../store/utils/thunkCreators';
 import SidebarFilters from './SidebarFilters';
 import Cookies from 'js-cookie';
 import GeoChart from '../Charts/GeoChart';
-import data from "../../US_geo.json";
+import geodata from "../../us-states.json";
 import Patients from './Patients';
 import MultipleSelect from '../Inputs/MultipleSelect';
 import Graph from '../Charts/Graph';
@@ -54,7 +54,7 @@ const PatientFinder = () => {
     useEffect(() => {
         dispatch(fetchLabels())
         dispatch(getPreferences());
-    }, [])
+    }, []) 
 
     useEffect(() => {
         fetchGraphData();
@@ -67,14 +67,14 @@ const PatientFinder = () => {
                 if (obj) setFormData({ ...obj });
             }
         }
-    }, [modalStatus]);
+    },[modalStatus]);
 
     useEffect(()=> {
         if(preferences.defaultPreferenceId) handlePreferenceChange(preferences.defaultPreferenceId);
         else if(preferences.preferences?.length>0){
             handlePreferenceChange(preferences.preferences[0].id);
         }
-    }, [])
+    },[])
 
     const [formData, setFormData] = useState({ ...initialData });
 
@@ -108,6 +108,13 @@ const PatientFinder = () => {
         return data;
     }, [medicalConditions, preferences, treatments]);
 
+
+    /**
+     * This function request backend the following graph data
+     * 1. Treatments chart
+     * 2. Medical Condition Chart
+     * 3. US states chart
+     */
     const fetchGraphData = () => {
         const request = requestObject();
 
@@ -123,6 +130,9 @@ const PatientFinder = () => {
         }, 2000)
     }
 
+    /**
+     * This fetch treatments graph data from the backend
+     */
     const getTreatmentsData = async (request) => {
         try {
             let url = constants.BACKEND_URL + 'patientfinder/treatments';
@@ -142,6 +152,9 @@ const PatientFinder = () => {
         }
     }
 
+    /**
+     * This fetch medical condition graph data from the backend
+     */
     const getMedicalData = async (request) => {
         try {
             let url = constants.BACKEND_URL + 'patientfinder/medicals';
@@ -162,6 +175,9 @@ const PatientFinder = () => {
         }
     }
 
+    /**
+     * This fetch US states graph data from the backend
+     */
     const getStatesData = async (request) => {
         try {
             let url = constants.BACKEND_URL + 'patientfinder/states/population';
@@ -185,6 +201,11 @@ const PatientFinder = () => {
         }
     }
 
+    /**
+     * 
+     * @param {*} obj is the object with all the data required to create a bar chart
+     * @returns 
+     */
     const createChartData = (obj) => {
         const chart = { labels: obj.labels, datasets: [] }
         obj.data.map((val, index) => {
@@ -287,8 +308,8 @@ const PatientFinder = () => {
 
 
     const viewPatients = (event, d) => {
-        getPatientData(constants.States[d.properties.NAME])
-        dispatch(showModal({ messageType: constants.MESSAGE_TYPES.VIEW_HEATMAP_PATIENTS, action: 'open', data: { name: d.properties.NAME } }));
+        getPatientData(constants.States[d.properties.name])
+        dispatch(showModal({ messageType: constants.MESSAGE_TYPES.VIEW_HEATMAP_PATIENTS, action: 'open', data: { name: d.properties.name } }));
     }
 
     return (
@@ -325,7 +346,7 @@ const PatientFinder = () => {
                         The presented geographical analysis displays the proportion of target patients among adult members in the Optum administrative claims dataset. You can hover your cursor above a specific state to view numeric values in the corresponding pop-up window.
                         Please note that patients in Puerto Rico or Unknown geographical regions are not displayed in this figure.
                     </div>
-                    <GeoChart data={data} stateData={stateData} viewPatients={viewPatients}/>
+                    <GeoChart data={geodata} stateData={stateData} viewPatients={viewPatients}/>
                 </div>
 
                 {/** Patient list in a state */}

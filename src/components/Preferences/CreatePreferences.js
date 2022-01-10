@@ -202,6 +202,14 @@ const CreatePreferences = () => {
 
 
     const handleFormSubmit = async () => {
+        const errorStatus = validateName(name);
+        if (errorStatus.error) {
+            setFormErrors({...formErrors, 'name':errorStatus.message});
+            return;
+        } else {
+            if(formErrors.hasOwnProperty('name')) delete formErrors.name;
+        }
+
         if (!validateFormData(formData)) return;
 
         const req = requestObject();

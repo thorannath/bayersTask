@@ -14,6 +14,7 @@ import Typography from '@mui/material/Typography';
 import { Button } from '@mui/material';
 import Checkbox from '@mui/material/Checkbox';
 
+/** Styles for the drop down input*/
 const customStyles = {
     menu: (provided, state) => ({
         ...provided,

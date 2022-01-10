@@ -13,6 +13,7 @@ const Login = () => {
     
     const handleFormSubmit = async () =>{
         if (username && password) {
+            //Sends the user input to the redux service to perform the login to the backend
             dispatch(login({username, password}));
         }
     }
