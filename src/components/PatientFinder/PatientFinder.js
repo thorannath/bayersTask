@@ -116,6 +116,8 @@ const PatientFinder = () => {
      * 3. US states chart
      */
     const fetchGraphData = () => {
+        eventBus.dispatch("updateChartNotice", {status:false});
+        
         const request = requestObject();
 
         if (!request) return;
