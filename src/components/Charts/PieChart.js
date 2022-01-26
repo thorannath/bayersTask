@@ -96,4 +96,4 @@ const PieChart = () => {
     )
 }
 
-export default PieChart
+export default React.memo(PieChart)
