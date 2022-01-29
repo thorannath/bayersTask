@@ -6,15 +6,15 @@ import { Button, TextField } from '@mui/material';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import './Preferences.css';
 import CloseIcon from '@mui/icons-material/Close';
-import Filters from '../PatientFinder/Filters';
+import Filters from './Filters';
 import * as constants from '../../Constant';
 import { useSelector, useDispatch } from 'react-redux';
 import { addPreference, updatePreference } from '../../store/utils/thunkCreators';
 import { useEffect } from 'react';
-import { validateName } from '../common/validation';
 import { closeModal } from '../../store/modals';
 import Typography from '@mui/material/Typography';
 import Modal from '@mui/material/Modal';
+import { FormHelperText } from '@mui/material';
 
 const style = {
     position: 'absolute',
@@ -28,10 +28,9 @@ const style = {
     boxShadow: 24,
 };
 
-const CreatePreferences = (props) => {
+const CreatePreferences = () => {
     const dispatch = useDispatch();
     const [open, setOpen] = useState(false);
-
 
     const initialData = {
         preferenceId: '',
@@ -41,15 +40,60 @@ const CreatePreferences = (props) => {
         cohorts: { ckd: true, diab: true, both: true },
         payType: { MCR: true, COM: true },
     }
-    const [name, setName] = useState('');
-    const [defaultVal, setDefaultVal] = useState(false);
-    const [formData, setFormData] = useState(initialData);
-    const [errorStatus, setErrorStatus] = useState(('initialData.saveName' || 'initialData.preferenceName') ? { error: false, message: "" } : { error: true, message: "Please fill up the form!" });
 
+    const [formData, setFormData] = useState(initialData);
+
+    const [formErrors, setFormErrors] = useState({});
+    
     const modalStatus = useSelector(state => state.modals);
     const preferences = useSelector(state => state.preferences.preferences);
+
+    const [name, setName] = useState('');
+    const [defaultVal, setDefaultVal] = useState(false);
+    // const [errorStatus, setErrorStatus] = useState(('initialData.saveName' || 'initialData.preferenceName') ? { error: false, message: "" } : { error: true, message: "Please fill up the form!" });
+
     const defaultPreferenceId = useSelector(state => state.preferences.defaultPreferenceId);
     const loader = useSelector(state => state.loader);
+
+    const validateName = (nameString)=>{
+        /**
+         * Validation function for Name in Form
+         * NOTE: Element with id as in `messageBoxId`, must be set to `{visibility: hidden}` style before running this function.
+         * @function: validateName
+         * @param {string} nameString - string for name value which is required to validate
+         * @returns {Object} {
+         *   error: true if there is an error else false (incase of no errors in validation).
+         *   message: indicating why the error has occured
+         * }
+         */
+        nameString = nameString.trim();
+        const errorStatus = {error: false, message: ""}, namePattern = /^[a-zA-Z\s0-9]+$/, maxLength = 128;
+        if(!namePattern.test(nameString) || nameString.length > maxLength){
+            errorStatus.message = `Name must only contain (0-9), (A-Z), (a-z) or spaces with max ${maxLength} characters.`;
+            errorStatus.error = true;
+        }
+        return errorStatus;
+    }
+    
+    const validateEmail = (nameString)=>{
+        /**
+         * Validation function for Name in Form
+         * NOTE: Element with id as in `messageBoxId`, must be set to `{visibility: hidden}` style before running this function.
+         * @function: validateName
+         * @param {string} nameString - string for name value which is required to validate
+         * @returns {Object} {
+         *   error: true if there is an error else false (incase of no errors in validation).
+         *   message: indicating why the error has occured
+         * }
+         */
+        nameString = nameString.trim();
+        const errorStatus = {error: false, message: ""}, namePattern = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/, maxLength = 128;
+        if(!namePattern.test(nameString) || nameString.length > maxLength){
+            errorStatus.message = `Enter a valid email!`;
+            errorStatus.error = true;
+        }
+        return errorStatus;
+    }
 
     useEffect(() => {
         switch (modalStatus.messageType) {
@@ -103,22 +147,17 @@ const CreatePreferences = (props) => {
         return data;
     }
 
-
-    const messageBoxId = 'create-preference-message';
-
     useEffect(() => {
         setDefaultVal((defaultPreferenceId === formData.id) ? true : false);
     }, [defaultPreferenceId]);
 
     const handleName = (event) => {
         /* Name Validation Checking */
-        const errorStat = validateName(event.target.value);
-        setErrorStatus(errorStat);
-        if (errorStat.error) {
-            document.getElementById(messageBoxId).firstElementChild.textContent = errorStat.message;
-            document.getElementById(messageBoxId).style.visibility = "visible";
+        const errorStatus = validateName(event.target.value);
+        if (errorStatus.error) {
+            setFormErrors({...formErrors, 'name':errorStatus.message});
         } else {
-            document.getElementById(messageBoxId).style.visibility = "hidden";
+            if(formErrors.hasOwnProperty('name')) delete formErrors.name;
         }
         setName(event.target.value);
     }
@@ -146,8 +185,7 @@ const CreatePreferences = (props) => {
     const validateFormData = (formData) => {
         if (!formData) return false;
 
-        if (
-            formData.groupBy
+        if ( formData.groupBy
             && (
                 formData.groupBy === 'cohort' ?
                     (formData.cohorts && Object.keys(formData.cohorts).map(e => Number(formData.cohorts[e])).reduce((p, c) => p + c) > 0) :
@@ -155,21 +193,27 @@ const CreatePreferences = (props) => {
             )
             &&
             formData.states.length > 0
-            &&
-            !errorStatus.error
         ) {
             setName(name.trim());
             return true;
         }
-        document.getElementById(messageBoxId).firstElementChild.textContent = (errorStatus.message !== "") ? errorStatus.message : "Please fill up all required.";
-        document.getElementById(messageBoxId).style.visibility = "visible";
         return false;
     };
 
 
     const handleFormSubmit = async () => {
+        const errorStatus = validateName(name);
+        if (errorStatus.error) {
+            setFormErrors({...formErrors, 'name':errorStatus.message});
+            return;
+        } else {
+            if(formErrors.hasOwnProperty('name')) delete formErrors.name;
+        }
+
         if (!validateFormData(formData)) return;
+
         const req = requestObject();
+        console.log(initialData, "initialData");
         if (initialData.saveName || initialData.preferenceName) {
             req.preferenceId = initialData?.id;
             req.preferenceId = initialData?.preferenceId;
@@ -187,6 +231,7 @@ const CreatePreferences = (props) => {
     }
 
     const handleCancel = () => {
+        setFormData({...initialData});
         dispatch(closeModal({ messageType: constants.MESSAGE_TYPES.CREATE_PREFERENCE, action: 'close' }));
     }
 
@@ -211,6 +256,7 @@ const CreatePreferences = (props) => {
                             value={name}
                             onChange={handleName}
                             variant="standard" />
+                            {formErrors?.name && <FormHelperText id="error-message">{formErrors?.name}</FormHelperText>}
                     </FormGroup>
                     <Filters
                         formData={formData}

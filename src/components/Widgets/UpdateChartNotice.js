@@ -6,19 +6,18 @@ import eventBus from '../../services/EventBus';
 
 
 const UpdateChartNotice = () => {
-    const [open, setOpen] = useState(true);
+    const [open, setOpen] = useState(false);
 
     useEffect(() => {
-        eventBus.on("updateChartNotice", (data) => {
-          setOpen(true);
+        eventBus.on("updateChartNotice", ({status}) => {
+          if(status){
+            setOpen(true)
+          }
+          else{
+            setOpen(false)
+          }
         });
-      }, [])
-    
-      useEffect(() => {
-        return () => {
-          eventBus.remove("updateChartNotice");
-        }
-      }, [])
+      }, []);
 
 
     return (

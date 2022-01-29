@@ -7,7 +7,7 @@ import { fetchLabels, getPreferences } from '../../store/utils/thunkCreators';
 import SidebarFilters from './SidebarFilters';
 import Cookies from 'js-cookie';
 import GeoChart from '../Charts/GeoChart';
-import data from "../../US_geo.json";
+import geodata from "../../us-states.json";
 import Patients from './Patients';
 import MultipleSelect from '../Inputs/MultipleSelect';
 import Graph from '../Charts/Graph';
@@ -54,7 +54,7 @@ const PatientFinder = () => {
     useEffect(() => {
         dispatch(fetchLabels())
         dispatch(getPreferences());
-    }, [])
+    }, []) 
 
     useEffect(() => {
         fetchGraphData();
@@ -67,14 +67,14 @@ const PatientFinder = () => {
                 if (obj) setFormData({ ...obj });
             }
         }
-    }, [modalStatus]);
+    },[modalStatus]);
 
     useEffect(()=> {
         if(preferences.defaultPreferenceId) handlePreferenceChange(preferences.defaultPreferenceId);
         else if(preferences.preferences?.length>0){
             handlePreferenceChange(preferences.preferences[0].id);
         }
-    }, [])
+    },[])
 
     const [formData, setFormData] = useState({ ...initialData });
 
@@ -108,7 +108,16 @@ const PatientFinder = () => {
         return data;
     }, [medicalConditions, preferences, treatments]);
 
+
+    /**
+     * This function request backend the following graph data
+     * 1. Treatments chart
+     * 2. Medical Condition Chart
+     * 3. US states chart
+     */
     const fetchGraphData = () => {
+        eventBus.dispatch("updateChartNotice", {status:false});
+        
         const request = requestObject();
 
         if (!request) return;
@@ -123,9 +132,13 @@ const PatientFinder = () => {
         }, 2000)
     }
 
+    /**
+     * This fetch treatments graph data from the backend
+     */
     const getTreatmentsData = async (request) => {
         try {
-            const treatmentResponse = await axios.post(`${constants.API_URL}/patientfinder/treatments`, request);
+            let url = constants.BACKEND_URL + '/patientfinder/treatments';
+            const treatmentResponse = (await axios.post(url, request)).data;
             const res = treatmentResponse.data;
             res.treatments.labels.shift();
             res.treatments.data = res.treatments.data.map((e, i) => {
@@ -141,18 +154,24 @@ const PatientFinder = () => {
         }
     }
 
+    /**
+     * This fetch medical condition graph data from the backend
+     */
     const getMedicalData = async (request) => {
         try {
-            const medicalResponse = await axios.post(`${constants.API_URL}/patientfinder/medicals`, request);
-            const res2 = medicalResponse.data;
-            res2.medical_conditions.labels.shift();
-            res2.medical_conditions.data = res2.medical_conditions.data.map((e, i) => {
+            let url = constants.BACKEND_URL + '/patientfinder/medicals';
+            const medicalResponse = (await axios.post(url, request)).data;
+            const res = medicalResponse.data;
+            res.medical_conditions.labels.shift();
+            res.medical_conditions.data = res.medical_conditions.data.map((e, i) => {
                 const ALL_DATA = e.data.shift();
                 const result = e.data.map((ele, i) => (ele / ALL_DATA * 100));
                 return { type: e.type, data: result };
             });
-
-            const medicalChart = createChartData(res2.medical_conditions)
+            
+            
+            const medicalChart = createChartData(res.medical_conditions)
+            
             setMedicalChartData({ ...medicalChart });
         }
         catch (error) {
@@ -160,9 +179,13 @@ const PatientFinder = () => {
         }
     }
 
+    /**
+     * This fetch US states graph data from the backend
+     */
     const getStatesData = async (request) => {
         try {
-            const populationData = await axios.post(`${constants.API_URL}/patientfinder/states/population`, request);
+            let url = constants.BACKEND_URL + '/patientfinder/states/population';
+            const populationData = (await axios.post(url, request)).data;
             setStateData(populationData.data || '');
         }
         catch (error) {
@@ -173,14 +196,22 @@ const PatientFinder = () => {
     const getPatientData = async (selectedState) => {
         try {
             const request = requestObject();
-            const patientData = await axios.post(`${constants.API_URL}/patientfinder/patients/details`, {...request, selectedState: selectedState});
-            setPatientData(patientData.data);
+
+            let url = constants.BACKEND_URL + '/patientfinder/patients/details';
+            const patientData = (await axios.post(url, {...request, selectedState: selectedState}));
+            setPatientData(patientData.data.data);
+            
         }
         catch (error) {
             eventBus.dispatch("patientDataError", { message: "Unable to retrive the Patient details from all states in map data" });
         }
     }
 
+    /**
+     * 
+     * @param {*} obj is the object with all the data required to create a bar chart
+     * @returns 
+     */
     const createChartData = (obj) => {
         const chart = { labels: obj.labels, datasets: [] }
         obj.data.map((val, index) => {
@@ -283,8 +314,8 @@ const PatientFinder = () => {
 
 
     const viewPatients = (event, d) => {
-        getPatientData(constants.States[d.properties.NAME])
-        dispatch(showModal({ messageType: constants.MESSAGE_TYPES.VIEW_HEATMAP_PATIENTS, action: 'open', data: { name: d.properties.NAME } }));
+        getPatientData(constants.States[d.properties.name])
+        dispatch(showModal({ messageType: constants.MESSAGE_TYPES.VIEW_HEATMAP_PATIENTS, action: 'open', data: { name: d.properties.name } }));
     }
 
     return (
@@ -321,10 +352,9 @@ const PatientFinder = () => {
                         The presented geographical analysis displays the proportion of target patients among adult members in the Optum administrative claims dataset. You can hover your cursor above a specific state to view numeric values in the corresponding pop-up window.
                         Please note that patients in Puerto Rico or Unknown geographical regions are not displayed in this figure.
                     </div>
-                    <GeoChart data={data} stateData={stateData} viewPatients={viewPatients}/>
+                    <GeoChart data={geodata} stateData={stateData} viewPatients={viewPatients}/>
                 </div>
 
-                {/** Patient list in a state */}
                 <Patients data={patientData}/>
 
                 {/** Update chart notice */}

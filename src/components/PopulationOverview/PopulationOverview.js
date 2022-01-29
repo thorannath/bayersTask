@@ -1,6 +1,7 @@
 import axios from 'axios';
+import Cookies from 'js-cookie';
 import React from 'react'
-import { API_URL } from '../../Constant';
+import { BACKEND_URL } from '../../Constant';
 import Histogram from '../Charts/Histogram';
 import PieChart from '../Charts/PieChart';
 import './PopulationOverview.css';
@@ -31,38 +32,44 @@ class PopulationOverview extends React.Component{
     constructor(props){
         super(props)
         this.state = {}
-        
-        setTimeout(async () => {
-            const data = {... (await axios.get(`${API_URL}/population/overview`)).data};
-            if(data.status===200) {
-                const ageData = {}, raceData = {};
+    }
+
+    componentDidMount(){
+        const params = {
+            userid: Cookies.get("userid", { path: '/' }),
+            authToken: Cookies.get('authToken', { path: '/' }),
+        }
+
+        axios.get(`${BACKEND_URL}/population/overview`, {params}).then((res)=>{
+            const resp = res.data;
+            if(resp.status===200) {
+                const data = resp.data;
+                const ageData = {}, raceData = {}, insuranceData = {};
+
                 data.ageData.map(e=>ageData[e["group"]]=e["count"]);
                 data.raceData.map(e=>raceData[ ({'W':'White','B':'Black','0':'Other','H':'Hipsanic','A':'Asian'}[e["race"]])]=e["count"]);
-                console.log()
+                data.insuranceData.map(e=>insuranceData[e["paytyp"]]=e["count"])
                 this.setState({
                     ageData,
                     raceData,
+                    insuranceData,
                     isLoaded: true
                 })
-            };
-        }, 1000);
+            };    
+        }).catch(err=>{/*Error*/});
+        
     }
+
     render(){
         
         let ageData = {};
         let raceData = {};
-        let insuranceData = {
-            "OTH": 30,
-            "HMO": 44,
-            "POS": 64,
-            "PPO": 30,
-            "EPO": 44,
-            "IND": 104
-        };
+        let insuranceData = {};
 
         if(this.state.isLoaded){
             ageData = this.state.ageData;
             raceData = this.state.raceData;
+            insuranceData = this.state.insuranceData;
         }
 
         return (

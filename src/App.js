@@ -2,10 +2,8 @@ import './App.css';
 import Authentication from './components/Authentication/Authentication';
 import { BrowserRouter, Route, Switch, Redirect } from 'react-router-dom';
 import Layout from './components/Layout/Layout';
-import { Provider, useDispatch } from "react-redux";
+import { Provider } from "react-redux";
 import store from "./store/index";
-import Cookies from 'js-cookie';
-import { loginAction } from './store/users';
 
 function App() {
   return (

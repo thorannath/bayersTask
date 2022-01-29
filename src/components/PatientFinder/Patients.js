@@ -29,6 +29,7 @@ const Patients = (props) => {
     const [open, setOpen] = useState(false);
     const [stateSelected, setStateSelected] = useState()
     const modalStatus = useSelector(state => state.modals);
+
     useEffect(() => {
         switch (modalStatus.messageType) {
             case constants.MESSAGE_TYPES.VIEW_HEATMAP_PATIENTS:
@@ -71,8 +72,8 @@ const Patients = (props) => {
                         </TableHead>
                         <TableBody sx={{overflow: "hidden"}}>
                             {
-                                (props.data.patientData)?(
-                                    props.data.patientData.map(e=>{
+                                (props.data instanceof Array && props.data.length>0)?(
+                                    props.data.map(e=>{
                                         return(
                                             <TableRow key={e.patid} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
                                                 <TableCell component="th" scope="row">
@@ -90,7 +91,9 @@ const Patients = (props) => {
                                             </TableRow>
                                         );
                                     })
-                                ):""
+                                ): <TableRow >
+                                    <TableCell colSpan={4} align="center"><b> No data available </b></TableCell>
+                                    </TableRow>
                             }
                         </TableBody>
                     </Table>
