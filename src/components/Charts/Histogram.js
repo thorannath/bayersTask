@@ -75,4 +75,4 @@ const Histogram = ({ data, title }) => {
     )
 }
 
-export default Histogram
+export default React.memo(Histogram)

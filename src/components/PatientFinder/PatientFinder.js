@@ -137,8 +137,8 @@ const PatientFinder = () => {
      */
     const getTreatmentsData = async (request) => {
         try {
-            let url = constants.BACKEND_URL + 'patientfinder/treatments';
-            const treatmentResponse = await axios.post(url, request);
+            let url = constants.BACKEND_URL + '/patientfinder/treatments';
+            const treatmentResponse = (await axios.post(url, request)).data;
             const res = treatmentResponse.data;
             res.treatments.labels.shift();
             res.treatments.data = res.treatments.data.map((e, i) => {
@@ -159,17 +159,19 @@ const PatientFinder = () => {
      */
     const getMedicalData = async (request) => {
         try {
-            let url = constants.BACKEND_URL + 'patientfinder/medicals';
-            const medicalResponse = await axios.post(url, request);
-            const res2 = medicalResponse.data;
-            res2.medical_conditions.labels.shift();
-            res2.medical_conditions.data = res2.medical_conditions.data.map((e, i) => {
+            let url = constants.BACKEND_URL + '/patientfinder/medicals';
+            const medicalResponse = (await axios.post(url, request)).data;
+            const res = medicalResponse.data;
+            res.medical_conditions.labels.shift();
+            res.medical_conditions.data = res.medical_conditions.data.map((e, i) => {
                 const ALL_DATA = e.data.shift();
                 const result = e.data.map((ele, i) => (ele / ALL_DATA * 100));
                 return { type: e.type, data: result };
             });
-
-            const medicalChart = createChartData(res2.medical_conditions)
+            
+            
+            const medicalChart = createChartData(res.medical_conditions)
+            
             setMedicalChartData({ ...medicalChart });
         }
         catch (error) {
@@ -182,8 +184,8 @@ const PatientFinder = () => {
      */
     const getStatesData = async (request) => {
         try {
-            let url = constants.BACKEND_URL + 'patientfinder/states/population';
-            const populationData = await axios.post(url, request);
+            let url = constants.BACKEND_URL + '/patientfinder/states/population';
+            const populationData = (await axios.post(url, request)).data;
             setStateData(populationData.data || '');
         }
         catch (error) {
@@ -194,9 +196,11 @@ const PatientFinder = () => {
     const getPatientData = async (selectedState) => {
         try {
             const request = requestObject();
-            let url = constants.BACKEND_URL + 'patientfinder/patients/details';
-            const patientData = await axios.post(url, {...request, selectedState: selectedState});
-            setPatientData(patientData.data);
+
+            let url = constants.BACKEND_URL + '/patientfinder/patients/details';
+            const patientData = (await axios.post(url, {...request, selectedState: selectedState}));
+            setPatientData(patientData.data.data);
+            
         }
         catch (error) {
             eventBus.dispatch("patientDataError", { message: "Unable to retrive the Patient details from all states in map data" });
@@ -351,7 +355,6 @@ const PatientFinder = () => {
                     <GeoChart data={geodata} stateData={stateData} viewPatients={viewPatients}/>
                 </div>
 
-                {/** Patient list in a state */}
                 <Patients data={patientData}/>
 
                 {/** Update chart notice */}

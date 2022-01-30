@@ -6,9 +6,9 @@
 */
 export const Paytype = [ "MCR", "COM" ];
 
-const LOCAL_URL = 'http://localhost:3000/';
+const LOCAL_URL = 'http://localhost:3000';
 
-const PRODUCTION_URL = 'http://ec2-54-147-53-219.compute-1.amazonaws.com:3000/'
+const PRODUCTION_URL = 'http://ec2-54-147-53-219.compute-1.amazonaws.com:3000';
 
 export const BACKEND_URL = (process.env.NODE_ENV == 'development') ? LOCAL_URL : PRODUCTION_URL;
 
