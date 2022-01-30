@@ -74,26 +74,6 @@ const CreatePreferences = () => {
         }
         return errorStatus;
     }
-    
-    const validateEmail = (nameString)=>{
-        /**
-         * Validation function for Name in Form
-         * NOTE: Element with id as in `messageBoxId`, must be set to `{visibility: hidden}` style before running this function.
-         * @function: validateName
-         * @param {string} nameString - string for name value which is required to validate
-         * @returns {Object} {
-         *   error: true if there is an error else false (incase of no errors in validation).
-         *   message: indicating why the error has occured
-         * }
-         */
-        nameString = nameString.trim();
-        const errorStatus = {error: false, message: ""}, namePattern = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/, maxLength = 128;
-        if(!namePattern.test(nameString) || nameString.length > maxLength){
-            errorStatus.message = `Enter a valid email!`;
-            errorStatus.error = true;
-        }
-        return errorStatus;
-    }
 
     useEffect(() => {
         switch (modalStatus.messageType) {
@@ -213,10 +193,10 @@ const CreatePreferences = () => {
         if (!validateFormData(formData)) return;
 
         const req = requestObject();
-        console.log(initialData, "initialData");
-        if (initialData.saveName || initialData.preferenceName) {
-            req.preferenceId = initialData?.id;
-            req.preferenceId = initialData?.preferenceId;
+
+        if (formData.saveName || formData.preferenceName) {
+            req.preferenceId = formData?.id;
+            req.preferenceId = formData?.preferenceId;
             dispatch(updatePreference(req));
             if (!loader.isLoading) {
                 dispatch(closeModal({ messageType: constants.MESSAGE_TYPES.CREATE_PREFERENCE, action: 'close' }))
