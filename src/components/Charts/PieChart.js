@@ -54,6 +54,7 @@ const PieChart = () => {
             .attr("align", "center");
 
         const data = { 'CKD': 9, 'Both CKD and T2D': 20, 'T2D': 25 }
+        
         const color = d3.scaleOrdinal()
             .range(["#7FC8F8", "#FF6392", "#033860", "#6b486b"])
 
@@ -90,7 +91,7 @@ const PieChart = () => {
 
     return (
         <div id="pieChart" align="center">
-            <h3 > Patient Cohorts </h3>
+            <h3> Patient Cohorts </h3>
             <div className="tooltip"></div>
         </div>
     )

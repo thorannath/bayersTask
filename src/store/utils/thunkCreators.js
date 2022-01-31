@@ -78,7 +78,6 @@ export const addPreference = (obj) => async (dispatch) => {
 }
 
 export const updatePreference = (obj) => async (dispatch) => {
-    console.log("edit");
     try {
         dispatch(setLoadingStatus(true));
         const params = {
@@ -88,7 +87,8 @@ export const updatePreference = (obj) => async (dispatch) => {
         const { data } = await axios.put(baseURL + "/users/preferences", { ...obj, ...params });
 
         if (data.success) {
-            dispatch(editPreferenceAction({ preference: data.data, defaultPreferenceId: obj.makeDefault }));
+            let defaultPreferenceId = obj.makeDefault ? data.data.id : '';
+            dispatch(editPreferenceAction({ preference: data.data, defaultPreferenceId}));
         }
         dispatch(setLoadingStatus(false));
     } catch (error) {

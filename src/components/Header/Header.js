@@ -149,6 +149,13 @@ const Header = () => {
                             </ListItemText>
                         </MenuItem>
                     </Link>
+                    <Link className="list-link" to={constants.routes.Medication_Sequence}>
+                        <MenuItem className={isActive(constants.routes.Medication_Sequence)}>
+                            <ListItemText disableTypography className='list-item-text'>
+                                Medication Sequence
+                            </ListItemText>
+                        </MenuItem>
+                    </Link>
                 </MenuList>
             </nav>
         </div>

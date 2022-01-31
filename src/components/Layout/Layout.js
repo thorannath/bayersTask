@@ -13,6 +13,7 @@ import ViewPreferences from '../Preferences/ViewPreferences';
 import CreatePreferences from '../Preferences/CreatePreferences';
 import Loader from '../Widgets/Loader/Loader';
 import SnackbarError from '../Widgets/Snackbar/SnackbarError';
+import MedicationSequence from '../MedicationSequence/MedicationSequence';
 
 const Layout = () => {
     const history = useHistory()
@@ -30,6 +31,7 @@ const Layout = () => {
             <Header />
             <div className="content">
                 <Route path={constants.routes.Patient_Finder} component={PatientFinder} ></Route>
+                <Route path={constants.routes.Medication_Sequence} component={MedicationSequence} ></Route>
                 <Route path={constants.routes.Introduction} component={Introduction}></Route>
                 <Route path={constants.routes.Population_Overview} component={PopulationOverview}></Route>
                 <Route path={constants.routes.Profile} component={Profile} />

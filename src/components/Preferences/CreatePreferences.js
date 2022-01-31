@@ -86,7 +86,7 @@ const CreatePreferences = () => {
                     let data = loadPreferenceForm(modalStatus.data.id);
                     setFormData({ ...data });
                     setName(data.preferenceName);
-                    setDefaultVal((defaultPreferenceId === data.id) ? true : false);
+                    setDefaultVal((defaultPreferenceId === modalStatus.data.id) ? true : false);
                     setOpen(true);
                 }
                 else {
@@ -215,6 +215,11 @@ const CreatePreferences = () => {
         dispatch(closeModal({ messageType: constants.MESSAGE_TYPES.CREATE_PREFERENCE, action: 'close' }));
     }
 
+    const Title = () => {
+        if(modalStatus.data?.id) return (<Typography align="left" variant="h6"> Edit Preference </Typography>)
+        else return (<Typography align="left" variant="h6"> Create Preference </Typography>)
+    }
+
     return (
         <Modal
             open={open}
@@ -222,7 +227,7 @@ const CreatePreferences = () => {
             closeAfterTransition>
             <Box sx={style}>
                 <div className="modal-header">
-                    <Typography align="left" variant="h6"> Create Preferences </Typography>
+                    <Title/>
                     <div className="modal-close">
                         <Button type="submit" color="inherit" onClick={handleCancel}><CloseIcon /></Button>
                     </div>
