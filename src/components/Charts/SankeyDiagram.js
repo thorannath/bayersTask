@@ -6,11 +6,15 @@ import { sankey as d3Sankey, sankeyLinkHorizontal } from "d3-sankey";
 
 
 const SankeyNode = ({ name, x0, x1, y0, y1, color }) => (
-  <rect x={x0} y={y0} width={x1 - x0} height={y1 - y0} fill={color}>
+  <g>
+    <rect
+      x={x0} y={y0} width={x1 - x0} height={y1 - y0}
+      fill={color}>
+    </rect>
     <title>{name}</title>
-    <text x={x0+10} y={y0+50} width={x1 - x0} height={y1 - y0} fill='black'>{name}</text>
-  </rect>
-  
+  </g>
+
+
 );
 
 const SankeyLink = ({ link, color }) => (
@@ -24,6 +28,7 @@ const SankeyLink = ({ link, color }) => (
     }}
   />
 );
+
 const SankeyDiagram = ({ data }) => {
 
   const wrapperRef = useRef();
@@ -47,7 +52,7 @@ const SankeyDiagram = ({ data }) => {
     .domain([0, nodes.length])
     .range([0, 1]);
 
-    console.log(nodes)
+  console.log(nodes)
 
   return (
     <div ref={wrapperRef} style={{ marginBottom: '2rem' }} align="center">
@@ -55,24 +60,24 @@ const SankeyDiagram = ({ data }) => {
 
       <svg id="svg" style={{ width: 960, height: 500 }} ref={svgRef}>
 
-      <g style={{ mixBlendMode: "multiply" }}>
-        {nodes.map((node, i) => (
-          <SankeyNode
-            {...node}
-            key={i}
-            color={color(colorScale(i))}
-            key={node.name}
-          />
-        ))}
+        <g style={{ mixBlendMode: "multiply" }}>
+          {nodes.map((node, i) => (
+            <SankeyNode
+              {...node}
+              key={i}
+              color={color(colorScale(i))}
+              key={node.name}
+            />
+          ))}
 
-        {links.map((link, i) => (
-          <SankeyLink
-            link={link}
-            key={i}
-            color={color(colorScale(link.source.index))}
-          />
-        ))}
-      </g>
+          {links.map((link, i) => (
+            <SankeyLink
+              link={link}
+              key={i}
+              color={color(colorScale(link.source.index))}
+            />
+          ))}
+        </g>
       </svg>
 
     </div>

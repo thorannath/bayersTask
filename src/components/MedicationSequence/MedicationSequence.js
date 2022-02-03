@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import SankeyDiagram from '../Charts/SankeyDiagram';
 import * as d3 from 'd3';
+import NewSankeyDiagram from '../Charts/NewSankeyDiagram';
 
 const styles = {
   container: {
@@ -39,11 +40,16 @@ const MedicationSequence = () => {
       <h2> Medication Sequence </h2>
       <div style={styles.infoBox}>
         <b>Instructions</b><br />
-        This page provides an overview of the skankey diagram. Need to add the description about the sankey diagram.</div>
+        This page provides an overview of the sankey diagram. Need to add the description about the sankey diagram.</div>
       <div>
         {
           data && <SankeyDiagram data={data} />
         } 
+      </div>
+      <div>
+        {
+          data && <NewSankeyDiagram data={data}/>
+        }
       </div>
     </div>
   );
