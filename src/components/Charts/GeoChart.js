@@ -232,7 +232,7 @@ const GeoChart = ({ data, stateData, property, viewPatients }) => {
                 <FileDownloadIcon />
                 Download
             </Button>} */}
-            <svg id="svg" ref={svgRef}>
+            <svg id="geoAlberMap" ref={svgRef}>
             </svg>
             <div className="map-tooltip"></div>
         </div>

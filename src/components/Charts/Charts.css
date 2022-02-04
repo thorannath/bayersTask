@@ -34,36 +34,36 @@
 }
 
 
-#svg{
+#geoAlberMap{
     padding: 10px;
     margin: 10px auto;
     text-align: center;
     background-color: rgb(64, 198, 255);
     width: 960px;
     height: 500px; 
-}#svg>*{transform: scale(0.80);}
+}#geoAlberMap>*{transform: scale(0.80);}
 
 @media only screen and (max-width: 1024px){
-    #svg>*{transform: scale(0.75);}
+    #geoAlberMap>*{transform: scale(0.75);}
     .graph-container{transform: scale(1);}
 }@media only screen and (max-width: 924px){
-    #svg>*{transform: scale(0.6);}
-    #svg{
+    #geoAlberMap>*{transform: scale(0.6);}
+    #geoAlberMap{
         height: 350px;
     }
 }@media only screen and (max-width: 820px){
-    #svg>*{transform: scale(0.5);}
-    #svg{
+    #geoAlberMap>*{transform: scale(0.5);}
+    #geoAlberMap{
         height: 300px;
     }
 }@media only screen and (max-width: 760px){
-    #svg>*{transform: scale(0.4);}
-    #svg{
+    #geoAlberMap>*{transform: scale(0.4);}
+    #geoAlberMap{
         height: 250px;
     }
 }@media only screen and (max-width: 580px){
-    #svg>*{transform: scale(0.3);}
-    #svg{
+    #geoAlberMap>*{transform: scale(0.3);}
+    #geoAlberMap{
         height: 200px;
         padding-left: 30px;
     }
