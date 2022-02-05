@@ -1,0 +1,28 @@
+version: 2.1
+jobs:
+  build_project:
+    working_directory: ~/bayer-njit
+    docker:
+      - image: node:10.15.3
+    steps:
+      - checkout
+      - run:
+          name: Installing dependencies
+          command: npm install
+      - run:
+          name: Building project
+          command: npm build
+      - persist_to_workspace:
+          root: .
+          paths:
+            - .
+  deploy_project:
+    executor: aws-cli/default
+    steps:
+      - attach_workspace:
+          at: .
+      - aws-cli/setup:
+          profile-name: default
+      - run:
+          name: Upload file to S3
+          command: aws s3 sync ./dist/ s3://bayer-njit --delete

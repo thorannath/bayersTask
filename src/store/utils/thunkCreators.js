@@ -20,7 +20,6 @@ export const login = ({ username, password }) => async (dispatch) => {
         }
         else {
             throw new Error(response.data.message);
-            
         }
     } catch (error) {
         dispatch(setError({ type: LOGIN_FAILED, message:"Incorrect username or password!"}))
@@ -120,7 +119,6 @@ export const getPreferences = () => async (dispatch) => {
             authToken: Cookies.get('authToken', { path: '/' }),
         }
         const { data } = await axios.get(baseURL + "/users/preferences", { params });
-        console.log({ preferences: data.data.preferenceList, defaultPreferenceId: data.data.defaultPreferenceId?data.data.defaultPreferenceId:1 });
         if (data.success) {
             dispatch(loadPreferences({ preferences: data.data.preferenceList, defaultPreferenceId: data.data.defaultPreferenceId?data.data.defaultPreferenceId:1 }));
         }
