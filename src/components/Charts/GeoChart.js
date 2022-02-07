@@ -165,7 +165,7 @@ const GeoChart = ({ data, stateData, property, viewPatients }) => {
         // Data and color scale
         var colorScale = d3.scaleThreshold()
             .domain([100000, 1000000, 10000000, 30000000, 100000000, 500000000])
-            .range(d3.schemeBlues[7]);
+            .range(d3.schemeGreens[7]);
 
 
         // create a tooltip
@@ -223,7 +223,7 @@ const GeoChart = ({ data, stateData, property, viewPatients }) => {
     }, [data, property, stateData])
 
     return (
-        <div ref={wrapperRef} style={{ marginBottom: '2rem' }}>
+        <div ref={wrapperRef} style={{ display: 'flex', marginBottom: '2rem' }}>
             {/* {Object.keys(stateData).length != 0 && <Button id='geochart-download'
                 onClick={downloadGraph}
                 className="download-icon"
@@ -232,7 +232,7 @@ const GeoChart = ({ data, stateData, property, viewPatients }) => {
                 <FileDownloadIcon />
                 Download
             </Button>} */}
-            <svg id="svg" style={{ width: 960, height: 500 }} ref={svgRef}>
+            <svg id="geoAlberMap" ref={svgRef}>
             </svg>
             <div className="map-tooltip"></div>
         </div>

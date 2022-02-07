@@ -13,6 +13,7 @@
     padding: 10px;
     background-color: white;
     position: relative;
+    transform: scale(0.9);
 }
 
 .download-icon{
@@ -28,7 +29,42 @@
     fill: none;
     stroke: #000;
     stroke-opacity: .2;
-  }
-  .link:hover {
+}.link:hover {
     stroke-opacity: .5;
-  }
+}
+
+
+#geoAlberMap{
+    padding: 10px;
+    margin: 10px auto;
+    text-align: center;
+    background-color: rgb(64, 198, 255);
+    width: 960px;
+    height: 500px; 
+}#geoAlberMap>*{transform: scale(0.80);}
+
+@media only screen and (max-width: 1024px){
+    #geoAlberMap>*{transform: scale(0.75);}
+    .graph-container{transform: scale(1);}
+}@media only screen and (max-width: 924px){
+    #geoAlberMap>*{transform: scale(0.6);}
+    #geoAlberMap{
+        height: 350px;
+    }
+}@media only screen and (max-width: 820px){
+    #geoAlberMap>*{transform: scale(0.5);}
+    #geoAlberMap{
+        height: 300px;
+    }
+}@media only screen and (max-width: 760px){
+    #geoAlberMap>*{transform: scale(0.4);}
+    #geoAlberMap{
+        height: 250px;
+    }
+}@media only screen and (max-width: 580px){
+    #geoAlberMap>*{transform: scale(0.3);}
+    #geoAlberMap{
+        height: 200px;
+        padding-left: 30px;
+    }
+}
