@@ -3,7 +3,7 @@ name: Github Actions automate deployment
 on:
  push:
    branches:
-     - development
+     - master
 
 jobs:
  Deploy:
