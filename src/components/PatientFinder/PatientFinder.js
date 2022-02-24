@@ -54,7 +54,7 @@ const PatientFinder = () => {
     useEffect(() => {
         dispatch(fetchLabels())
         dispatch(getPreferences());
-    }, []) 
+    }, [])
 
     useEffect(() => {
         fetchGraphData();
@@ -67,14 +67,14 @@ const PatientFinder = () => {
                 if (obj) setFormData({ ...obj });
             }
         }
-    },[modalStatus]);
+    }, [modalStatus]);
 
-    useEffect(()=> {
-        if(preferences.defaultPreferenceId) handlePreferenceChange(preferences.defaultPreferenceId);
-        else if(preferences.preferences?.length>0){
+    useEffect(() => {
+        if (preferences.defaultPreferenceId) handlePreferenceChange(preferences.defaultPreferenceId);
+        else if (preferences.preferences?.length > 0) {
             handlePreferenceChange(preferences.preferences[0].id);
         }
-    },[])
+    }, [])
 
     const [formData, setFormData] = useState({ ...initialData });
 
@@ -116,10 +116,10 @@ const PatientFinder = () => {
      * 3. US states chart
      */
     const fetchGraphData = () => {
-        eventBus.dispatch("updateChartNotice", {status:false});
-        
-        const request = requestObject();
+        eventBus.dispatch("updateChartNotice", { status: false });
 
+        const request = requestObject();
+        console.log(request)
         if (!request) return;
         dispatch(setLoadingStatus(true));
         setTimeout(async () => {
@@ -161,6 +161,7 @@ const PatientFinder = () => {
         try {
             let url = constants.BACKEND_URL + '/patientfinder/medicals';
             const medicalResponse = (await axios.post(url, request)).data;
+            console.log(medicalResponse)
             const res = medicalResponse.data;
             res.medical_conditions.labels.shift();
             res.medical_conditions.data = res.medical_conditions.data.map((e, i) => {
@@ -168,10 +169,10 @@ const PatientFinder = () => {
                 const result = e.data.map((ele, i) => (ele / ALL_DATA * 100));
                 return { type: e.type, data: result };
             });
-            
-            
+
+
             const medicalChart = createChartData(res.medical_conditions)
-            
+
             setMedicalChartData({ ...medicalChart });
         }
         catch (error) {
@@ -192,15 +193,15 @@ const PatientFinder = () => {
             eventBus.dispatch("statesGraphError", { message: "Unable to retrive the States map data" });
         }
     }
-    
+
     const getPatientData = async (selectedState) => {
         try {
             const request = requestObject();
 
             let url = constants.BACKEND_URL + '/patientfinder/patients/details';
-            const patientData = (await axios.post(url, {...request, selectedState: selectedState}));
+            const patientData = (await axios.post(url, { ...request, selectedState: selectedState }));
             setPatientData(patientData.data.data);
-            
+
         }
         catch (error) {
             eventBus.dispatch("patientDataError", { message: "Unable to retrive the Patient details from all states in map data" });
@@ -244,7 +245,7 @@ const PatientFinder = () => {
                     group_by: formData.groupBy,
                     selection: Object.keys(groupKeys).filter((e, i) => { return groupKeys[e] })
                 },
-                states: formData.states ? formData.states.map(data=> data.value): null,
+                states: formData.states ? formData.states.map(data => data.value) : null,
                 treatments: {
                     labels: treatmentLabels,
                     OR: formData.treatmentsOR ? formData.treatmentsOR.map(data => data.value) : null,
@@ -283,8 +284,8 @@ const PatientFinder = () => {
         debouncedCallNotice();
     }
 
-    const [debouncedCallNotice] = useState(() => debounce(()=> {
-        eventBus.dispatch("updateChartNotice", {status: true});
+    const [debouncedCallNotice] = useState(() => debounce(() => {
+        eventBus.dispatch("updateChartNotice", { status: true });
     }, 2000));
 
     const onChangeGraphData = (data) => {
@@ -298,7 +299,7 @@ const PatientFinder = () => {
             <div style={styles.infoBox}>
                 This figure displays the prevalence of specific medical conditions among the target patients. Please hover your cursor above the figure to view numeric values of results in the corresponding pop-up window. In the legend, click to select or unselect specific subgroups from display. Below the figure, select or unselect specific medical conditions to customize the display. Display groups can be presented by cohort (default) or by payor type.
             </div>
-            <Graph chartData={treatmentsChartData} name="treatment"/>
+            <Graph chartData={treatmentsChartData} name="treatment" />
         </div>
     );
 
@@ -308,7 +309,7 @@ const PatientFinder = () => {
             <div style={styles.infoBox}>
                 This figure displays the prevalence of specific medication use among the target patients. Please hover your cursor above the figure to view numeric values of results in the corresponding pop-up window. In the legend, click to select or unselect specific subgroups from display. Below the figure, select or unselect specific medication classes to customize the display. Display groups can be presented by cohort (default) or by payor type.
             </div>
-            <Graph chartData={medicalChartData} name="medication"/>
+            <Graph chartData={medicalChartData} name="medication" />
         </div>
     );
 
@@ -352,13 +353,13 @@ const PatientFinder = () => {
                         The presented geographical analysis displays the proportion of target patients among adult members in the Optum administrative claims dataset. You can hover your cursor above a specific state to view numeric values in the corresponding pop-up window.
                         Please note that patients in Puerto Rico or Unknown geographical regions are not displayed in this figure.
                     </div>
-                    <GeoChart data={geodata} stateData={stateData} viewPatients={viewPatients}/>
+                    <GeoChart data={geodata} stateData={stateData} viewPatients={viewPatients} />
                 </div>
 
-                <Patients data={patientData}/>
+                <Patients data={patientData} />
 
                 {/** Update chart notice */}
-                <UpdateChartNotice/>
+                <UpdateChartNotice />
             </div>
         </div>
     )

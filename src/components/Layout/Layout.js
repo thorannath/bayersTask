@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react'
 import { Route } from "react-router-dom";
 import PatientFinder from '../PatientFinder/PatientFinder';
+import NewPatientFinder from'../NewPatientFinder/NewPatientFinder';
 import Header from '../Header/Header';
 import Introduction from '../Introduction/Introduction';
 import './Layout.css';
@@ -34,6 +35,7 @@ const Layout = () => {
                 <Route path={constants.routes.Medication_Sequence} component={MedicationSequence} ></Route>
                 <Route path={constants.routes.Introduction} component={Introduction}></Route>
                 <Route path={constants.routes.Population_Overview} component={PopulationOverview}></Route>
+                <Route path={constants.routes.New_Patient_Finder} component={NewPatientFinder}></Route>
                 <Route path={constants.routes.Profile} component={Profile} />
             </div>
 

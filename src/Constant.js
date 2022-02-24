@@ -47,6 +47,7 @@ export const routes = {
     Introduction: '/app/introduction',
     Dashboard: '/app/dashboard',
     Patient_Finder: '/app/patient-finder',
+    New_Patient_Finder:'/app/NewPatientFinder',
     Medication_Sequence: '/app/medication-sequence',
     Population_Overview:'/app/population-overview',
     Home:'/app/home',

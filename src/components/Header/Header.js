@@ -142,6 +142,18 @@ const Header = () => {
                             </ListItemText>
                         </MenuItem>
                     </Link>
+
+{/* new finder added here  */}
+                    <Link className="list-link" to={constants.routes.New_Patient_Finder}>
+                        <MenuItem className={isActive(constants.routes.New_Patient_Finder)}>
+                            <ListItemText disableTypography className='list-item-text'>
+                                New Patient Finder
+                            </ListItemText>
+                        </MenuItem>
+                    </Link>
+
+
+
                     <Link className="list-link" to={constants.routes.Population_Overview}>
                         <MenuItem className={isActive(constants.routes.Population_Overview)}>
                             <ListItemText disableTypography className='list-item-text'>
@@ -156,6 +168,9 @@ const Header = () => {
                             </ListItemText>
                         </MenuItem>
                     </Link>
+
+
+                    
                 </MenuList>
             </nav>
         </div>
