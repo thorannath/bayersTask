@@ -3,8 +3,6 @@
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ![Screenshot](data1.png)
-![Screenshot](data2.png)
-![Screenshot](data3.png)
 
 ## Available Scripts
 
